@@ -26,7 +26,7 @@ Buka `2-react-spa/index.html` di panel File — inilah yang dikirim server ke br
 </body>
 ```
 
-**Isinya kosong.** Lalu di mana konten "Tentang Kami"-nya? Buka **`2-react-spa/main.jsx`** — di situlah dia berada, di dalam JavaScript. JavaScript inilah yang nanti "menggambar" halaman di browser kamu.
+**Isinya kosong.** Lalu di mana konten "Tentang Kami"-nya? Buka **`2-react-spa/main.jsx`** — di situlah dia berada, di dalam JavaScript. JavaScript inilah yang nanti menulis isi halaman di browser kamu.
 
 ## Kenapa ada dua file: `main.jsx` dan `main.js`?
 
@@ -52,7 +52,7 @@ Nanti kalau kamu membaca artikel React, kamu akan sering menemukan istilah **Vir
 
 ## Masalahnya: Google tidak bisa membaca
 
-Ingat di lesson sebelumnya — Google membaca file HTML yang dikirim server. Di sini, file itu isinya `<div>` kosong, dan Google tidak menunggu JavaScript menggambar isinya. Untuk blog, toko online, atau halaman promosi — ini fatal: kontenmu tidak tercatat di Google.
+Ingat di lesson sebelumnya — Google membaca file HTML yang dikirim server. Di sini, file itu isinya `<div>` kosong, dan Google tidak menunggu JavaScript menampilkan isinya. Untuk blog, toko online, atau halaman promosi — ini fatal: kontenmu tidak tercatat di Google.
 
 ## Ringkasan
 

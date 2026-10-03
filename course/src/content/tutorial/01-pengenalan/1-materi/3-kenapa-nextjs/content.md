@@ -9,7 +9,7 @@ focus: /3-nextjs/app/page.tsx
 
 # Kenapa Next.js?
 
-Dari dua lesson tadi:
+Dari dua lesson sebelumnya:
 
 | | Kelebihan | Masalah |
 |---|---|---|
@@ -17,12 +17,14 @@ Dari dua lesson tadi:
 | React SPA (CSR) | Pindah halaman mulus seperti aplikasi | HTML awal kosong → Google tidak melihat isinya |
 
 :::info{title="Istilah: MPA"}
-Cara HTML biasa ini sering disebut **MPA (Multi-Page Application)** — "aplikasi banyak halaman" — karena setiap halaman adalah file `.html` tersendiri. Dia kebalikan dari SPA yang hanya punya satu halaman.
+ **MPA (Multi-Page Application)** — "aplikasi dengan banyak halaman" — karena setiap halaman adalah file `.html` tersendiri. MPA adalah kebalikan dari SPA yang hanya punya satu halaman.
 :::
 
-**Next.js = React + SSR (Server-Side Rendering)** — mengambil kelebihan keduanya, membuang kekurangannya.
+**Next.js = React + SSR (Server-Side Rendering)** — mengambil kelebihan keduanya: pindah halaman mulus seperti SPA, tapi isinya tetap bisa dibaca Google seperti HTML biasa.
 
-## Kodenya sama, tempat jalannya beda
+## Kode React-nya sama — bedanya dijalankan di server
+
+Komponen `Nav`, `Beranda`, `Tentang`, `Footer` yang kamu tulis di `main.jsx` kemarin dipakai juga di Next.js — kodenya tidak berubah. Yang berubah: React-nya dijalankan **di server**, sebelum hasilnya dikirim ke browser.
 
 Lihat struktur `3-nextjs/` di panel File — ini bentuk project Next.js sungguhan:
 
@@ -34,13 +36,15 @@ Lihat struktur `3-nextjs/` di panel File — ini bentuk project Next.js sungguha
 └── dashboard/page.tsx   ← halaman /dashboard
 ```
 
-Buka `app/tentang/page.tsx` — isinya **hanya konten halaman**, sama persis dengan komponen `Tentang` di `main.jsx` kemarin. Ke mana perginya `<nav>` dan `<footer>`? Mereka tinggal di **`app/layout.tsx`** — ditulis **sekali** dan otomatis membungkus semua halaman. Ingat masalah kode diulang di lesson 1? Di Next.js itulah jawabannya.
+Buka `app/tentang/page.tsx` — isinya **hanya konten halaman**, sama persis dengan komponen `Tentang` di `main.jsx` kemarin.
 
-Dan folder `tentang/` itu sendiri menentukan alamatnya — `app/tentang/page.tsx` menjadi halaman `/tentang`. Itulah routing di Next.js.
+Lalu ke mana `<nav>` dan `<footer>`? Buka **`app/layout.tsx`** — keduanya ada di sana, ditulis **sekali**. File ini otomatis membungkus semua halaman: `{children}` di dalamnya adalah tempat isi halaman ditampilkan. Ingat masalah kode yang ditulis berulang di lesson 1? Di sinilah Next.js menjawabnya.
 
-Di `layout.tsx` ada juga baris `const waktu` — jam dihitung di server **setiap ada request ke halaman mana pun**, persis seperti `{{WAKTU}}` di lesson 1. Bedanya: di sini yang di-render bukan satu placeholder teks, melainkan **seluruh komponen React**.
+Folder `tentang/` juga bukan sekadar folder — namanya menentukan alamat halaman. `app/tentang/page.tsx` otomatis menjadi halaman di `/tentang`. Itulah cara kerja routing di Next.js.
 
-## SSR — server yang menggambar
+Terakhir, perhatikan baris `const waktu` di `layout.tsx` — jamnya dihitung di server setiap ada request, persis seperti `{{WAKTU}}` di lesson 1. Bedanya: di sini yang dirender bukan satu placeholder teks, melainkan **seluruh komponen React**.
+
+## SSR — server yang membuat halaman
 
 ![Alur SSR](/diagrams/ssr.svg)
 
@@ -52,25 +56,51 @@ Bagian "React dipasang diam-diam" itu namanya **hydration** — HTML statis "dih
 
 ## SEO — artinya "mudah ditemukan di Google"
 
-Dari tadi kita bilang "Google bisa membaca". Istilah resminya: **SEO (Search Engine Optimization)** — usaha membuat halamanmu mudah ditemukan orang yang mencari di Google.
+Dari tadi kita bilang "Google bisa membaca". Istilah resminya: **SEO (Search Engine Optimization)** — usaha mengoptimasi website supaya halamannya muncul tinggi di hasil pencarian Google.
 
 Penting atau tidaknya SEO tergantung jenis halamanmu:
 
 - **Perlu SEO** → blog, toko online, portal berita, landing page. Halaman publik yang harus ditemukan orang yang belum tahu alamatmu.
 - **Tidak perlu SEO** → dashboard internal, panel admin, aplikasi setelah login. Penggunanya sudah tahu alamatnya dan sudah masuk — tidak ada yang mencarinya di Google.
 
+## SEO di Next.js — tinggal isi `metadata`
+
+Hal paling dasar untuk SEO adalah memberi tahu Google **judul dan deskripsi** halamanmu. Di Next.js cukup satu objek `metadata`:
+
+```tsx
+// app/layout.tsx — berlaku untuk semua halaman
+export const metadata = {
+  title: "Toko Roti Kecil — Roti Segar Setiap Pagi",
+  description: "Toko roti di Bandung. Semua roti dibuat segar setiap pagi.",
+};
+```
+
+Keduanya inilah yang tampil saat halamanmu muncul di Google: `title` menjadi **judul hasil pencarian** (teks yang diklik orang untuk masuk ke halamanmu), `description` menjadi **ringkasan** di bawah judul itu. Karena halaman dirender di server, metadata ini ikut dalam HTML pertama — langsung terbaca Google. Setiap `page.tsx` juga bisa menulis `metadata`-nya sendiri, jadi tiap halaman bisa punya judul dan deskripsi berbeda.
+
+:::warning{title="SSR bukan jaminan langsung masuk Google"}
+SSR hanya membantu satu hal: isi halamanmu jadi bisa dibaca Google. Tapi supaya halamanmu benar-benar muncul di pencarian, Google harus tahu dulu bahwa situsmu ada. Bagaimana Google bisa tahu? Begitu ada satu link ke situsmu di mana pun di internet — di website orang lain, media sosial, atau forum — Google mengikuti link itu dan sampailah dia ke situsmu. Jadi mendaftarkan situs sebenarnya tidak wajib. Meski begitu, daftar ke **Google Search Console** sangat dianjurkan: halaman baru ditemukan lebih cepat, kamu bisa mengirim sitemap, dan dapat laporan kata kunci serta error.
+
+Dan ingat — bisa dibaca bukan berarti langsung di peringkat atas. Urutan hasil pencarian ditentukan hal-hal lain: tulisanmu bagus dan unik atau tidak, banyak yang berkunjung atau tidak, ada website lain yang merekomendasikan situsmu atau tidak, dan seberapa ramai pesaing di kata kunci yang kamu bidik. Teknologi cuma membuka pintu — sisanya tetap kerja di konten dan promosi.
+:::
+
 ## Kapan CSR, kapan SSR?
 
-Aturan praktisnya sederhana:
+Aturan praktisnya sederhana: **lihat siapa yang harus bisa membaca halamanmu.**
 
-- **SSR** untuk halaman yang isinya harus dibaca Google dan tampil seketika — halaman produk, artikel, profil toko.
-- **CSR** untuk halaman yang sangat interaktif dan tidak perlu dicari — dashboard penuh grafik, editor teks, keranjang belanja.
+- **Pilih SSR** untuk halaman yang harus mudah ditemukan lewat pencarian Google — isinya harus terbaca sejak HTML pertama diterima:
+  - halaman produk dan kategori di toko online (e-commerce)
+  - artikel blog, portal berita, halaman dokumentasi
+  - landing page, halaman promo, profil bisnis
+- **Pilih CSR** untuk halaman yang sangat interaktif dan tidak perlu dicari lewat Google — penggunanya datang langsung, biasanya sudah login:
+  - dashboard admin, panel penjualan, grafik analitik
+  - editor teks, kanvas gambar, aplikasi chat
+  - keranjang belanja dan halaman checkout
 
 ## Next.js bisa dua-duanya — lihat buktinya di kode
 
 Dalam satu project Next.js, kamu memutuskan **per halaman** mana yang dirender di mana:
 
-- `app/page.tsx` dan `app/tentang/page.tsx` — komponen biasa → **di-render di server**: konten langsung tampil dan bisa dibaca Google.
+- `app/page.tsx` dan `app/tentang/page.tsx` — komponen biasa → **dirender di server**: konten langsung tampil dan bisa dibaca Google.
 - `app/dashboard/page.tsx` — diawali `'use client'` di baris pertama → **React-nya berjalan di browser**: untuk halaman yang sangat interaktif.
 
 Buka `3-nextjs/app/dashboard/page.tsx` — dashboard penjualan dengan tombol yang menambah angka. Interaksi seperti ini harus hidup di browser, jadi ditandai `'use client'` — **inilah CSR di dalam Next.js**:
@@ -91,10 +121,10 @@ Sebagai perbandingan, ini alur CSR (yang kamu lihat di lesson sebelumnya):
 
 | | CSR (React SPA) | SSR (Next.js) |
 |---|---|---|
-| Yang menggambar halaman | Browser pengunjung | Server |
+| Yang membuat HTML halaman | Browser pengunjung | Server |
 | Pertama kali terlihat | Menunggu JS di-download + jalan | Langsung (HTML sudah jadi) |
 | Yang dilihat Google | `<div>` kosong | Konten lengkap |
-| Beban kerja | Di device pengunjung (lemot kalau HP-nya tidak kencang) | Di server (kamu yang kendalikan) |
+| Beban kerja | Di perangkat pengunjung (lemot kalau HP-nya tidak kencang) | Di server (kamu yang kendalikan) |
 | Koneksi lambat | Makin parah — JS belum selesai di-download | HTML kecil, tetap cepat |
 
 ## Jadi, kenapa Next.js?
@@ -108,7 +138,7 @@ Sebagai perbandingan, ini alur CSR (yang kamu lihat di lesson sebelumnya):
 
 | | HTML biasa (MPA) | React SPA (CSR) | Next.js (SSR) |
 |---|---|---|---|
-| Halaman digambar di mana | Server (file statis) | Browser kamu | Server, lalu "dihidupkan" di browser |
+| Halaman dibuat di mana | Server (file statis) | Browser kamu | Server, lalu "dihidupkan" di browser |
 | Pertama dibuka | Langsung terlihat | Kosong, menunggu JS | Langsung terlihat |
 | Pindah halaman | Reload total | Mulus | Mulus |
 | Muncul di Google | Mudah | Sulit | Mudah |
@@ -116,4 +146,4 @@ Sebagai perbandingan, ini alur CSR (yang kamu lihat di lesson sebelumnya):
 
 ---
 
-Sekarang kita **buktikan sendiri** semua klaim ini — pakai React SPA dan Next.js yang berjalan sungguhan. 👉
+Sekarang kita lihat langsung project **Next.js** sungguhan — bagaimana routing, layout, dan halaman diatur lewat struktur foldernya. 👉

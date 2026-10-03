@@ -19,7 +19,7 @@ Buka `1-html-biasa/tentang.html` di panel File. File inilah yang dikirim server 
 Di preview sebelah, klik **"Tentang"** pada menu navigasi — lalu perhatikan **angka waktu di bagian bawah halaman**. Klik kembali **"Beranda"** dan perhatikan angkanya lagi.
 :::
 
-Angkanya berubah, kan? Padahal halamannya terlihat mirip-mirip saja. Perubahan kecil itu adalah bukti bahwa baru saja terjadi **reload total** — browser membuang seluruh halaman lama, meminta file baru ke server, lalu menggambar ulang semuanya dari awal.
+Angkanya berubah, kan? Padahal halamannya terlihat mirip-mirip saja. Perubahan kecil itu adalah bukti bahwa baru saja terjadi **reload total** — browser membuang seluruh halaman lama, meminta file baru ke server, lalu membangun ulang semuanya dari awal.
 
 ![Alur reload total](/diagrams/reload-total.svg)
 
@@ -43,11 +43,11 @@ Sekarang bandingkan `index.html` dengan `tentang.html` di editor.
 
 ## Ringkasan
 
-Satu hal yang perlu kamu tahu dulu: supaya halamanmu bisa muncul di hasil pencarian, **Google harus bisa membaca isinya**. Yang dibaca Google adalah file HTML yang dikirim server — persis seperti yang diterima browser. Kalau file itu berisi tulisan, Google membacanya. Kalau isinya hanya `<div>` kosong ditambah script, Google melihat... kosong. Google tidak menunggu JavaScript menulis/menggambar isi halamanmu.
+Satu hal yang perlu kamu tahu dulu: supaya halamanmu bisa muncul di hasil pencarian, **Google harus bisa membaca isinya**. Yang dibaca Google adalah file HTML yang dikirim server — persis seperti yang diterima browser. Kalau file itu berisi tulisan, Google membacanya. Kalau isinya hanya `<div>` kosong ditambah script, Google melihat... kosong. Google tidak menunggu JavaScript menampilkan isi halamanmu.
 
 - ✅ **Mudah muncul di Google** — semua isi halaman tertulis langsung di file HTML, jadi Google bisa membacanya dengan mudah
 - ✅ Halaman langsung tampil tanpa menunggu apa pun
-- ❌ Setiap pindah halaman = reload total — halaman digambar ulang dari nol (terasa sebagai "kedip" kalau websitenya berat)
+- ❌ Setiap pindah halaman = reload total — halaman dibangun ulang dari nol (terasa sebagai "kedip" kalau websitenya berat)
 - ❌ Kode yang sama harus ditulis ulang di setiap halaman (menu, footer, dan lain-lain)
 - ❌ Ingin membuat fitur interaktif (dropdown, pencarian langsung)? Semuanya harus ditulis manual — memakan waktu dan mudah berantakan
 

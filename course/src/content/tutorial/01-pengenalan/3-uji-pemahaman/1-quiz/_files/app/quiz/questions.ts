@@ -31,7 +31,7 @@ export const questions: Question[] = [
       "SPA = satu HTML di awal, selebihnya JavaScript mengganti isi halaman tanpa reload. Contoh: Gmail, Twitter/X.",
   },
   {
-    soal: "CSR (Client-Side Rendering) artinya halaman digambar...",
+    soal: "CSR (Client-Side Rendering) artinya halaman ditampilkan...",
     opsi: [
       "Di server, lalu dikirim ke browser",
       "Di database",
@@ -40,7 +40,7 @@ export const questions: Question[] = [
     ],
     jawaban: 2,
     pembahasan:
-      "Client = browser kamu. React SPA bekerja dengan CSR: server kirim wadah kosong, JS yang menggambar isi halaman.",
+      "Client = browser kamu. React SPA bekerja dengan CSR: server kirim wadah kosong, JS yang menampilkan isi halaman.",
   },
   {
     soal: "Kenapa React SPA (CSR) bermasalah untuk SEO?",
@@ -58,7 +58,7 @@ export const questions: Question[] = [
     soal: "Apa beda utama SSR dengan CSR?",
     opsi: [
       "SSR pakai database, CSR tidak",
-      "SSR menggambar HTML di server sehingga browser menerima halaman yang sudah jadi",
+      "SSR membuat HTML di server sehingga browser menerima halaman yang sudah jadi",
       "SSR tidak bisa interaktif sama sekali",
       "SSR hanya untuk halaman login",
     ],
