@@ -1,0 +1,12 @@
+{
+  "name": "lesson-bacaan",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "node server.js",
+    "start": "node server.js"
+  },
+  "stackblitz": {
+    "startCommand": "node server.js"
+  }
+}

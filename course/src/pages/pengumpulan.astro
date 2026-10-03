@@ -1,0 +1,119 @@
+---
+// Halaman pengumpulan tugas — komentar peserta tersimpan di GitHub
+// Discussions via Giscus (tanpa backend sendiri).
+//
+// SETUP SEKALI (oleh mentor):
+// 1. Push repo course ke GitHub (public)
+// 2. Aktifkan Discussions di Settings repo
+// 3. Install app Giscus: https://github.com/apps/giscus
+// 4. Buka https://giscus.app, isi repo → dapatkan data-repo-id &
+//    data-category-id → ganti placeholder di bawah.
+const GISCUS_REPO = "USERNAME/REPO"; // TODO: ganti, misal "giri/nextjs-track"
+const GISCUS_REPO_ID = "GANTI_REPO_ID"; // dari giscus.app
+const GISCUS_CATEGORY = "Tugas"; // atau "General" / "Announcements"
+const GISCUS_CATEGORY_ID = "GANTI_CATEGORY_ID"; // dari giscus.app
+---
+
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Pengumpulan Tugas — Next.js Track</title>
+    <style>
+      body {
+        font-family:
+          system-ui,
+          -apple-system,
+          "Segoe UI",
+          sans-serif;
+        max-width: 42rem;
+        margin: 0 auto;
+        padding: 3rem 1.25rem;
+        line-height: 1.7;
+        color: #1e293b;
+        background: #f8fafc;
+      }
+      h1 {
+        font-size: 1.75rem;
+        margin-bottom: 0.5rem;
+      }
+      a {
+        color: #4f46e5;
+      }
+      ol {
+        padding-left: 1.25rem;
+      }
+      ol li {
+        margin-bottom: 0.6rem;
+      }
+      .badge {
+        display: inline-block;
+        background: #eef2ff;
+        color: #4f46e5;
+        font-size: 0.8rem;
+        font-weight: 600;
+        padding: 0.2rem 0.7rem;
+        border-radius: 999px;
+        margin-bottom: 0.75rem;
+      }
+      .card {
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        border-radius: 0.9rem;
+        padding: 1.4rem 1.6rem;
+        margin: 1.5rem 0;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      }
+      .card p:last-child {
+        margin-bottom: 0;
+      }
+      .note {
+        font-size: 0.85rem;
+        color: #64748b;
+      }
+    </style>
+  </head>
+  <body>
+    <span class="badge">Pertemuan 01</span>
+    <h1>Pengumpulan Tugas</h1>
+
+    <p>Kumpulkan tugasmu dengan mengomentari thread di bawah ini:</p>
+
+    <div class="card">
+      <ol>
+        <li>Push project tugasmu ke repo GitHub (public) — atau simpan di StackBlitz.</li>
+        <li>
+          Tulis komentar: <strong>nama + link repo/StackBlitz</strong>.
+        </li>
+        <li>
+          Mentor cek submisi di thread yang sama — semua komentar tersimpan di GitHub
+          Discussions repo kursus.
+        </li>
+      </ol>
+      <p class="note">Butuh akun GitHub untuk berkomentar (gratis).</p>
+    </div>
+
+    <!-- Giscus: satu thread Discussions per term "tugas-01".
+         Ganti data-term per pertemuan (tugas-02, dst.) atau buat halaman terpisah. -->
+    <script
+      src="https://giscus.app/client.js"
+      data-repo={GISCUS_REPO}
+      data-repo-id={GISCUS_REPO_ID}
+      data-category={GISCUS_CATEGORY}
+      data-category-id={GISCUS_CATEGORY_ID}
+      data-mapping="specific"
+      data-term="tugas-01"
+      data-strict="0"
+      data-reactions-enabled="1"
+      data-emit-metadata="0"
+      data-input-position="top"
+      data-theme="light"
+      data-lang="id"
+      data-loading="lazy"
+      crossorigin="anonymous"
+      is:inline
+      async></script>
+
+    <p class="note"><a href="/">← Kembali ke materi</a></p>
+  </body>
+</html>

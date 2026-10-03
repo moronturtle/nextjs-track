@@ -1,0 +1,209 @@
+/* Tema kustom Next.js Track — file ini otomatis dimuat TutorialKit. */
+
+/* ---------- Font: Plus Jakarta Sans ---------- */
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  src: url('/fonts/PlusJakartaSans.ttf') format('truetype');
+  font-weight: 100 900;
+  font-display: swap;
+}
+
+body {
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+}
+
+/* ---------- Warna aksen: indigo ---------- */
+:root,
+:root[data-theme='light'] {
+  --tk-background-accent: #4f46e5;
+  --tk-background-accent-secondary: #4f46e5;
+  --tk-background-accent-active: #4338ca;
+  --tk-text-accent: #4f46e5;
+  --tk-border-accent: #4f46e5;
+}
+
+:root[data-theme='dark'] {
+  --tk-background-accent: #6366f1;
+  --tk-background-accent-secondary: #818cf8;
+  --tk-background-accent-active: #818cf8;
+  --tk-text-accent: #a5b4fc;
+  --tk-border-accent: #6366f1;
+}
+
+/* ---------- Panel materi: lebih compact ---------- */
+.markdown-content {
+  --content-font-size: 15.5px;
+  --content-line-height: 28px;
+}
+
+/* Paragraf lebih lega */
+.markdown-content p {
+  margin: 0.9em 0;
+}
+.markdown-content ul,
+.markdown-content ol {
+  margin: 0.9em 0;
+}
+
+.markdown-content h1 {
+  font-size: 26px;
+}
+.markdown-content h2 {
+  font-size: 20px;
+}
+.markdown-content h3 {
+  font-size: 17px;
+}
+.markdown-content h4 {
+  font-size: 15.5px;
+}
+
+/* ---------- Inline code: chip indigo lembut ---------- */
+.markdown-content :not(pre) > code {
+  --code-background-color: #eef2ff;
+  --code-color: #4338ca;
+  --code-border-color: #e0e7ff;
+  --code-border-radius: 6px;
+  --code-box-shadow: none;
+}
+
+:root[data-theme='dark'] .markdown-content :not(pre) > code {
+  --code-background-color: #312e8133;
+  --code-color: #a5b4fc;
+  --code-border-color: #4338ca55;
+  --code-box-shadow: none;
+}
+
+/* ---------- Blockquote: aksen bar di kiri ---------- */
+.markdown-content blockquote {
+  --blockquote-border-color: #4f46e5;
+  border-left-width: 3px;
+  border-radius: 0 8px 8px 0;
+}
+
+/* ---------- Tabel: rounded + header tint ---------- */
+.markdown-content table {
+  border-radius: 8px;
+  overflow: hidden;
+}
+.markdown-content thead {
+  --table-header-background: #eef2ff;
+}
+:root[data-theme='dark'] .markdown-content thead {
+  --table-header-background: #1e1b4b;
+}
+
+/* ---------- Kartu navigasi Prev/Next ---------- */
+.content-nav-card {
+  border-radius: 12px;
+  transition: all 0.2s ease;
+  min-height: 64px;
+}
+
+/* Rapiin isi kartu: ikon & judul sebaris, sejajar tengah */
+.content-nav-card {
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+}
+.content-nav-card .icon {
+  margin-bottom: 0;
+  flex-shrink: 0;
+}
+
+/* Kartu "Next" — tombol utama: judul kiri, panah kanan */
+.content-nav-card.items-end {
+  background: linear-gradient(135deg, #4f46e5, #6366f1);
+  border-color: transparent;
+  color: #ffffff;
+  box-shadow: 0 4px 14px -4px rgba(79, 70, 229, 0.45);
+  justify-content: space-between;
+  text-align: left;
+  align-items: center;
+}
+.content-nav-card.items-end .icon {
+  order: 2;
+  color: rgba(255, 255, 255, 0.9);
+}
+.content-nav-card.items-end:hover {
+  background: linear-gradient(135deg, #4338ca, #4f46e5);
+  box-shadow: 0 6px 20px -4px rgba(79, 70, 229, 0.55);
+  transform: translateY(-1px);
+  color: #ffffff;
+}
+.content-nav-card.items-end:hover .icon {
+  color: #ffffff;
+  transform: translateX(2px);
+  transition: transform 0.2s ease;
+}
+
+/* Kartu "Prev" — subtle, tetap ada tapi nggak rebut perhatian */
+.content-nav-card:not(.items-end) {
+  justify-content: flex-start;
+}
+.content-nav-card:not(.items-end):hover {
+  border-color: #4f46e5;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px -6px rgba(0, 0, 0, 0.12);
+}
+
+/* ---------- Sembunyikan link credit bawah ----------
+   Ini bukan tombol "buka project" — dia ke situs webcontainers.io
+   dan bikin murid salah kira. Tombol StackBlitz asli = ikon ⚡ di topbar. */
+a[href='https://webcontainers.io/'] {
+  display: none;
+}
+
+/* ---------- Dropdown navigasi (breadcrumb) ---------- */
+/* Toggle-nya lebih rounded + border aksen halus saat open */
+[class*='NavContainer'] {
+  border-radius: 12px !important;
+}
+[class*='NavContainer'][data-state='open'] {
+  box-shadow: 0 12px 32px -8px rgba(0, 0, 0, 0.18);
+}
+
+/* Item lesson aktif di dropdown: aksen indigo + tegas */
+:root,
+:root[data-theme='light'] {
+  --tk-elements-breadcrumbs-dropdown-accordionTextColorSelected: #4f46e5;
+  --tk-elements-breadcrumbs-dropdown-accordionIconColorSelected: #4f46e5;
+  --tk-elements-breadcrumbs-toggleButton-borderColorSelected: #c7d2fe;
+}
+:root[data-theme='dark'] {
+  --tk-elements-breadcrumbs-dropdown-accordionTextColorSelected: #a5b4fc;
+  --tk-elements-breadcrumbs-dropdown-accordionIconColorSelected: #a5b4fc;
+}
+
+/* ---------- Scrollbar tipis & modern ---------- */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(100, 116, 139, 0.35);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(100, 116, 139, 0.6);
+  background-clip: content-box;
+}
+
+/* ---------- Tombol reload preview: beri label teks biar jelas ---------- */
+.panel-title button:has(.i-ph-arrow-clockwise) {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+.panel-title button:has(.i-ph-arrow-clockwise)::after {
+  content: "Muat ulang";
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+/* Sembunyikan teks judul tab preview — cukup tombol "Muat ulang" saja */
+.panel-title button:has(.i-ph-arrow-clockwise) + span {
+  display: none;
+}

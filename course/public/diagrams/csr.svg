@@ -1,0 +1,28 @@
+<svg viewBox="0 0 680 130" xmlns="http://www.w3.org/2000/svg" font-family="system-ui, sans-serif">
+  <defs>
+    <marker id="arrowC" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+      <path d="M0,0 L8,4 L0,8 Z" fill="#94a3b8"/>
+    </marker>
+  </defs>
+  <text x="8" y="16" font-size="11" font-weight="700" fill="#64748b">CSR — browser yang kerja</text>
+  <rect x="4" y="28" width="96" height="56" rx="10" fill="#eef2ff" stroke="#4f46e5" stroke-width="1.5"/>
+  <text x="52" y="60" text-anchor="middle" font-size="12" font-weight="600" fill="#1e293b">Kamu buka</text>
+  <line x1="100" y1="56" x2="128" y2="56" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrowC)"/>
+  <rect x="132" y="28" width="140" height="56" rx="10" fill="#f1f5f9" stroke="#94a3b8" stroke-width="1.5"/>
+  <text x="202" y="50" text-anchor="middle" font-size="11" font-weight="600" fill="#1e293b">Server kirim</text>
+  <text x="202" y="66" text-anchor="middle" font-size="11" font-weight="600" fill="#dc2626">HTML KOSONG</text>
+  <text x="202" y="80" text-anchor="middle" font-size="10" fill="#64748b">+ file JS besar</text>
+  <line x1="272" y1="56" x2="300" y2="56" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrowC)"/>
+  <rect x="304" y="28" width="130" height="56" rx="10" fill="#fef3c7" stroke="#f59e0b" stroke-width="1.5"/>
+  <text x="369" y="50" text-anchor="middle" font-size="11" font-weight="600" fill="#1e293b">Download JS</text>
+  <text x="369" y="66" text-anchor="middle" font-size="10" fill="#b45309">← layar masih putih</text>
+  <text x="369" y="80" text-anchor="middle" font-size="10" fill="#b45309">crawler: halaman kosong</text>
+  <line x1="434" y1="56" x2="462" y2="56" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrowC)"/>
+  <rect x="466" y="28" width="130" height="56" rx="10" fill="#fef3c7" stroke="#f59e0b" stroke-width="1.5"/>
+  <text x="531" y="50" text-anchor="middle" font-size="11" font-weight="600" fill="#1e293b">JS jalan → React</text>
+  <text x="531" y="66" text-anchor="middle" font-size="11" font-weight="600" fill="#1e293b">gambar halaman</text>
+  <line x1="596" y1="56" x2="624" y2="56" stroke="#94a3b8" stroke-width="1.5" marker-end="url(#arrowC)"/>
+  <rect x="628" y="28" width="48" height="56" rx="10" fill="#dcfce7" stroke="#22c55e" stroke-width="1.5"/>
+  <text x="652" y="60" text-anchor="middle" font-size="12" font-weight="600" fill="#166534">✓</text>
+  <text x="340" y="116" text-anchor="middle" font-size="10" fill="#64748b">Yang kerja berat: BROWSER user — HP kentang &amp; koneksi lambat ikut kena</text>
+</svg>
