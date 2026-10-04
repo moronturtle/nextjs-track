@@ -1,17 +1,19 @@
 ---
-// Halaman pengumpulan tugas — komentar peserta tersimpan di GitHub
-// Discussions via Giscus (tanpa backend sendiri).
+// Halaman pengumpulan tugas — peserta mengumpulkan lewat komentar di
+// GitHub Discussions repo kursus (tanpa backend/embed).
 //
-// SETUP SEKALI (oleh mentor):
-// 1. Push repo course ke GitHub (public)
-// 2. Aktifkan Discussions di Settings repo
-// 3. Install app Giscus: https://github.com/apps/giscus
-// 4. Buka https://giscus.app, isi repo → dapatkan data-repo-id &
-//    data-category-id → ganti placeholder di bawah.
-const GISCUS_REPO = "USERNAME/REPO"; // TODO: ganti, misal "giri/nextjs-track"
-const GISCUS_REPO_ID = "GANTI_REPO_ID"; // dari giscus.app
-const GISCUS_CATEGORY = "Tugas"; // atau "General" / "Announcements"
-const GISCUS_CATEGORY_ID = "GANTI_CATEGORY_ID"; // dari giscus.app
+// Thread ditentukan dari query param `t`:
+//   /pengumpulan            → thread "tugas-01" (default)
+//   /pengumpulan?t=tugas-02 → thread "tugas-02"
+//
+// Setiap pertemuan baru: bikin 1 Discussion di repo (kategori
+// General, judul bebas misal "Pengumpulan Tugas 02"), lalu tambahkan
+// link-nya ke THREADS di bawah. Thread juga bisa dibuat sekaligus
+// semua di awal kursus.
+const THREADS: Record<string, string> = {
+  "tugas-01": "https://github.com/moronturtle/nextjs-track/discussions/1",
+  "tugas-02": "https://github.com/moronturtle/nextjs-track/discussions/2",
+};
 ---
 
 <html lang="id">
@@ -71,49 +73,75 @@ const GISCUS_CATEGORY_ID = "GANTI_CATEGORY_ID"; // dari giscus.app
         font-size: 0.85rem;
         color: #64748b;
       }
+      .btn {
+        display: inline-block;
+        background: #1f883d;
+        color: #fff;
+        font-weight: 600;
+        padding: 0.7rem 1.4rem;
+        border-radius: 0.5rem;
+        text-decoration: none;
+      }
+      .btn:hover {
+        background: #1a7f37;
+      }
+      .btn-disabled {
+        background: #94a3b8;
+        cursor: not-allowed;
+      }
+      .btn-disabled:hover {
+        background: #94a3b8;
+      }
     </style>
   </head>
   <body>
-    <span class="badge">Pertemuan 01</span>
+    <span class="badge" id="badge">Pertemuan 01</span>
     <h1>Pengumpulan Tugas</h1>
 
-    <p>Kumpulkan tugasmu dengan mengomentari thread di bawah ini:</p>
+    <p>Kumpulkan tugasmu dengan mengomentari thread pengumpulan di GitHub:</p>
 
     <div class="card">
       <ol>
-        <li>Push project tugasmu ke repo GitHub (public) — atau simpan di StackBlitz.</li>
+        <li>Push project tugasmu ke repo GitHub (public).</li>
         <li>
-          Tulis komentar: <strong>nama + link repo/StackBlitz</strong>.
+          Tulis komentar dengan format <code>[nama]_[link repo GitHub]</code>.
+          <br />Contoh: <code>budi_https://github.com/budi/nama-project</code>
         </li>
         <li>
-          Mentor cek submisi di thread yang sama — semua komentar tersimpan di GitHub
-          Discussions repo kursus.
+          Mentor cek submisi di thread yang sama — semua komentar tersimpan di
+          GitHub Discussions repo kursus.
         </li>
       </ol>
+      <p>
+        <a id="thread-link" class="btn" href="#" target="_blank" rel="noopener">
+          Buka thread pengumpulan di GitHub →
+        </a>
+      </p>
+      <p id="thread-note" class="note" hidden>
+        Thread pengumpulan untuk pertemuan ini belum dibuka oleh mentor.
+      </p>
       <p class="note">Butuh akun GitHub untuk berkomentar (gratis).</p>
     </div>
 
-    <!-- Giscus: satu thread Discussions per term "tugas-01".
-         Ganti data-term per pertemuan (tugas-02, dst.) atau buat halaman terpisah. -->
-    <script
-      src="https://giscus.app/client.js"
-      data-repo={GISCUS_REPO}
-      data-repo-id={GISCUS_REPO_ID}
-      data-category={GISCUS_CATEGORY}
-      data-category-id={GISCUS_CATEGORY_ID}
-      data-mapping="specific"
-      data-term="tugas-01"
-      data-strict="0"
-      data-reactions-enabled="1"
-      data-emit-metadata="0"
-      data-input-position="top"
-      data-theme="light"
-      data-lang="id"
-      data-loading="lazy"
-      crossorigin="anonymous"
-      is:inline
-      async></script>
-
     <p class="note"><a href="/">← Kembali ke materi</a></p>
+
+    <script is:inline define:vars={{ THREADS }}>
+      const term = new URLSearchParams(location.search).get("t") || "tugas-01";
+
+      const nomor = term.match(/\d+/);
+      if (nomor)
+        document.getElementById("badge").textContent = "Pertemuan " + nomor[0];
+
+      const link = document.getElementById("thread-link");
+      const url = THREADS[term];
+      if (url) {
+        link.href = url;
+      } else {
+        link.removeAttribute("href");
+        link.classList.add("btn-disabled");
+        link.textContent = "Thread belum tersedia";
+        document.getElementById("thread-note").hidden = false;
+      }
+    </script>
   </body>
 </html>
