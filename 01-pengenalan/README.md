@@ -15,7 +15,7 @@ Setelah pertemuan ini kamu bisa:
 
 - Pernah menulis HTML dan sedikit JavaScript
 - React dasar: tahu komponen dan JSX itu apa — nggak perlu jago
-- Browser (buat StackBlitz), atau Node.js 20.9+ kalau mau jalanin di lokal
+- **Node.js 20.9+** di laptopmu — saat ini `next dev` sedang error di StackBlitz (bug di Next.js-nya sendiri), jadi latihan Next.js dikerjakan di lokal. Folder `demo-spa/` masih aman dibuka di StackBlitz karena pakai Vite.
 
 ---
 
@@ -196,25 +196,25 @@ export default function RootLayout({
 
 [![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/USERNAME/REPO/tree/main/01-pengenalan/final)
 
-> **Catatan StackBlitz:** script `dev` pakai `next dev --webpack` karena Turbopack belum didukung WebContainers. Kalau jalanin di lokal, boleh diganti `next dev` biasa — lebih cepat.
+> **Catatan StackBlitz:** `next dev` saat ini error di StackBlitz/WebContainers (`InvariantError` — bug di Next.js-nya, bukan di project-mu). Untuk sementara jalankan `starter/` dan `final/` **di lokal**: `npm install` lalu `npm run dev`. Tombol StackBlitz di atas tetap disediakan kalau nanti masalahnya sudah teratasi. `demo-spa/` aman dibuka karena pakai Vite.
 
 ## Latihan
 
-Kerjakan di `starter/`. Tiap langkah ditandai komentar `TODO` di `app/page.tsx`:
+Kerjakan di `starter/` yang dijalankan **di lokal** (`npm install`, lalu `npm run dev`). Tiap langkah ditandai komentar `TODO` di `app/page.tsx`:
 
-1. **Eksperimen dulu** — buka `demo-spa/` dan `starter/` di dua tab StackBlitz. View source keduanya, lalu matikan JavaScript dan reload. Bedanya apa? (Ini jawaban langsung dari materi Bagian 2–3.)
-2. **Pemanasan** — edit teks di `app/page.tsx`, simpan, lihat perubahannya langsung di preview (hot reload).
+1. **Eksperimen dulu** — `demo-spa/` boleh dibuka di StackBlitz (Vite masih jalan di sana). View source halamannya, lalu matikan JavaScript dan reload. Bandingkan dengan `starter/` yang jalan di lokalmu — bedanya apa? (Ini jawaban langsung dari materi Bagian 2–3.)
+2. **Pemanasan** — edit teks di `app/page.tsx`, simpan, lihat perubahannya langsung di browser (hot reload).
 3. **Route `/tentang`** — bikin `app/tentang/page.tsx` berisi halaman tentang sederhana.
 4. **Route `/blog`** — bikin `app/blog/page.tsx` berisi daftar 3 judul artikel (hardcode dulu).
 5. **Route `/kontak`** — bikin `app/kontak/page.tsx` berisi info kontak.
 6. **Bonus** — ubah `title` dan `description` di `metadata` pada `app/layout.tsx`, cek di tab browser.
 
-**Cara verifikasi:** ketik URL-nya langsung di preview StackBlitz, misal `/tentang`. Kalau halamannya muncul, routing-mu benar. Kalau 404, cek lagi nama folder & file-nya — harus persis `page.tsx` di dalam folder `tentang/`.
+**Cara verifikasi:** ketik URL-nya langsung di browser, misal `http://localhost:3000/tentang`. Kalau halamannya muncul, routing-mu benar. Kalau 404, cek lagi nama folder & file-nya — harus persis `page.tsx` di dalam folder `tentang/`.
 
 ## Tugas & Quiz
 
 - 🧠 **Quiz interaktif** — buka `/quiz` di starter yang sedang jalan. Jawab, langsung tahu benar/salah + skor. (Versi teks ada di [quiz.md](./quiz.md).)
-- 📋 [Tugas pertemuan 01](./tugas/README.md) — mini site profil 3 halaman
+- 📋 [Tugas pertemuan 01](./tugas/README.md) — install Next.js sendiri, lalu bikin dua halaman `/tentang` dan `/kontak`
 
 ## Selanjutnya
 

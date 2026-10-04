@@ -2,24 +2,18 @@
 
 Kursus Next.js berbahasa Indonesia, tersedia dalam **dua jalur** dengan materi yang sama:
 
-- **`01-pengenalan/`** — jalur repo: baca materi di README, coba kode lewat tombol **Open in StackBlitz**. Tanpa install apa pun di laptop.
+- **`01-pengenalan/`** — jalur repo: baca materi di README, lalu jalankan project di laptopmu sendiri. (Tombol **Open in StackBlitz** sementara tidak bisa menjalankan `next dev` — bug di Next.js-nya, bukan di project. Folder `demo-spa/` yang pakai Vite tetap aman dibuka di StackBlitz.)
 - **`course/`** — jalur website interaktif (TutorialKit, di-deploy ke Vercel): materi + editor + preview dalam satu halaman, mirip Tour of Go.
 
 ## Cara pakai repo ini
 
 1. Buka folder pertemuan dari daftar di bawah.
 2. Baca `README.md` pertemuan itu — isinya tujuan belajar, materi, dan latihan.
-3. Klik **Open in StackBlitz** pada folder `starter/` untuk langsung coding di browser. StackBlitz otomatis menjalankan `npm install` + `npm run dev`.
+3. Jalankan folder `starter/` **di lokal**: `cd 01-pengenalan/starter`, lalu `npm install`, lalu `npm run dev`. Butuh Node.js **20.9+**.
 4. Kerjakan latihan yang ditandai komentar `TODO` di kode. Kalau mentok, bandingkan dengan `final/` (hasil akhir yang benar).
 5. Cek pemahamanmu lewat `/quiz` di dalam app (interaktif, langsung tahu benar/salah) atau `quiz.md`, lalu kerjakan `tugas/`.
 
-> **Mau jalanin di lokal?** Boleh banget:
-> ```bash
-> cd 01-pengenalan/starter
-> npm install
-> npm run dev
-> ```
-> Butuh Node.js **20.9+**.
+> **Kenapa tidak lewat StackBlitz?** `next dev` saat ini error di WebContainers (`InvariantError` — bug di dalam Next.js, bukan di project). Tombol Open in StackBlitz di tiap pertemuan dibiarkan untuk berjaga-jaga kalau nanti sudah diperbaiki.
 
 ## Daftar pertemuan
 
@@ -42,7 +36,7 @@ nextjs-track/
 ├── CONTRIBUTING.md
 ├── 01-pengenalan/         ← JALUR REPO — versi standalone pertemuan 01
 │   ├── README.md          ← materi & latihan
-│   ├── starter/           ← project untuk dicoba (Open in StackBlitz)
+│   ├── starter/           ← project untuk dicoba (jalankan di lokal)
 │   ├── demo-spa/          ← React SPA murni, buat perbandingan
 │   ├── final/             ← hasil akhir latihan
 │   ├── tugas/
@@ -59,19 +53,17 @@ Konten pertemuan yang sama ditulis dalam dua format. Pemetaannya:
 
 | Jalur repo (`01-pengenalan/`) | Jalur course (`course/src/content/tutorial/01-pengenalan/`) |
 |---|---|
-| `README.md` (materi HTML→SPA→SSR→Next.js) | `1-materi/` (3 lesson: 1-html-biasa, 2-react-spa, 3-kenapa-nextjs) |
-| `demo-spa/` (pembanding CSR) | `1-materi/4-eksperimen-ssr-vs-csr/` + `src/templates/demo-spa/` |
-| Bagian struktur folder di `README.md` | `1-materi/5-struktur-folder/content.md` + `src/templates/nextjs/` |
-| Latihan di `starter/` + kunci `final/` | `2-praktik/` (lesson `_files` + `_solution`) |
-| `quiz.md` + route `/quiz` di starter | `3-uji-pemahaman/1-quiz/` |
-| `tugas/` | `3-uji-pemahaman/2-tugas/` + `src/pages/pengumpulan.astro` |
+| `README.md` (materi HTML→SPA→SSR→Next.js) | `1-materi/` (4 lesson: 1-html-biasa, 2-react-spa, 3-kenapa-nextjs, 4-struktur-folder) |
+| Latihan di `starter/` + kunci `final/` | Tugas di `2-uji-pemahaman/2-tugas/` (dikerjakan di lokal, bukan di browser) |
+| `quiz.md` + route `/quiz` di starter | `2-uji-pemahaman/1-quiz/` |
+| `tugas/` | `2-uji-pemahaman/2-tugas/` + `src/pages/pengumpulan.astro` |
 
 > ⚠️ Keduanya **tidak berbagi file** — kalau edit materi, ubah di dua tempat.
 
-Tiap `starter/`, `final/`, dan `demo-spa/` adalah **project mandiri** — punya `package.json` sendiri, bukan monorepo. Itu yang bikin tiap folder bisa langsung dibuka di StackBlitz.
+Tiap `starter/`, `final/`, dan `demo-spa/` adalah **project mandiri** — punya `package.json` sendiri, bukan monorepo. Masing-masing bisa di-`npm install` dan dijalankan terpisah.
 
 ## Catatan teknis
 
 - Stack: **Next.js 16, React 19, TypeScript, Tailwind CSS 4** — semuanya App Router.
-- Script `dev` dan `build` di semua project pakai flag `--webpack`. Ini sengaja: Turbopack (default Next.js 16) belum jalan di StackBlitz WebContainers. Di lokal kamu bebas pakai `next dev` biasa.
-- Tidak ada `package-lock.json` — StackBlitz resolve dependency saat import, jadi selalu dapat versi terbaru yang kompatibel.
+- `next dev` saat ini **error di StackBlitz/WebContainers** (baik Next 15 maupun 16 — bug `InvariantError` di dalam framework). Kerjakan project Next.js di lokal.
+- Tidak ada `package-lock.json` — sengaja, supaya `npm install` selalu resolve versi terbaru yang kompatibel.

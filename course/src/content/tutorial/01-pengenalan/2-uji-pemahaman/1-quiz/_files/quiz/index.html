@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quiz — Pengenalan Next.js</title>
+    <style>
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      body {
+        font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+        background: #0f1117;
+        color: #e4e6e9;
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        padding: 2rem 1rem;
+      }
+      .kartu { width: 100%; max-width: 560px; }
+      .progres {
+        font-size: 0.85rem;
+        color: #8b94a3;
+        margin-bottom: 0.5rem;
+      }
+      h1 { font-size: 1.35rem; margin-bottom: 1.25rem; line-height: 1.4; }
+      .opsi {
+        display: block;
+        width: 100%;
+        text-align: left;
+        padding: 0.85rem 1rem;
+        margin-bottom: 0.6rem;
+        background: #1a1d27;
+        border: 1px solid #2a2f3f;
+        border-radius: 8px;
+        color: #e4e6e9;
+        font-size: 0.95rem;
+        cursor: pointer;
+        transition: border-color 0.15s;
+      }
+      .opsi:hover:not(:disabled) { border-color: #5b8def; }
+      .opsi:disabled { cursor: default; }
+      .opsi.benar { border-color: #3ecf8e; background: #16332a; }
+      .opsi.salah { border-color: #f47272; background: #3a2222; }
+      .pembahasan {
+        display: none;
+        margin-top: 1rem;
+        padding: 0.9rem 1rem;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        line-height: 1.5;
+      }
+      .pembahasan.tampil { display: block; }
+      .pembahasan.benar { background: #16332a; border: 1px solid #3ecf8e; }
+      .pembahasan.salah { background: #3a2222; border: 1px solid #f47272; }
+      .lanjut {
+        margin-top: 1.25rem;
+        padding: 0.7rem 1.5rem;
+        background: #5b8def;
+        border: none;
+        border-radius: 8px;
+        color: #fff;
+        font-size: 0.95rem;
+        cursor: pointer;
+        display: none;
+      }
+      .lanjut.tampil { display: inline-block; }
+      .skor { font-size: 2.5rem; font-weight: 700; margin: 1rem 0; }
+      .pesan { color: #8b94a3; margin-bottom: 1.5rem; }
+    </style>
+  </head>
+  <body>
+    <div class="kartu" id="app"></div>
+
+    <script>
+      const SOAL = [
+        {
+          soal: "Apa ciri khas website HTML biasa (MPA)?",
+          opsi: [
+            "Satu file HTML, JavaScript mengganti isi saat pindah halaman",
+            "Setiap halaman punya file HTML sendiri — pindah halaman berarti memuat file baru",
+            "Semua halaman digambar oleh server JavaScript",
+            "HTML-nya selalu kosong dan diisi JavaScript",
+          ],
+          jawaban: 1,
+          pembahasan:
+            "HTML biasa: tiap halaman adalah file .html terpisah. Klik link = browser memuat file baru dari awal — makanya perpindahannya terasa 'reload'.",
+        },
+        {
+          soal: "Apa ciri khas React SPA (Single-Page Application)?",
+          opsi: [
+            "Tiap halaman punya file HTML sendiri",
+            "Website yang hanya punya satu halaman",
+            "Browser memuat satu HTML kosong, lalu JavaScript mengganti isinya saat pindah halaman",
+            "Website tanpa JavaScript sama sekali",
+          ],
+          jawaban: 2,
+          pembahasan:
+            "SPA = satu HTML di awal, selebihnya JavaScript yang menulis dan mengganti isi halaman tanpa reload. Itu yang bikin perpindahannya mulus.",
+        },
+        {
+          soal: "Kenapa React SPA bermasalah untuk SEO?",
+          opsi: [
+            "Karena Google melarang website pakai JavaScript",
+            "Karena HTML awalnya kosong — Google tidak menemukan isi halaman",
+            "Karena SPA selalu lambat di semua kondisi",
+            "Karena SPA tidak bisa punya judul halaman",
+          ],
+          jawaban: 1,
+          pembahasan:
+            "Google membaca file HTML yang diterima. Kalau isinya cuma <div> kosong (isi ditulis JavaScript belakangan), kontenmu tidak terbaca olehnya.",
+        },
+        {
+          soal: "Di Next.js App Router, file apa yang membuat sebuah folder menjadi route?",
+          opsi: ["index.tsx", "route.tsx", "layout.tsx", "page.tsx"],
+          jawaban: 3,
+          pembahasan:
+            "page.tsx yang menghidupkan route. Folder tanpa page.tsx tidak bisa diakses lewat URL — jadi aman untuk menaruh file pendukung.",
+        },
+        {
+          soal: "File app/profil/page.tsx bisa diakses di URL apa?",
+          opsi: ["/page", "/app/profil", "/profil", "/profil/page"],
+          jawaban: 2,
+          pembahasan:
+            "Nama folder menjadi alamatnya — nama file page.tsx tidak ikut ke URL. Jadi app/profil/page.tsx → /profil.",
+        },
+      ];
+
+      let nomor = 0;
+      let skor = 0;
+      const app = document.getElementById("app");
+
+      function tampilSoal() {
+        const s = SOAL[nomor];
+        app.innerHTML = `
+          <p class="progres">Soal ${nomor + 1} dari ${SOAL.length}</p>
+          <h1>${s.soal}</h1>
+          ${s.opsi
+            .map(
+              (o, i) =>
+                `<button class="opsi" data-i="${i}">${o}</button>`
+            )
+            .join("")}
+          <div class="pembahasan" id="pembahasan"></div>
+          <button class="lanjut" id="lanjut">${
+            nomor + 1 === SOAL.length ? "Lihat hasil" : "Soal berikutnya"
+          }</button>
+        `;
+
+        document.querySelectorAll(".opsi").forEach((btn) =>
+          btn.addEventListener("click", () => jawab(+btn.dataset.i))
+        );
+        document
+          .getElementById("lanjut")
+          .addEventListener("click", () => {
+            nomor++;
+            nomor < SOAL.length ? tampilSoal() : tampilHasil();
+          });
+      }
+
+      function jawab(pilihan) {
+        const s = SOAL[nomor];
+        const benar = pilihan === s.jawaban;
+        if (benar) skor++;
+
+        document.querySelectorAll(".opsi").forEach((btn) => {
+          const i = +btn.dataset.i;
+          btn.disabled = true;
+          if (i === s.jawaban) btn.classList.add("benar");
+          else if (i === pilihan) btn.classList.add("salah");
+        });
+
+        const box = document.getElementById("pembahasan");
+        box.className = `pembahasan tampil ${benar ? "benar" : "salah"}`;
+        box.innerHTML = benar
+          ? `<strong>Benar!</strong> ${s.pembahasan}`
+          : `<strong>Belum tepat.</strong> Jawaban yang benar: <em>"${s.opsi[s.jawaban]}"</em>. ${s.pembahasan}`;
+
+        document.getElementById("lanjut").classList.add("tampil");
+      }
+
+      function tampilHasil() {
+        const pesan =
+          skor === SOAL.length
+            ? "Sempurna — kamu siap lanjut ke tugas."
+            : skor >= 3
+            ? "Bagus! Baca ulang bagian yang salah tadi, lalu lanjut ke tugas."
+            : "Nggak apa-apa — buka lagi lesson 1-4, perhatikan bagian yang salah, lalu coba lagi.";
+        app.innerHTML = `
+          <p class="progres">Selesai</p>
+          <h1>Skor kamu</h1>
+          <p class="skor">${skor}/${SOAL.length}</p>
+          <p class="pesan">${pesan}</p>
+          <button class="lanjut tampil" id="ulang">Ulangi quiz</button>
+        `;
+        document
+          .getElementById("ulang")
+          .addEventListener("click", () => {
+            nomor = 0;
+            skor = 0;
+            tampilSoal();
+          });
+      }
+
+      tampilSoal();
+    </script>
+  </body>
+</html>

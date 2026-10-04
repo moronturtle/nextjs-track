@@ -84,4 +84,4 @@ Selain `page.tsx`, satu folder boleh berisi `layout.tsx`, `loading.tsx` (tampila
 - ✅ `layout.tsx` membungkus semua halaman lewat `{children}` — bagian yang sama ditulis sekali
 - ✅ `public/` tempat menaruh gambar dan file statis lainnya
 
-Teori cukup — di lesson berikutnya **kamu** yang bikin route baru dengan tangan sendiri, dan melihatnya langsung jalan di browser. 👉
+Teori cukup — selanjutnya cek pemahamanmu lewat kuis singkat, lalu kerjakan tugasnya di laptopmu sendiri. 👉
