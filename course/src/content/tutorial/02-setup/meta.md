@@ -1,5 +1,5 @@
 ---
 type: part
-title: "02 · Setup Project"
+title: "02 · Setup Project dan Tools"
 template: nextjs
 ---

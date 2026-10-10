@@ -73,4 +73,4 @@ Push project-mu ke GitHub, lalu kirim link repo-nya di halaman pengumpulan:
 
 **[→ Kumpulkan tugas di sini](/pengumpulan)**
 
-Belum bisa git? Boleh kumpulkan screenshot dua halamanmu yang sedang jalan di browser.
+Repo GitHub yang dikumpulkan harus public agar mentor dapat membuka dan memeriksa kedua halaman.

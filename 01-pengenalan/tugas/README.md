@@ -60,4 +60,4 @@ Kalau `http://localhost:3000/tentang` dan `http://localhost:3000/kontak` bisa di
 
 ## Cara mengumpulkan
 
-Kirim link repo GitHub project-mu ke mentor lewat jalur yang ditentukan. Belum bisa git? Boleh kumpulkan screenshot dua halamanmu yang sedang jalan di browser.
+Push project-mu ke repo GitHub public, lalu kirim link repo tersebut melalui halaman pengumpulan kursus. Mentor perlu bisa membuka repo untuk memeriksa kedua halaman.

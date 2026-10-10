@@ -27,5 +27,6 @@ Semua teks materi (`course/src/content/**/*.md`) ditulis seperti mentor yang sed
 
 - `npm install`/`npm run dev` di set sebagai command global di `meta.md` — template `nextjs` berat (npm install real), `baca` ringan.
 - File lesson dimuat dari endpoint `*-files.json` — kalau editor kosong tapi tree muncul, biasanya dev server stale setelah rename folder; restart `astro dev`.
+- Nama folder chapter (`<part>/<chapter>/`) HARUS unik di seluruh tutorial — `nav.ts` TutorialKit mengelompokkan dropdown pakai `chapter.id` (nama folder) secara global, bukan per part. Dua part dengan chapter bernama sama (misal `1-materi`) akan digabung jadi satu di navigasi. Judul tampilan tetap bebas karena diambil dari `title` di `meta.md`.
 - Curl TIDAK tersedia di WebContainers — pakai `node` + `fetch`.
 - Babel/vendor besar membuat export StackBlitz gagal (HTTP 400) — jaga payload template kecil.
