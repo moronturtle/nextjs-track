@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Demo useState</title>
+  </head>
+  <body>
+    <div id="root"></div>
+
+    <hr />
+    <!-- Jam ini dicetak SEKALI saat HTML diambil dari server.
+         Kalau counter berubah tapi jam ini tetap, berarti halaman
+         TIDAK reload — JavaScript yang mengubah tampilannya. -->
+    <p><em>HTML ini diterima dari server pukul <strong>{{WAKTU}}</strong></em></p>
+
+    <!--
+      main.jsx adalah versi JSX untuk dibaca. Yang dijalankan browser
+      adalah main.js — versi React.createElement-nya, karena browser
+      tidak mengerti JSX. React dimuat dari vendor/ tanpa install.
+    -->
+    <script src="/vendor/react.production.min.js"></script>
+    <script src="/vendor/react-dom.production.min.js"></script>
+    <script src="main.js"></script>
+  </body>
+</html>
