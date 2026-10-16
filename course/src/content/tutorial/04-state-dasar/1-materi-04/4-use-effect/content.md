@@ -9,15 +9,15 @@ previews:
 focus: /demo-efek/main.jsx
 ---
 
-# useEffect — sinkronisasi ke dunia luar
+# useEffect — kode yang jalan setelah komponen tampil
 
 :::tip{title="Lihat preview"}
 Di panel Preview ada dua jam. Jam pertama — dari server — diam sejak halaman dimuat. Jam kedua **berdetak setiap detik**. Tidak ada yang kamu klik — komponen itu bekerja sendiri setelah tampil. Itu pekerjaan `useEffect`.
 :::
 
-`useState` menjawab "data berubah saat pengunjung beraksi". `useEffect` menjawab pertanyaan lain: "jalankan kode ini **setelah** komponen tampil". Cocok untuk urusan dengan dunia di luar React: timer, `localStorage`, judul tab (`document.title`), atau mendengarkan ukuran layar.
+`useState` menjawab "data berubah saat pengunjung beraksi". `useEffect` menjawab pertanyaan lain: "jalankan kode ini **setelah** komponen tampil". Cocok untuk urusan yang ada di luar React: timer, `localStorage`, judul tab (`document.title`), atau mengukur lebar layar.
 
-## Anatomi `useEffect`
+## Bagian-bagian `useEffect`
 
 Buka `demo-efek/main.jsx`:
 
@@ -36,9 +36,9 @@ function Jam() {
 
 Tiga bagian penting:
 
-1. **Fungsi pertama** — kode yang dijalankan React setiap kali effect "aktif": memasang `setInterval` yang memperbarui state tiap detik.
-2. **`return () => ...`** — fungsi bersih-bersih. React memanggilnya saat komponen dilepas dari layar, supaya timer tidak terus berjalan di komponen yang sudah tidak ada. Ini penting: effect yang ditinggal berjalan bisa menumpuk dan membuat aplikasi lambat.
-3. **`[]` di akhir** — daftar **dependency**: kapan effect perlu diulang. Array kosong berarti "jalankan sekali saja setelah komponen tampil".
+1. **Fungsi pertama** — kode yang dijalankan React setiap kali effect aktif. Di sini: memasang `setInterval` yang memperbarui state tiap detik.
+2. **`return () => ...`** — fungsi pembersih. React memanggilnya saat komponen dibuang dari layar, supaya timer tidak terus berjalan di komponen yang sudah tidak ada. Timer yang dibiarkan bisa menumpuk dan membuat aplikasi lambat.
+3. **`[]` di akhir** — daftar **dependency**, yaitu aturan kapan effect diulang. Array kosong artinya "jalankan sekali saja setelah komponen tampil".
 
 Daftar dependency mengatur jadwal effect:
 
@@ -49,12 +49,12 @@ useEffect(fn, [slug]);  // tiap nilai slug berubah
 ```
 
 :::warning{title="Effect jalan dua kali di mode dev"}
-Saat `npm run dev`, React sengaja menjalankan effect dua kali untuk membantumu menemukan effect yang bersih-bersihnya lupa ditulis. Ini hanya terjadi di mode pengembangan — di versi produksi effect jalan normal.
+Saat `npm run dev`, React sengaja menjalankan effect dua kali. Tujuannya membantumu menemukan effect yang lupa menulis fungsi pembersih. Ini hanya terjadi di mode pengembangan — di versi produksi effect jalan normal.
 :::
 
 ## Contoh di project: like yang tersimpan
 
-Ingat `LikeButton` dari lesson 1? Masalahnya: reload halaman, hitungan kembali nol. Dengan `useEffect` kita bisa menyimpannya ke `localStorage` — tempat penyimpanan kecil di browser yang bertahan meski halaman dimuat ulang. Lihat `project/app/blog/[slug]/like-button.tsx`:
+Ingat `LikeButton` dari lesson 1? Masalahnya: reload halaman, hitungan kembali nol. Dengan `useEffect` kita bisa menyimpannya ke `localStorage` — penyimpanan kecil di browser yang isinya tidak hilang walau halaman dimuat ulang. Lihat `project/app/blog/[slug]/like-button.tsx`:
 
 ```tsx
 "use client";
@@ -86,7 +86,7 @@ export default function LikeButton({ slug }: { slug: string }) {
 }
 ```
 
-Dua effect, dua jadwal: yang pertama jalan saat `slug` berubah (membaca simpanan), yang kedua jalan tiap `suka` berubah (menulis). Nanti di project-mu: klik tombol, reload halaman — angkanya tidak hilang.
+Dua effect, dua jadwal. Yang pertama jalan saat `slug` berubah (membaca simpanan). Yang kedua jalan tiap `suka` berubah (menulis simpanan). Nanti di project-mu: klik tombol, reload halaman — angkanya tidak hilang.
 
 :::info{title="Bukan untuk mengambil data halaman"}
 Di Next.js, mengambil data untuk halaman biasanya dilakukan di komponen server — HTML-nya tiba sudah berisi. `useEffect` dipakai untuk hal yang memang hanya ada di browser: `localStorage`, timer, ukuran layar, dan sejenisnya.
@@ -94,9 +94,9 @@ Di Next.js, mengambil data untuk halaman biasanya dilakukan di komponen server �
 
 ## Ringkasan
 
-- ✅ `useEffect(fn, deps)` menjalankan `fn` setelah komponen tampil — untuk sinkronisasi ke sistem di luar React
+- ✅ `useEffect(fn, deps)` menjalankan `fn` setelah komponen tampil — untuk urusan di luar React
 - ✅ `[]` = sekali; `[x]` = tiap `x` berubah; tanpa array = tiap render
-- ✅ `return () => ...` = bersih-bersih saat komponen dilepas — wajib untuk timer dan pendengar event
+- ✅ `return () => ...` = pembersih saat komponen dibuang — wajib untuk timer dan pendengar event
 - ❌ Jangan memakai effect untuk hal yang bisa dihitung langsung saat render — effect jalan setelah tampil, jadi hasilnya telat satu langkah
 
 Materi pertemuan 04 selesai — quiz dulu, lalu lanjutkan project-mu di tugas.

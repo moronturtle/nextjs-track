@@ -7,13 +7,13 @@ terminal: false
 focus: /project/app/alat/konversi-suhu.tsx
 ---
 
-# Lifting state — mengangkat state ke parent
+# Lifting state — menaikkan state ke parent
 
-Lesson sebelumnya: state tinggal di parent, dibagi ke anak lewat props. Sekarang skenario yang lebih umum: **dua komponen sejajar** — bukan parent-anak — butuh data yang sama.
+Lesson sebelumnya: state ada di parent, dibagi ke anak lewat props. Sekarang kasus yang lebih umum: **dua komponen sejajar** — bukan parent-anak — butuh data yang sama.
 
 ## Masalahnya
 
-Bayangkan alat konversi suhu. Ada komponen input untuk mengetik Celcius, dan komponen terpisah yang menampilkan hasil dalam Fahrenheit:
+Bayangkan alat konversi suhu. Ada komponen input untuk mengetik Celcius, dan komponen lain yang menampilkan hasil dalam Fahrenheit:
 
 ```text
 KonversiSuhu (parent)
@@ -21,13 +21,13 @@ KonversiSuhu (parent)
 └── TampilFahrenheit  ← hasil konversi tampil di sini
 ```
 
-Kalau state `celcius` disimpan di dalam `InputCelcius`, `TampilFahrenheit` tidak bisa membacanya — props hanya mengalir turun, tidak menyamping ke saudara. React tidak punya cara untuk dua komponen sejajar saling membaca state.
+Kalau state `celcius` disimpan di dalam `InputCelcius`, `TampilFahrenheit` tidak bisa membacanya. Props hanya mengalir turun ke anak — tidak bisa menyamping ke komponen saudara. Dua komponen sejajar tidak bisa saling membaca state.
 
-## Solusinya: angkat ke parent bersama
+## Solusinya: naikkan ke parent bersama
 
-Jawabannya adalah **lifting state up** — "mengangkat state ke atas". Pindahkan `useState` ke parent terdekat yang membungkus keduanya, lalu bagi lewat props seperti biasa:
+Jawabannya adalah **lifting state up** — "menaikkan state ke atas". Pindahkan `useState` ke parent yang membungkus kedua komponen, lalu bagi lewat props seperti biasa:
 
-- `InputCelcius` menerima `nilai` + `saatBerubah` → mengetik memanggil callback ke parent.
+- `InputCelcius` menerima `nilai` dan `saatBerubah` → mengetik memanggil callback ke parent.
 - `TampilFahrenheit` menerima `celcius` → langsung menghitung hasilnya.
 
 Buka `project/app/alat/konversi-suhu.tsx` — parent yang memegang state-nya:
@@ -51,7 +51,7 @@ export default function KonversiSuhu() {
 }
 ```
 
-Sekarang mengetik di `InputCelcius` mengubah state parent → kedua komponen digambar ulang → `TampilFahrenheit` langsung menampilkan konversi terbaru. Satu state, dua komponen yang sinkron — tidak ada data kembar yang bisa berbeda isinya.
+Sekarang mengetik di `InputCelcius` mengubah state parent → kedua komponen ditampilkan ulang → `TampilFahrenheit` langsung menunjukkan hasil konversi terbaru. Satu state untuk dua komponen — tidak ada data kembar yang isinya bisa berbeda.
 
 Dua anaknya sederhana — hanya menerima props:
 
@@ -83,21 +83,21 @@ export default function TampilFahrenheit({ celcius }: { celcius: number }) {
 }
 ```
 
-## Kapan mengangkat state?
+## Kapan state perlu dinaikkan?
 
-Patokan praktisnya: **letakkan state di komponen terendah yang masih membungkus semua pemakainya.**
+Patokannya sederhana: **letakkan state di komponen paling bawah yang masih membungkus semua pemakainya.**
 
 - Dipakai satu komponen saja → state di komponen itu (seperti `LikeButton` di lesson 1).
 - Dipakai anak-anaknya → state di parent (seperti `DaftarTulisan`).
 - Dipakai dua komponen sejajar → state di parent bersama, dibagi lewat props.
 
-Mengangkat terlalu tinggi juga ada batasnya — kalau state harus menembus lima lapis komponen yang tidak membutuhkannya, props jadi "estafet" yang melelahkan. Masalah itu dijawab di pertemuan 05 dengan `useContext`.
+Ada batasnya juga. Kalau state harus melewati lima lapis komponen yang sebenarnya tidak membutuhkannya, props jadi operan panjang yang melelahkan. Masalah itu dijawab di pertemuan 05 dengan `useContext`.
 
 ## Ringkasan
 
 - ✅ Dua komponen sejajar tidak bisa berbagi state langsung — props hanya mengalir turun
-- ✅ Lifting state up = pindahkan `useState` ke parent bersama, bagi nilai dan `set`-nya lewat props
-- ✅ Satu sumber data di parent = dua tampilan selalu sinkron
-- ❌ Jangan duplikasi state yang sama di dua komponen — isinya bisa berbeda dan sulit dilacak
+- ✅ Lifting state up = pindahkan `useState` ke parent bersama, lalu bagi nilai dan `set`-nya lewat props
+- ✅ Satu sumber data di parent = dua tampilan selalu sama
+- ❌ Jangan menyalin state yang sama di dua komponen — isinya bisa berbeda dan sulit dilacak
 
-Tiga cara mengatur state sudah kamu kuasai. Satu hook lagi untuk melengkapi dasar-dasarnya: `useEffect` — untuk sinkronisasi ke dunia di luar React.
+Tiga cara mengatur state sudah kamu kuasai. Satu hook lagi untuk melengkapi dasar-dasarnya: `useEffect`.

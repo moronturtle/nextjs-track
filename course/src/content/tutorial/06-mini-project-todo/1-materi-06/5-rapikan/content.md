@@ -9,7 +9,7 @@ focus: /project/app/menu.tsx
 
 # Langkah 4: rapikan dan pasang di menu
 
-Fungsinya sudah lengkap. Sisa dua hal kecil yang membuat aplikasi terasa "jadi": tampilan yang niat, dan cara menuju `/todo` tanpa mengetik alamatnya manual.
+Fungsinya sudah lengkap. Sisa dua hal kecil yang membuat aplikasi terasa jadi: tampilan yang rapi, dan cara menuju `/todo` tanpa mengetik alamatnya manual.
 
 ## Masukkan ke menu navigasi
 
@@ -24,11 +24,11 @@ const menu = [
 ];
 ```
 
-Karena `Menu` sudah pakai `usePathname`, menunya otomatis menyala saat kamu di `/todo` maupun `/todo/42`. Dan karena `Menu` duduk di `app/layout.tsx` — bingkai semua halaman — tautannya muncul di mana pun.
+Karena `Menu` sudah pakai `usePathname`, menunya otomatis ditandai saat kamu ada di `/todo` maupun `/todo/42`. Dan karena `Menu` ada di `app/layout.tsx` — file yang membungkus semua halaman — tautannya muncul di mana pun.
 
-## Rapikan daftar: empty state dan progress
+## Rapikan daftar: empty state dan kartu
 
-Di `todo-app.tsx` versi final, dua penyempurnaan kecil tapi penting:
+Di `todo-app.tsx` versi final, ada dua penyempurnaan kecil tapi penting:
 
 ```tsx
 {todos.length === 0 ? (
@@ -45,9 +45,9 @@ Di `todo-app.tsx` versi final, dua penyempurnaan kecil tapi penting:
 ```
 
 - **Empty state** — saat daftar kosong, jangan biarkan layar kosong tanpa penjelasan. Satu `? :` memberi tahu pengguna apa yang harus dilakukan.
-- **Kartu di sekitar daftar** — `rounded-lg border` pada `<ul>` dan `divide-y` memberi garis pembatas antaritem tanpa CSS tambahan.
+- **Kartu di sekitar daftar** — `rounded-lg border` pada `<ul>` dan `divide-y` memberi garis pembatas antaritem tanpa menulis CSS.
 
-`TodoItem` juga ikut dipoles — padding di dalam baris dan tombol hapus yang tidak mencolok sampai dibutuhkan:
+`TodoItem` juga ikut dipoles — padding di dalam baris, dan tombol hapus yang tidak mencolok sampai dibutuhkan:
 
 ```tsx
 <li className="flex items-center gap-2 px-4 py-3">
@@ -66,7 +66,7 @@ Di `todo-app.tsx` versi final, dua penyempurnaan kecil tapi penting:
 </li>
 ```
 
-`hover:` pada tombol hapus dan `hover:underline` pada link adalah pola yang sama dengan menu blog — pratinjau kecil bahwa elemen itu bisa diklik.
+`hover:` pada tombol hapus dan `hover:underline` pada link adalah pola yang sama dengan menu blog — tanda kecil bahwa elemen itu bisa diklik.
 
 :::tip{title="Styling itu bertingkat"}
 Perhatikan di mana kelas diletakkan: `page.tsx` mengatur lebar halaman (`mx-auto max-w-xl`), `todo-app.tsx` mengatur kartu dan jarak, `todo-item.tsx` mengatur satu baris. Setiap komponen merawat tampilannya sendiri — tidak ada satu file CSS raksasa.
@@ -76,7 +76,7 @@ Perhatikan di mana kelas diletakkan: `page.tsx` mengatur lebar halaman (`mx-auto
 
 Buka aplikasimu dan jalankan urutan ini — semuanya harus lolos:
 
-1. Menu **Todo** di navigasi membawa ke `/todo`, dan menandainya aktif.
+1. Menu **Todo** di navigasi membawa ke `/todo`, dan ikut ditandai aktif.
 2. Tambah tugas → muncul di daftar, penghitung "tersisa" bertambah.
 3. Centang tugas → teks tercoret, "tersisa" berkurang.
 4. Klik teks tugas → halaman detail `/todo/{id}` tampil dengan statusnya.
@@ -88,7 +88,7 @@ Buka aplikasimu dan jalankan urutan ini — semuanya harus lolos:
 
 - ✅ Menu aktif bekerja gratis untuk semua halaman di bawah `/todo` berkat `usePathname`
 - ✅ Empty state = tampilan saat data kosong; jangan tinggalkan pengguna menebak
-- ✅ Styling tersebar per komponen — masing-masing merawat tampilannya
-- ✅ Aplikasi kecil tapi utuh: routing dinamis, navigasi, state, persistensi, styling
+- ✅ Styling dibagi per komponen — masing-masing merawat tampilannya
+- ✅ Aplikasi kecil tapi utuh: routing dinamis, navigasi, state, penyimpanan, styling
 
 Selamat — kamu baru saja membangun aplikasi dari nol sampai jalan. Sebelum ke uji pemahaman, coba pikirkan: kalau ada fitur "edit tugas" atau "filter selesai/belum", di mana kamu akan meletakkannya? Pertanyaan itu ada di tugas.

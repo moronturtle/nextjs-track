@@ -11,17 +11,17 @@ focus: /demo-state/main.jsx
 
 # useState — data yang bisa berubah
 
-Sampai pertemuan 03, semua halamanmu statis — isinya sudah tetap sejak ditulis. Sekarang kita buat halaman yang **bereaksi terhadap pengunjung**.
+Sampai pertemuan 03, semua halamanmu statis — isinya sudah tetap sejak ditulis. Sekarang kita buat halaman yang **bereaksi saat pengunjung beraksi**.
 
 :::tip{title="Coba di preview"}
-Klik tombol **Tambah** beberapa kali di panel Preview. Angkanya berubah — tapi perhatikan jam server di bawah halaman: tetap sama. Artinya halaman tidak memuat ulang; JavaScript yang mengubah tampilannya.
+Klik tombol **Tambah** beberapa kali di panel Preview. Angkanya berubah — tapi perhatikan jam server di bawah halaman: tetap sama. Artinya halaman tidak dimuat ulang; JavaScript di browser yang mengubah tampilannya.
 :::
 
 ## State itu apa?
 
-**State** adalah data yang bisa berubah selama aplikasi berjalan — dan setiap kali berubah, React menggambar ulang komponennya dengan nilai terbaru. Angka counter di demo tadi adalah state.
+**State** adalah data yang bisa berubah selama aplikasi berjalan. Setiap kali state berubah, React menampilkan ulang komponennya dengan nilai yang baru. Angka counter di demo tadi adalah state.
 
-Variabel biasa tidak bisa dipakai untuk ini. Kalau kamu menulis `let count = 0` lalu mengubahnya, React tidak tahu ada perubahan — layar tidak ikut diperbarui. React hanya menggambar ulang saat **state** berubah.
+Variabel biasa tidak bisa dipakai untuk ini. Kalau kamu menulis `let count = 0` lalu mengubahnya, React tidak tahu ada perubahan — tampilan tidak ikut berubah. React hanya menampilkan ulang saat **state** berubah.
 
 ## `useState`
 
@@ -42,15 +42,15 @@ function App() {
 }
 ```
 
-`useState(0)` mengembalikan sepasang hal:
+`useState(0)` mengembalikan dua hal sekaligus:
 
 - **`count`** — nilai state saat ini. `0` di dalam kurung adalah nilai awalnya.
 - **`setCount`** — satu-satunya cara yang benar untuk mengubahnya.
 
-Saat tombol diklik, `setCount(count + 1)` memberi tahu React: "state berubah, gambar ulang". React menjalankan ulang fungsi `App`, dan `{count}` di layar menampilkan nilai baru.
+Saat tombol diklik, `setCount(count + 1)` memberi tahu React: "state berubah, tampilkan lagi". React menjalankan ulang fungsi `App`, dan `{count}` di layar menampilkan nilai baru.
 
 :::warning{title="Jangan ubah langsung"}
-`count = count + 1` mengubah variabelnya, tapi React tidak tahu — layar tidak berubah. Selalu lewat `setCount`. Anggap `count` itu hasil cetakan tiap render: hanya bisa dibaca, tidak bisa ditulis.
+`count = count + 1` memang mengubah variabelnya, tapi React tidak tahu — tampilan tidak berubah. Selalu lewat `setCount`. Anggap `count` itu hanya untuk dibaca, tidak bisa ditulis.
 :::
 
 ## Di project Next.js-mu
@@ -76,17 +76,17 @@ export default function LikeButton() {
 }
 ```
 
-Halaman `app/blog/[slug]/page.tsx` tetap komponen server biasa — dia tinggal memanggil `<LikeButton />`. Setiap komponen `LikeButton` punya state-nya sendiri: menekan tombol di satu tulisan tidak mengubah hitungan di tulisan lain.
+Halaman `app/blog/[slug]/page.tsx` tetap komponen server biasa — dia tinggal memanggil `<LikeButton />`. Setiap `LikeButton` punya state sendiri: menekan tombol di satu tulisan tidak mengubah hitungan di tulisan lain.
 
 :::info{title="Tentang file demo"}
-Demo di preview memakai React versi `React.createElement` (lihat `demo-state/main.js`) supaya jalan tanpa install — sama seperti demo SPA di pertemuan 01. `main.jsx` adalah versi JSX-nya yang persis seperti yang kamu tulis di project.
+Demo di preview memakai React versi `React.createElement` (lihat `demo-state/main.js`) supaya jalan tanpa install — sama seperti demo SPA di pertemuan 01. `main.jsx` adalah versi JSX-nya, persis seperti yang kamu tulis di project.
 :::
 
 ## Ringkasan
 
-- ✅ State = data yang bisa berubah; saat berubah, React menggambar ulang komponen
-- ✅ `const [nilai, setNilai] = useState(awal)` — nilai dibaca, `setNilai` mengubahnya
+- ✅ State = data yang bisa berubah; saat berubah, React menampilkan ulang komponen
+- ✅ `const [nilai, setNilai] = useState(awal)` — `nilai` untuk dibaca, `setNilai` untuk mengubahnya
 - ✅ File yang memakai `useState` wajib `"use client"`; page boleh tetap komponen server yang memanggilnya
-- ❌ Jangan mengubah state tanpa fungsi `set`-nya — layar tidak ikut berubah
+- ❌ Jangan mengubah state tanpa fungsi `set`-nya — tampilan tidak ikut berubah
 
 State di satu komponen sudah bisa. Tapi bagaimana kalau dua komponen perlu data yang sama? Lesson berikutnya: **state antar komponen**.

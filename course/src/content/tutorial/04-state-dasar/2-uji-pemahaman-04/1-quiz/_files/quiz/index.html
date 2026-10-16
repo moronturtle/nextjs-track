@@ -75,7 +75,7 @@
             "Fungsi untuk memuat ulang komponen",
           ],
           jawaban: 1,
-          pembahasan: "const [nilai, setNilai] = useState(awal) — nilai untuk dibaca, fungsi set untuk mengubah. Mengubah variabelnya langsung tidak memicu gambar ulang.",
+          pembahasan: "const [nilai, setNilai] = useState(awal) — nilai untuk dibaca, fungsi set untuk mengubah. Mengubah variabelnya langsung tidak membuat tampilan ikut berubah.",
         },
         {
           soal: "Komponen di project Next.js ingin memakai useState. Apa syaratnya?",
@@ -113,7 +113,7 @@
         {
           soal: "Kapan useEffect(fn, []) dijalankan?",
           opsi: [
-            "Setiap kali komponen digambar ulang",
+            "Setiap kali komponen ditampilkan ulang",
             "Sekali, setelah komponen tampil pertama kali",
             "Sebelum komponen tampil di layar",
             "Hanya saat pengunjung mengklik sesuatu",
@@ -127,10 +127,10 @@
             "Mengambil data halaman — komponen server tidak bisa melakukannya",
             "Menggantikan useState untuk semua jenis data",
             "Menjalankan navigasi antarhalaman",
-            "Sinkronisasi ke dunia luar yang hanya ada di browser — localStorage, timer, ukuran layar",
+            "Menjalankan kode untuk urusan yang hanya ada di browser — localStorage, timer, ukuran layar",
           ],
           jawaban: 3,
-          pembahasan: "Di Next.js, data halaman biasanya diambil di komponen server. useEffect untuk urusan yang memang hanya hidup di browser — seperti menyimpan ke localStorage atau memasang timer.",
+          pembahasan: "Di Next.js, data halaman biasanya diambil di komponen server. useEffect dipakai untuk urusan yang memang hanya hidup di browser — seperti menyimpan ke localStorage atau memasang timer.",
         },
       ];
 

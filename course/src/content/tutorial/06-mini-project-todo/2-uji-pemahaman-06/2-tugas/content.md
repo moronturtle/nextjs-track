@@ -1,25 +1,25 @@
 ---
 type: lesson
-title: "Tugas: todo naik kelas"
+title: "Tugas: sempurnakan aplikasi todo"
 template: baca
 previews: false
 terminal: false
 editor: false
 ---
 
-# Tugas: todo naik kelas
+# Tugas: sempurnakan aplikasi todo
 
-Lanjutan dari project yang sama — sekarang dengan aplikasi todo yang sudah berjalan dari materi pertemuan ini.
+Lanjutan dari project yang sama — sekarang sudah ada aplikasi todo yang berjalan dari materi pertemuan ini.
 
-Aplikasinya sudah jalan, tapi ada dua kelemahan yang akan kamu perbaiki sekaligus: daftar tugas belum bisa difilter, dan daftar tugas tersimpan di `localStorage` tetapi state-nya tidak bisa dibaca komponen lain — misalnya menu, yang seharusnya bisa menampilkan "3 tugas tersisa" di semua halaman.
+Aplikasinya sudah jalan, tapi ada dua hal yang belum: daftar tugas belum bisa difilter, dan jumlah tugas belum bisa dilihat dari halaman lain. Menu, misalnya, seharusnya bisa menampilkan "3 tugas tersisa" di semua halaman — tapi sekarang dia tidak bisa, karena `todos` terkunci di dalam `todo-app.tsx`.
 
 ## Yang dikerjakan
 
 ### 1. Pindahkan todos ke Context
 
-Sekarang `todos` dipegang `todo-app.tsx`, jadi komponen lain tidak bisa ikut membaca — menu di `layout.tsx` termasuk korbannya. Ini persis masalah global state dari pertemuan 05, dan jawabannya sama: **Context**.
+State `useState` di `todo-app.tsx` tidak bisa dibaca komponen lain — menu di `layout.tsx` termasuk korbannya. Ini persis masalah global state dari pertemuan 05, dan jawabannya sama: **Context**.
 
-Buat `app/todo-context.tsx` — polanya identik dengan `favorit-context.tsx` dari tugas 05, tapi isinya daftar todo lengkap dengan `tambah`, `toggle`, dan `hapus`. Kedua `useEffect` untuk `localStorage` pindah ke dalam Provider juga:
+Buat `app/todo-context.tsx` — polanya sama dengan `favorit-context.tsx` dari tugas 05, tapi isinya daftar todo lengkap dengan `tambah`, `toggle`, dan `hapus`. Dua `useEffect` untuk `localStorage` pindah ke dalam Provider juga:
 
 ```tsx
 "use client";
@@ -73,10 +73,10 @@ export function useTodos() {
 
 Lalu pasang `<TodoProvider>` di `app/layout.tsx` membungkus `Menu` dan `{children}` — sama seperti `FavoritProvider`.
 
-Sesudah Provider terpasang, perbarui komponen-komponennya:
+Setelah Provider terpasang, perbarui komponennya:
 
 - `todo-app.tsx` — hapus `useState` todos dan fungsi-fungsinya; ganti dengan `const { todos, tambah, toggle, hapus } = useTodos();`. `useState` untuk `teks` tetap — itu state lokal form, bukan urusan global.
-- `detail-todo.tsx` — ganti `useEffect` + pembacaan `localStorage` dengan `const { todos } = useTodos();` lalu `todos.find((t) => String(t.id) === id)`. Lebih pendek dan tidak menyentuh `localStorage` langsung — `localStorage` tetap dipakai, tapi sekarang hanya Provider yang bicara dengannya.
+- `detail-todo.tsx` — ganti `useEffect` dan pembacaan `localStorage` dengan `const { todos } = useTodos();` lalu `todos.find((t) => String(t.id) === id)`. Lebih pendek, dan tidak menyentuh `localStorage` langsung — `localStorage` tetap dipakai, tapi sekarang hanya Provider yang berbicara dengannya.
 
 ### 2. Jumlah tersisa di menu
 
@@ -86,7 +86,13 @@ Uji: tambah tugas di `/todo`, lalu pindah ke `/blog` — angka di menu ikut beru
 
 ### 3. Filter daftar
 
-Di `todo-app.tsx`, tambahkan satu state lokal — `const [filter, setFilter] = useState<"semua" | "belum" | "selesai">("semua")` — dan tiga tombol di atas daftar untuk memilihnya. Daftar yang dirender adalah `todos` yang sudah disaring:
+Di `todo-app.tsx`, tambahkan satu state lokal:
+
+```tsx
+const [filter, setFilter] = useState<"semua" | "belum" | "selesai">("semua");
+```
+
+Lalu tiga tombol di atas daftar untuk memilihnya. Daftar yang ditampilkan adalah `todos` yang sudah disaring:
 
 ```tsx
 const tampil = todos.filter((t) =>
@@ -94,7 +100,7 @@ const tampil = todos.filter((t) =>
 );
 ```
 
-Perhatikan: `filter` sengaja tetap `useState` lokal — pilihan filter adalah urusan halaman ini saja, tidak perlu diangkat ke Context. Ini keputusan arsitektur dari pertemuan 05: global untuk yang dipakai banyak halaman, lokal untuk yang dipakai satu tempat.
+Perhatikan: `filter` sengaja tetap `useState` lokal — pilihan filter hanya urusan halaman ini, tidak perlu dinaikkan ke Context. Ini keputusan dari pertemuan 05: global untuk yang dipakai banyak halaman, lokal untuk yang dipakai satu tempat.
 
 ### 4. Periksa hasilnya
 
@@ -116,7 +122,7 @@ npx tsc --noEmit
 
 ## Bonus (opsional): edit tugas
 
-Tambahkan tombol pensil di `TodoItem`. Saat ditekan, teks berubah menjadi input terisi isi tugas; Enter menyimpan (lewat fungsi `ubah(id, teksBaru)` yang kamu tambahkan di Provider), Escape membatalkan. Ini latihan gabungan: state lokal untuk mode edit, callback naik ke Context.
+Tambahkan tombol pensil di `TodoItem`. Saat ditekan, teks berubah menjadi input berisi isi tugas; Enter menyimpan (lewat fungsi `ubah(id, teksBaru)` yang kamu tambahkan di Provider), Escape membatalkan. Ini latihan gabungan: state lokal untuk mode edit, callback naik ke Context.
 
 ## Cara mengumpulkan
 

@@ -12,7 +12,7 @@ previews:
 
 # Quiz — cek pemahamanmu
 
-Ada **7 soal pilihan ganda** tentang prop drilling, Context, `useContext`, global state, dan Redux. Kerjakan di panel Preview.
+Ada **7 soal pilihan ganda** tentang prop drilling, Context, `useContext`, global state, dan Zustand. Kerjakan di panel Preview.
 
 - Pilih satu jawaban untuk setiap soal.
 - Jawaban langsung dinilai. Jika jawabanmu belum tepat, quiz menunjukkan jawaban yang benar dan alasannya.

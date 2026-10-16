@@ -63,7 +63,7 @@ Buka `http://localhost:3000/blog` lalu klik tiap link di daftar — alamat berub
 
 ### 3. Tambahkan layout khusus blog
 
-Buat `app/blog/layout.tsx` — bingkai tambahan yang hanya membungkus halaman blog. Contohnya menampilkan strip "Bagian: Blog" dengan link kembali ke daftar:
+Buat `app/blog/layout.tsx` — pembungkus tambahan yang hanya dipakai halaman blog. Contohnya menampilkan baris kecil "Bagian: Blog" dengan link kembali ke daftar:
 
 ```tsx
 import Link from "next/link";
@@ -111,7 +111,7 @@ Lalu jalankan project dan uji lewat browser:
 
 - `/blog` tampil dan semua link tulisan bisa diklik
 - halaman tulisan menampilkan slug yang sesuai alamat
-- strip "Bagian: Blog" hanya muncul di halaman blog — tidak di `/tentang` atau `/kontak`
+- baris "Bagian: Blog" hanya muncul di halaman blog — tidak di `/tentang` atau `/kontak`
 - link menu ke halaman yang sedang dibuka terlihat berbeda dari link lain
 - tombol `useRouter` benar-benar memindahkan halaman tanpa link diklik
 

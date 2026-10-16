@@ -7,15 +7,15 @@ terminal: false
 focus: /project/app/blog/artikel-pertama/page.tsx
 ---
 
-# Nested routes — halaman bertingkat
+# Nested routes — halaman di dalam halaman
 
-Di pertemuan 01 kamu belajar aturan utamanya: **nama folder di dalam `app/` menjadi alamat halaman**. Sejauh ini semua halamanmu sejajar — `/tentang`, `/kontak`, `/profil`.
+Di pertemuan 01 kamu belajar aturan utamanya: **nama folder di dalam `app/` menjadi alamat halaman**. Sampai sekarang semua halamanmu sejajar — `/tentang`, `/kontak`, `/profil`. Tidak ada yang bertingkat.
 
-Website sungguhan jarang datar seperti itu. Alamatnya bertingkat: `/blog` berisi daftar tulisan, lalu `/blog/artikel-pertama` untuk membuka satu tulisan. Bagian `/blog/artikel-pertama` adalah "anak" dari `/blog` — inilah yang disebut **nested route** (route bersarang: route di dalam route).
+Website sungguhan tidak seperti itu. Lihat alamat sebuah blog: `/blog` untuk daftar tulisan, lalu `/blog/artikel-pertama` untuk membaca satu tulisan. Alamat kedua adalah bagian dari alamat pertama — seperti kamar di dalam rumah. Inilah yang disebut **nested route**, artinya "route di dalam route".
 
 ## Folder di dalam folder
 
-Caranya persis seperti dugaanmu — taruh folder route di dalam folder route:
+Cara membuatnya sesuai dugaanmu: taruh folder route di dalam folder route.
 
 ```text
 app/
@@ -29,31 +29,31 @@ app/
         └── page.tsx              → /blog/belajar-nextjs
 ```
 
-Buka file-file di `project/app/blog/` pada panel File. Isinya komponen halaman biasa — tidak ada yang spesial. Yang bertingkat hanya alamatnya; file `page.tsx` tetap berisi isi halaman seperti biasa.
+Buka file-file di `project/app/blog/` pada panel File. Isinya file halaman biasa — tidak ada yang baru. Yang bertingkat hanya alamatnya; `page.tsx` tetap berisi isi halaman seperti biasa.
 
-Aturannya tidak berubah: setiap tingkat folder menambah satu potongan alamat yang dipisah `/`, dan nama `page.tsx` tidak ikut ke URL.
+Aturannya juga tidak berubah: setiap folder menambah satu potongan alamat yang dipisah `/`. Nama `page.tsx` sendiri tidak ikut ke alamat.
 
-:::tip{title="Folder boleh tanpa page.tsx"}
-Kalau `app/blog/` tidak punya `page.tsx`, alamat `/blog` tidak bisa dibuka — tapi `/blog/artikel-pertama` tetap jalan selama foldernya sendiri punya `page.tsx`. Folder tanpa `page.tsx` juga aman untuk mengelompokkan file pendukung, misalnya komponen yang dipakai beberapa halaman.
+:::tip{title="Folder boleh tidak punya page.tsx"}
+Kalau `app/blog/` tidak punya `page.tsx`, alamat `/blog` tidak bisa dibuka — tapi `/blog/artikel-pertama` tetap jalan, selama foldernya sendiri punya `page.tsx`. Folder tanpa `page.tsx` juga berguna untuk menampung file pendukung, misalnya komponen yang dipakai beberapa halaman.
 :::
 
 ## Kapan dipakai?
 
-Susun folder mengikuti susunan alamat yang kamu mau. Halaman yang menjadi bagian suatu section masuk ke folder section itu:
+Susun folder mengikuti susunan alamat yang kamu mau. Halaman-halaman yang masih satu topik masuk ke folder yang sama:
 
 ```text
 app/
-├── blog/             → semua halaman blog tinggal di sini
-├── dashboard/        → semua halaman dashboard tinggal di sini
-└── tentang/          → halaman lepas
+├── blog/             → semua halaman blog ada di sini
+├── dashboard/        → semua halaman dashboard ada di sini
+└── tentang/          → halaman yang berdiri sendiri
 ```
 
-Keuntungannya bukan cuma alamat rapi — di lesson berikutnya kamu akan lihat bahwa folder juga bisa membawa `layout.tsx` sendiri, jadi satu section bisa punya bingkai khusus.
+Rapi bukan satu-satunya keuntungan. Di lesson berikutnya kamu akan lihat: folder juga bisa membawa `layout.tsx` sendiri — jadi semua halaman blog bisa dibungkus tampilan khusus yang tidak dipakai halaman lain.
 
 ## Ringkasan
 
-- ✅ Nested route = folder route di dalam folder route; tiap tingkat menambah satu potongan alamat
-- ✅ `page.tsx` tetap wajib ada di tingkat yang ingin bisa dibuka — tanpa file itu, alamatnya tidak hidup
-- ✅ Folder tanpa `page.tsx` tidak jadi route, tapi anak-anaknya tetap bisa jadi route
+- ✅ Nested route = folder route di dalam folder route; tiap folder menambah satu potongan alamat
+- ✅ `page.tsx` harus ada di setiap alamat yang ingin bisa dibuka
+- ✅ Folder tanpa `page.tsx` tidak jadi halaman, tapi folder di dalamnya tetap bisa jadi halaman
 
-Menulis satu folder untuk setiap tulisan blog masih boros — bagaimana kalau tulisanmu ada 100? Lesson berikutnya menjawab itu dengan **route dinamis**.
+Menulis satu folder untuk setiap tulisan blog itu boros — bagaimana kalau tulisanmu ada 100? Lesson berikutnya menjawabnya dengan **route dinamis**.

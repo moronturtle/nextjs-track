@@ -117,9 +117,9 @@ npx tsc --noEmit
 - [ ] Menu menampilkan jumlah favorit dan ikut berubah saat tombol ditekan dari halaman mana pun
 - [ ] `npm run lint` dan `npx tsc --noEmit` selesai tanpa error
 
-## Bonus (opsional): versi Redux
+## Bonus (opsional): versi Zustand
 
-Kalau langkah 1–4 sudah beres dan kamu masih mau tantangan, tulis ulang fitur favorit dengan Redux Toolkit seperti di materi: `app/favorit-slice.ts`, `app/store.ts`, dan `app/providers.tsx` — lalu `useSelector`/`useDispatch` menggantikan `useFavorit`. Boleh dikerjakan di file baru berdampingan dengan versi Context, tidak perlu dihapus.
+Kalau langkah 1–4 sudah beres dan kamu masih mau tantangan, tulis ulang fitur favorit dengan Zustand seperti di materi: pasang `zustand`, buat `app/use-favorit.ts` dengan `create`, lalu `useFavorit` menggantikan context — tanpa `Provider` di layout dan tanpa `favorit-context.tsx`. Boleh dikerjakan di file baru berdampingan dengan versi Context, tidak perlu dihapus.
 
 ## Cara mengumpulkan
 

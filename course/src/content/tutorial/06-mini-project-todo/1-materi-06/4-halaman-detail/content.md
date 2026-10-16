@@ -9,7 +9,7 @@ focus: /project/app/todo/[id]/detail-todo.tsx
 
 # Langkah 3: halaman detail untuk tiap tugas
 
-Daftar tugas sudah jalan dan tersimpan. Sekarang setiap item mendapat halaman sendiri — klik teksnya, terbang ke `/todo/1718000000000` dan lihat detailnya. Di sinilah tiga konsep bertemu: route dinamis (03), `localStorage` lintas halaman (langkah 2), dan navigasi kembali (03).
+Daftar tugas sudah jalan dan tersimpan. Sekarang setiap item mendapat halaman sendiri — klik teksnya, kamu terbang ke `/todo/1718000000000` dan melihat detailnya. Di sinilah tiga konsep bertemu: route dinamis (03), `localStorage` lintas halaman (langkah 2), dan navigasi kembali (03).
 
 ## Route-nya: `/todo/[id]`
 
@@ -42,7 +42,7 @@ export default async function DetailPage({
 }
 ```
 
-## detail-todo.tsx — membaca lintas halaman
+## detail-todo.tsx — membaca data lintas halaman
 
 ```tsx
 "use client";
@@ -82,15 +82,15 @@ export default function DetailTodo({ id }: { id: string }) {
 
 Tiga bagian yang perlu diperhatikan:
 
-- **`useState<Todo | null>(null)`** — nilai awalnya `null` (belum ketemu), diisi saat effect menemukan tugasnya. `Todo | null` berarti "boleh Todo, boleh null" — TypeScript memaksa kita menangani dua-duanya, makanya ada `if (!todo)`.
+- **`useState<Todo | null>(null)`** — nilai awalnya `null`, artinya "belum ketemu". Effect mengisinya saat menemukan tugasnya. `Todo | null` berarti "boleh Todo, boleh null" — TypeScript memaksa kita menangani dua kemungkinan itu, makanya ada `if (!todo)`.
 - **`localStorage.getItem("todos") ?? "[]"`** — `??` memberi nilai cadangan: kalau belum ada simpanan sama sekali, kita pakai array kosong supaya `JSON.parse` tidak error.
-- **`router.back()`** — mundur satu halaman, seperti tombol back browser. Ini `useRouter` dari pertemuan 03 dipakai untuk kebutuhan aslinya.
+- **`router.back()`** — mundur satu halaman, seperti tombol back browser. Inilah `useRouter` dari pertemuan 03 dipakai untuk kebutuhan aslinya.
 
 Dan sumber datanya? Persis yang ditulis `todo-app.tsx` — key `localStorage` yang sama, `"todos"`. Dua halaman berbagi satu sumber tanpa Context, karena `localStorage` milik browser.
 
 ## Hubungkan daftar ke detail
 
-Terakhir, teks setiap `TodoItem` dibungkus `<Link>` supaya bisa diklik — satu baris perubahan:
+Terakhir, teks setiap `TodoItem` dibungkus `<Link>` supaya bisa diklik — cukup satu baris perubahan:
 
 ```tsx
 import Link from "next/link";
@@ -105,13 +105,13 @@ import Link from "next/link";
 
 ## Coba di project-mu
 
-Buat folder `app/todo/[id]/` dengan kedua file di atas, lalu ubah teks `TodoItem` menjadi `Link`. Klik sebuah tugas di `/todo` — halaman detail terbuka, status tampil, dan tombol kembali membawamu pulang ke daftar.
+Buat folder `app/todo/[id]/` dengan kedua file di atas, lalu ubah teks `TodoItem` menjadi `Link`. Klik sebuah tugas di `/todo` — halaman detail terbuka, statusnya tampil, dan tombol kembali membawamu pulang ke daftar.
 
 ## Ringkasan
 
-- ✅ `[id]` = route dinamis yang sama seperti `[slug]`; `page.tsx` server membaca `await params`
+- ✅ `[id]` = route dinamis yang sama seperti `[slug]`; `page.tsx` komponen server membaca `await params`
 - ✅ Data detail dibaca dari `localStorage` — sumber yang sama dengan daftar, tanpa perlu Context
 - ✅ `useState<Todo | null>` + `if (!todo)` = pola umum untuk "data belum tentu ada"
 - ✅ `router.back()` = kembali satu halaman lewat kode
 
-Aplikasinya sudah lengkap fungsinya. Langkah terakhir: rapikan tampilannya supaya layak dibanggakan.
+Aplikasinya sudah lengkap fungsinya. Langkah terakhir: rapikan tampilannya.

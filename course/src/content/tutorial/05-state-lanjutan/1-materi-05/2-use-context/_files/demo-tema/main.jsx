@@ -26,7 +26,7 @@ function App() {
 
 function Konten() {
   // Komponen tengah: tidak membawa props tema sama sekali.
-  // Bandingkan dengan "kurir" di lesson prop drilling.
+  // Bandingkan dengan "perantara" di lesson prop drilling.
   return (
     <section>
       <p>Aku komponen tengah — tidak ada props tema lewat sini.</p>

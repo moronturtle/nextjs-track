@@ -11,7 +11,7 @@ focus: /project/app/blog/daftar-tulisan.tsx
 
 `useState` menyimpan data di dalam satu komponen. Tapi komponen jarang hidup sendiri — komponen saling memanggil, dan state sering perlu dipakai bersama.
 
-React punya aturan arus data yang tegas: **data mengalir satu arah, dari parent ke anak, lewat props**. Kebalikannya — anak memberi tahu parent — dilakukan lewat **callback**: parent menyerahkan fungsi sebagai props, anak memanggilnya.
+React punya aturan arus data yang tegas: **data mengalir satu arah — dari parent ke anak — lewat props**. Untuk arah sebaliknya, dipakai **callback**: parent mengirim fungsi lewat props, dan anak memanggil fungsi itu saat mau memberi kabar.
 
 ## Turun lewat props, naik lewat callback
 
@@ -21,10 +21,10 @@ Contoh yang akan kita pakai di tugas: kotak pencarian di atas daftar tulisan blo
 app/blog/
 ├── page.tsx            ← server: daftar judul tulisan
 ├── daftar-tulisan.tsx  ← client: pemilik state + filter
-└── kotak-cari.tsx      ← anak: kotak input yang "dikendalikan" parent
+└── kotak-cari.tsx      ← anak: kotak input yang dikendalikan parent
 ```
 
-**`kotak-cari.tsx`** — komponen anak. Dia tidak punya state sendiri; nilai input dan cara mengubahnya datang dari parent lewat props:
+**`kotak-cari.tsx`** — komponen anak. Dia tidak punya state sendiri. Nilai input dan cara mengubahnya datang dari parent lewat props:
 
 ```tsx
 export default function KotakCari({
@@ -48,11 +48,11 @@ export default function KotakCari({
 Perhatikan dua props-nya:
 
 - `nilai` — teks yang tampil di input, **dikirim turun** dari parent.
-- `saatBerubah` — fungsi yang dipanggil anak setiap kali pengunjung mengetik, **mengirim kabar naik** ke parent.
+- `saatBerubah` — fungsi yang dipanggil anak setiap kali pengunjung mengetik. Lewat fungsi inilah anak **mengirim kabar naik** ke parent.
 
-Input yang nilainya dipegang state parent seperti ini disebut **controlled input** — input "dikendalikan" React, bukan menyimpan teksnya sendiri.
+Input yang nilainya dipegang state parent seperti ini disebut **controlled input** — input yang dikendalikan React, bukan menyimpan teksnya sendiri.
 
-**`daftar-tulisan.tsx`** — parent-nya. State `cari` tinggal di sini:
+**`daftar-tulisan.tsx`** — parent-nya. State `cari` ada di sini:
 
 ```tsx
 "use client";
@@ -85,7 +85,7 @@ export default function DaftarTulisan({
 }
 ```
 
-Alurnya: pengunjung mengetik → `KotakCari` memanggil `saatBerubah(teks)` → `setCari` jalan → state berubah → `DaftarTulisan` digambar ulang → `hasil` yang terfilter ikut baru.
+Alurnya begini: pengunjung mengetik → `KotakCari` memanggil `saatBerubah(teks)` → `setCari` jalan → state berubah → `DaftarTulisan` ditampilkan ulang → daftar `hasil` ikut terfilter dengan teks baru.
 
 Dan `page.tsx` tetap komponen server — daftar judul dikirim ke komponen client sebagai props:
 
@@ -103,14 +103,14 @@ export default function BlogPage() {
 ```
 
 :::info{title="Kenapa kotak-cari.tsx tidak perlu &quot;use client&quot;"}
-File yang diimpor oleh komponen `"use client"` ikut dijalankan di browser. `KotakCari` tidak memakai hook apa pun — dia cuma menerima props dan mengembalikan JSX — jadi tidak perlu menandai dirinya sendiri.
+File yang diimpor komponen `"use client"` ikut dijalankan di browser. `KotakCari` tidak memakai hook apa pun — dia hanya menerima props dan mengembalikan JSX — jadi tidak perlu menandai dirinya sendiri.
 :::
 
 ## Ringkasan
 
 - ✅ Data mengalir satu arah: parent → anak lewat props
 - ✅ Anak memberi kabar ke parent dengan memanggil fungsi yang dikirim lewat props (callback)
-- ✅ Pemilik state adalah parent; anak cukup "dikendalikan" lewat props
+- ✅ Pemilik state adalah parent; anak cukup dikendalikan lewat props
 - ❌ Anak tidak bisa mengubah state parent secara langsung — hanya lewat callback yang diberikan parent
 
 Tapi bagaimana kalau dua komponen **sejajar** — bukan parent-anak — butuh state yang sama? Lesson berikutnya: **lifting state up**.

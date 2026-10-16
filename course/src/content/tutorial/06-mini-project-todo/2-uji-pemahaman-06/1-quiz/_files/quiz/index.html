@@ -75,7 +75,7 @@
             "Agar nama file-nya lebih rapi",
           ],
           jawaban: 0,
-          pembahasan: "Pola dari pertemuan 03 dan 04: page.tsx membingkai halaman sebagai komponen server, dan semua yang memakai hook pindah ke komponen \"use client\" di file sendiri.",
+          pembahasan: "Pola dari pertemuan 03 dan 04: page.tsx menyusun halaman sebagai komponen server, dan semua yang memakai hook pindah ke komponen \"use client\" di file sendiri.",
         },
         {
           soal: "Saat menambah tugas kita menulis setTodos([...todos, baru]). Kenapa tidak todos.push(baru)?",
@@ -122,10 +122,10 @@
           pembahasan: "Nilai awalnya null — belum ada tugas. Effect mengisinya begitu menemukan id yang cocok. if (!todo) menjaga komponen supaya tidak mencoba menampilkan data yang belum ada.",
         },
         {
-          soal: "Menu \"Todo\" tetap menyala saat kamu ada di /todo/42. Apa yang membuatnya begitu?",
+          soal: "Menu \"Todo\" tetap ditandai aktif saat kamu ada di /todo/42. Apa yang membuatnya begitu?",
           opsi: [
-            "Karena /todo/42 adalah file di dalam folder todo — Next.js menyalakannya otomatis",
-            "Karena Menu memeriksa pathname.startsWith(\"/todo\") — semua alamat di bawah /todo dianggap bagian dari menu Todo",
+            "Karena /todo/42 adalah file di dalam folder todo — Next.js menandainya otomatis",
+            "Karena Menu memeriksa pathname.startsWith(\"/todo\") — semua alamat di bawah /todo ikut ditandai",
             "Karena tombol ← Kembali sudah ditekan",
             "Karena layout.tsx mendeteksi halaman anaknya",
           ],

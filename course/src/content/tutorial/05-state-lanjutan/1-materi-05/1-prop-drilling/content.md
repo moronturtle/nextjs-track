@@ -9,11 +9,11 @@ focus: /project/app/header.tsx
 
 # Masalah prop drilling
 
-Pertemuan 04 mengajarkan: state diangkat ke parent, lalu dibagi turun lewat props. Itu bekerja bagus untuk dua atau tiga komponen. Sekarang kita lihat batasnya.
+Pertemuan 04 mengajarkan: state dinaikkan ke parent, lalu dibagi turun lewat props. Cara itu bagus untuk dua atau tiga komponen. Sekarang kita lihat batasnya.
 
 ## Skenario: nama pengguna di pojok atas
 
-Katakanlah project-mu punya data pengguna yang sedang login, dan nama itu harus tampil di pojok kanan atas menu — tepatnya di komponen `MenuProfil`. Posisi komponennya di dalam `Header`, dan `Header` di dalam `layout.tsx`:
+Katakanlah project-mu punya data pengguna yang sedang login. Nama itu harus tampil di pojok kanan atas menu — tepatnya di komponen `MenuProfil`. Posisi `MenuProfil` ada di dalam `Header`, dan `Header` ada di dalam `layout.tsx`:
 
 ```text
 layout.tsx
@@ -21,7 +21,7 @@ layout.tsx
     └── MenuProfil  (menu-profil.tsx)  ← nama dibutuhkan di sini
 ```
 
-Karena props hanya mengalir turun satu tingkat per langkah, `namaUser` harus diestafet: `layout.tsx` → `Header` → `MenuProfil`. Buka ketiga file di panel File dan perhatikan `header.tsx`:
+Props hanya bisa mengalir turun satu tingkat per langkah. Jadi `namaUser` harus dioper berantai: `layout.tsx` → `Header` → `MenuProfil`. Buka ketiga file di panel File dan perhatikan `header.tsx`:
 
 ```tsx
 export default function Header({ namaUser }: { namaUser: string }) {
@@ -34,26 +34,26 @@ export default function Header({ namaUser }: { namaUser: string }) {
 }
 ```
 
-`Header` sama sekali tidak memakai `namaUser` — dia hanya meneruskannya. Komponen ini menjadi "kurir": menerima paket, meneruskan ke bawah, tanpa membuka isinya.
+`Header` sama sekali tidak memakai `namaUser` — dia hanya meneruskannya ke bawah. Komponen ini jadi perantara: menerima data, meneruskan, tanpa pernah memakainya.
 
 ## Kenapa ini jadi masalah
 
-Estafet props seperti ini disebut **prop drilling** — "mengebor" props menembus lapisan komponen. Akibatnya:
+Props yang dioper berlapis-lapis seperti ini disebut **prop drilling**. Akibatnya:
 
-- **Komponen tengah jadi kotor.** `Header` harus mendeklarasikan props yang bukan urusannya. Kalau lapisannya lima — bayangkan empat komponen jadi kurir.
-- **Susah diubah.** Mengganti nama `namaUser` berarti menyentuh semua komponen di rantai, bukan hanya yang memakai.
+- **Komponen tengah ikut kotor.** `Header` harus menulis props yang bukan urusannya. Kalau lapisannya ada lima, empat komponen jadi perantara.
+- **Susah diubah.** Mengganti nama `namaUser` berarti mengedit semua komponen di rantai — bukan hanya yang memakai.
 - **Susah dilacak.** Saat membaca `MenuProfil`, kamu harus menelusuri ke atas untuk mencari tahu dari mana `namaUser` berasal.
 
-Contoh nyata yang sering kena: data pengguna yang login, tema tampilan, bahasa antarmuka — hal-hal yang dibutuhkan banyak komponen di banyak kedalaman berbeda.
+Contoh nyata yang sering kena: data pengguna yang login, tema tampilan, bahasa aplikasi — hal-hal yang dibutuhkan banyak komponen di banyak tingkat berbeda.
 
 :::info{title="Prop drilling bukan selalu salah"}
-Mengoper props satu-dua tingkat itu normal dan justru bagus — jelas terlihat dari mana data berasal. Prop drilling jadi masalah saat komponen tengah dipaksa membawa data yang tidak dia pakai, hanya untuk diteruskan.
+Mengoper props satu-dua tingkat itu normal dan justru bagus — jelas terlihat dari mana data berasal. Prop drilling jadi masalah saat komponen tengah dipaksa membawa data yang tidak dia pakai, hanya untuk diteruskan lagi.
 :::
 
 ## Ringkasan
 
-- ✅ Prop drilling = props dioper berlapis ke komponen dalam; komponen tengah jadi "kurir" yang tidak memakai datanya
-- ✅ Terjadi karena props hanya mengalir turun — tidak bisa melompat ke cucu atau menembus lapisan
+- ✅ Prop drilling = props dioper berlapis ke komponen dalam; komponen tengah jadi perantara yang tidak memakai datanya
+- ✅ Terjadi karena props hanya mengalir turun — tidak bisa melompat ke cucu
 - ❌ Jangan biarkan banyak komponen membawa props yang tidak mereka pakai — rapuh dan susah dirawat
 
-React punya jawaban resmi untuk ini: **Context** — saluran yang bisa dibaca langsung oleh komponen mana pun di bawahnya, tanpa lewat kurir. Lesson berikutnya.
+React punya jawaban resmi untuk masalah ini: **Context** — cara membaca data langsung dari atas, tanpa dioper lewat props. Lesson berikutnya.

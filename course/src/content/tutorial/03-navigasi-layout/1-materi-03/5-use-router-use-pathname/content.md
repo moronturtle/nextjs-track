@@ -11,14 +11,14 @@ focus: /project/app/menu.tsx
 
 `<Link>` bekerja saat pengunjung mengkliknya. Tapi ada dua kebutuhan yang tidak bisa dijawab `<Link>`:
 
-1. **"Link mana yang sedang aktif?"** — menu perlu tahu alamat yang sedang dibuka supaya bisa menandainya.
-2. **"Pindah halaman lewat kode"** — misalnya setelah form disimpan, pengunjung dipindahkan ke halaman terima kasih. Tidak ada yang diklik — kode yang memindahkan.
+1. **"Link mana yang sedang aktif?"** — menu perlu tahu alamat yang sedang dibuka supaya bisa memberi tanda pada link itu.
+2. **"Pindah halaman lewat kode"** — misalnya setelah form disimpan, pengunjung langsung dipindahkan ke halaman terima kasih. Tidak ada yang diklik — kodenya yang memindahkan.
 
-Keduanya dijawab oleh dua **hook** dari `next/navigation`. Hook adalah fungsi React yang namanya diawali `use` — dia memberi komponen kemampuan tambahan; dalam hal ini membaca dan mengatur navigasi.
+Keduanya dijawab oleh dua **hook** dari `next/navigation`. Hook adalah fungsi React yang namanya diawali `use` — dia memberi komponen kemampuan tambahan. Kali ini kemampuannya: membaca dan mengatur navigasi.
 
 ## Syaratnya: komponen harus `"use client"`
 
-Selama ini komponenmu dijalankan di server — itulah kenapa HTML-nya tiba lengkap di browser. Tapi hook navigasi hanya hidup di browser pengunjung, karena klik dan perpindahan terjadi di sana. File yang memakai hook harus menandai dirinya dengan `"use client"` di baris pertama — komponen seperti ini disebut **Client Component**.
+Selama ini komponenmu dijalankan di server — itulah kenapa HTML-nya tiba lengkap di browser. Tapi klik dan pindah halaman terjadi di browser pengunjung, jadi hook navigasi hanya hidup di sana. File yang memakai hook harus menandai dirinya dengan `"use client"` di baris pertama. Komponen seperti ini disebut **Client Component**.
 
 ## `usePathname` — membaca alamat yang sedang dibuka
 
@@ -53,13 +53,13 @@ export default function Menu() {
 }
 ```
 
-`usePathname()` mengembalikan alamat yang sedang dibuka — misalnya `"/blog"`. Di contoh ini, link yang `href`-nya sama dengan `pathname` diberi class tebal dan garis bawah. Hasilnya: pengunjung selalu tahu sedang berada di halaman mana — menu itu "menyala" mengikuti halaman.
+`usePathname()` mengembalikan alamat yang sedang dibuka — misalnya `"/blog"`. Di contoh ini, link yang `href`-nya sama dengan `pathname` diberi huruf tebal dan garis bawah. Hasilnya: pengunjung selalu tahu sedang ada di halaman mana, karena menu itu ikut ditandai.
 
-`app/layout.tsx` tinggal memanggil `<Menu />` di tempat `<nav>` yang lama. Layout sendiri tetap komponen server biasa — pola ini umum: hanya bagian yang butuh interaksi yang ditandai `"use client"`, selebihnya tetap di server.
+`app/layout.tsx` tinggal memanggil `<Menu />` di tempat `<nav>` yang lama. Layout sendiri tetap komponen server biasa. Ini pola yang umum: hanya bagian yang butuh interaksi yang ditandai `"use client"`, selebihnya tetap di server.
 
 ## `useRouter` — pindah halaman dari kode
 
-`useRouter()` memberi objek untuk mengatur navigasi lewat program. Yang paling sering dipakai: `router.push("/alamat")` — pindahkan pengunjung ke alamat tersebut.
+`useRouter()` memberi objek untuk mengatur navigasi lewat kode. Yang paling sering dipakai: `router.push("/alamat")` — memindahkan pengunjung ke alamat itu.
 
 Buka `project/app/tombol-beranda.tsx`:
 
@@ -82,9 +82,9 @@ export default function TombolBeranda() {
 }
 ```
 
-`onClick` hanya hidup di browser — makanya komponen ini juga `"use client"`. Komponen ini dipakai di `app/tentang/page.tsx` sebagai `<TombolBeranda />`; page tetap komponen server, hanya tombolnya yang client.
+`onClick` hanya hidup di browser — makanya komponen ini juga `"use client"`. Komponen ini dipakai di `app/tentang/page.tsx` sebagai `<TombolBeranda />`; halamannya tetap komponen server, hanya tombolnya yang client.
 
-`useRouter` juga punya `router.back()` (mundur satu halaman) dan `router.replace("/alamat")` (pindah tanpa menambah riwayat back) — kenal dulu, dipakai saat butuh.
+`useRouter` juga punya `router.back()` (kembali satu halaman) dan `router.replace("/alamat")` (pindah tanpa menambah riwayat tombol back). Kenal dulu saja — dipakai saat butuh.
 
 :::warning{title="Impor dari next/navigation"}
 Di App Router, kedua hook ini diimpor dari `next/navigation`. Di internet kamu mungkin menemukan `next/router` — itu milik Pages Router (pola lama dari pertemuan 02) dan tidak berfungsi di dalam `app/`.
@@ -93,7 +93,7 @@ Di App Router, kedua hook ini diimpor dari `next/navigation`. Di internet kamu m
 ## Ringkasan
 
 - ✅ `usePathname()` = alamat yang sedang dibuka — cocok untuk menandai menu aktif
-- ✅ `useRouter()` = navigasi lewat kode — `router.push("/tujuan")`, misalnya setelah form disimpan
+- ✅ `useRouter()` = pindah halaman lewat kode — `router.push("/tujuan")`, misalnya setelah form disimpan
 - ✅ Keduanya diimpor dari `next/navigation` dan hanya jalan di komponen `"use client"`
 - ❌ `next/router` adalah versi Pages Router — jangan dipakai di App Router
 

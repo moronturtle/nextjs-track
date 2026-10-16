@@ -9,18 +9,18 @@ focus: /project/app/todo/todo-app.tsx
 
 # Langkah 1: daftar dan state
 
-Kita mulai membangun. Tujuannya di akhir langkah ini: `/todo` menampilkan daftar tugas, dan kamu bisa menambah, mencentang, serta menghapus item — semuanya lewat `useState`.
+Kita mulai membangun. Tujuan langkah ini: halaman `/todo` menampilkan daftar tugas, dan kamu bisa menambah, mencentang, serta menghapus item — semuanya lewat `useState`.
 
 ## Tiga file, tiga tugas
 
 ```text
 app/todo/
-├── page.tsx        ← server: bingkai halaman, panggil <TodoApp />
-├── todo-app.tsx    ← client: pemilik state + form + daftar
-└── todo-item.tsx   ← satu baris tugas (anak yang "dikendalikan")
+├── page.tsx        ← komponen server: menyusun halaman, memanggil <TodoApp />
+├── todo-app.tsx    ← client: memegang state, form, dan daftar
+└── todo-item.tsx   ← satu baris tugas (komponen anak)
 ```
 
-`page.tsx` tetap komponen server — dia hanya membingkai halaman:
+`page.tsx` tetap komponen server — dia hanya menyusun halaman:
 
 ```tsx
 import TodoApp from "./todo-app";
@@ -37,11 +37,11 @@ export default function TodoPage() {
 }
 ```
 
-Semua yang interaktif tinggal di `todo-app.tsx`, yang ditandai `"use client"`.
+Semua yang interaktif ada di `todo-app.tsx`, yang ditandai `"use client"`.
 
 ## Pemilik state: todo-app.tsx
 
-Buka file-nya di panel File. Tiga state dan fungsi penting:
+Buka file-nya di panel File. Ada dua state dan tiga fungsi penting:
 
 ```tsx
 "use client";
@@ -96,12 +96,12 @@ export default function TodoApp() {
 }
 ```
 
-Perhatikan pola yang sudah kamu kenal dari pertemuan 04 dan 05:
+Semua polanya sudah kamu kenal dari pertemuan 04 dan 05:
 
 - **`type Todo`** — TypeScript mencatat bentuk satu tugas: `id`, `teks`, `selesai`.
-- **`tambah`** — `e.preventDefault()` menghentikan reload bawaan form; `{...}` membuat objek baru; `[...todos, baru]` membuat array baru — **tidak ada `push` langsung**.
-- **`toggle`** — `map` menghasilkan array baru; hanya item dengan `id` itu yang disalin dengan `selesai` dibalik.
-- **`hapus`** — `filter` membuang item dengan `id` itu. Sama seperti `toggle` di favorit tugas 05.
+- **`tambah`** — `e.preventDefault()` menghentikan reload bawaan form. `[...todos, baru]` membuat array baru — **tidak ada `push` langsung**.
+- **`toggle`** — `map` menghasilkan array baru. Hanya item dengan `id` itu yang disalin dengan `selesai` dibalik.
+- **`hapus`** — `filter` membuang item dengan `id` itu. Sama seperti `toggle` di tugas favorit 05.
 - **`teks`** — controlled input: nilai input dipegang state, sama seperti `KotakCari`.
 
 ## Anaknya: todo-item.tsx
@@ -138,7 +138,7 @@ export default function TodoItem({
 }
 ```
 
-State `todos` tinggal di `TodoApp`; `TodoItem` hanya menampilkan dan memanggil callback — persis pola state antar komponen dari pertemuan 04.
+State `todos` ada di `TodoApp`. `TodoItem` hanya menampilkan dan memanggil callback — persis pola state antar komponen dari pertemuan 04.
 
 ## Coba di project-mu
 
@@ -146,9 +146,9 @@ Buat ketiga file di project tugasmu (folder `app/todo/`), jalankan dev server, b
 
 ## Ringkasan
 
-- ✅ `page.tsx` server membingkai; `todo-app.tsx` `"use client"` memegang state dan semua handler
+- ✅ `page.tsx` komponen server menyusun halaman; `todo-app.tsx` `"use client"` memegang state dan semua handler
 - ✅ Tambah = `[...todos, baru]`, ubah = `map`, hapus = `filter` — array selalu dibuat baru
-- ✅ `TodoItem` menerima props `todo` + callback — anak tidak memiliki state sendiri
+- ✅ `TodoItem` menerima props `todo` dan callback — anak tidak memiliki state sendiri
 - ❌ State belum tersimpan — reload menghapus semua tugas
 
 Lanjut ke langkah 2: simpan tugas ke `localStorage` supaya selamat dari reload.

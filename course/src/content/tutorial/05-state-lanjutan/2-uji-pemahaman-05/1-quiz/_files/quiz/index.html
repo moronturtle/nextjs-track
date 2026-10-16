@@ -70,12 +70,12 @@
           soal: "Apa itu prop drilling?",
           opsi: [
             "Menulis props dengan nama yang salah",
-            "Mengoper props berlapis-lapis ke komponen dalam — komponen tengah jadi kurir yang tidak memakai datanya",
+            "Mengoper props berlapis-lapis ke komponen dalam — komponen tengah jadi perantara yang tidak memakai datanya",
             "Membaca data langsung dari context",
             "Mengubah props milik parent dari dalam anak",
           ],
           jawaban: 1,
-          pembahasan: "Props hanya mengalir turun satu tingkat per langkah. Data untuk komponen dalam harus diestafet lewat semua komponen di tengahnya — itulah prop drilling.",
+          pembahasan: "Props hanya mengalir turun satu tingkat per langkah. Data untuk komponen dalam harus diteruskan lewat semua komponen di tengahnya — itulah prop drilling.",
         },
         {
           soal: "Bagaimana Context menjawab masalah prop drilling?",
@@ -130,18 +130,18 @@
             "Saat aplikasi berjalan di browser",
           ],
           jawaban: 1,
-          pembahasan: "Context untuk data yang dipakai banyak komponen di banyak kedalaman — tema, pengguna login, bahasa. State lokal tetap pakai useState; parent-anak dekat tetap pakai props.",
+          pembahasan: "Context untuk data yang dipakai banyak komponen di banyak tingkat — tema, pengguna login, bahasa. State lokal tetap pakai useState; parent-anak dekat tetap pakai props.",
         },
         {
-          soal: "Di Redux Toolkit, apa yang terjadi saat komponen menjalankan dispatch(toggle(slug))?",
+          soal: "Apa yang dibutuhkan supaya komponen bisa membaca global state Zustand?",
           opsi: [
-            "Komponen mengubah store-nya langsung",
-            "Action dikirim ke store, lalu reducer toggle di slice yang mengubah datanya",
-            "Provider memanggil useSelector untuk semua komponen",
-            "Data langsung tersimpan ke database",
+            "Pasang Provider di app/layout.tsx dulu",
+            "Buat Context baru untuk komponen itu",
+            "Cukup panggil useStore((s) => s.bagian) — create sudah membuat store sekaligus hook-nya",
+            "Kirim action ke store dengan dispatch",
           ],
-          jawaban: 1,
-          pembahasan: "Komponen tidak menyentuh store langsung — dia mengirim action lewat dispatch, dan reducer di dalam slice yang mengubah state. Pembacaan datanya lewat useSelector.",
+          jawaban: 2,
+          pembahasan: "Zustand tidak pakai Provider sama sekali — satu file create() langsung menghasilkan hook yang bisa dipanggil komponen mana pun. dispatch dan Provider adalah cara Redux dan Context.",
         },
       ];
 

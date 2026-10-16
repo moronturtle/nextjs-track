@@ -9,9 +9,9 @@ previews:
 focus: /demo-tema/main.jsx
 ---
 
-# useContext — saluran langsung ke komponen dalam
+# useContext — baca data langsung, tanpa props
 
-Prop drilling dari lesson sebelumnya punya jawaban resmi di React: **Context**. Context adalah "saluran" — kamu memasang nilai di atas, dan komponen mana pun di bawahnya bisa membacanya langsung, tanpa dioper lewat props berlapis.
+Prop drilling dari lesson sebelumnya punya jawaban resmi di React: **Context**. Context seperti papan pengumuman — kamu memasang nilai di atas, dan komponen mana pun di bawahnya bisa membacanya langsung. Tidak perlu dioper lewat props.
 
 :::tip{title="Coba di preview"}
 Klik tombol **Ganti ke Gelap** di panel Preview. Seluruh tampilan berubah — padahal kalau kamu buka `demo-tema/main.jsx`, komponen `Konten` di tengah tidak membawa props apa pun. Tombol di dalamnya membaca dan mengubah tema langsung dari context.
@@ -20,7 +20,7 @@ Klik tombol **Ganti ke Gelap** di panel Preview. Seluruh tampilan berubah — pa
 ## Tiga bagian context
 
 ```jsx
-// 1. Buat salurannya — sekali, di file terpisah
+// 1. Buat context-nya — sekali, di file terpisah
 const TemaContext = React.createContext(null);
 
 function App() {
@@ -44,7 +44,7 @@ function Konten() {
 }
 
 function TombolTema() {
-  // 3. Komponen dalam membaca langsung — tak peduli berapa lapis kedalamannya
+  // 3. Komponen dalam membaca langsung — tak peduli ada berapa lapis di antaranya
   const { gelap, setGelap } = React.useContext(TemaContext);
   return (
     <button onClick={() => setGelap(!gelap)}>
@@ -54,7 +54,7 @@ function TombolTema() {
 }
 ```
 
-Perhatikan `Konten`: dia benar-benar kosong dari urusan tema. Tidak seperti `Header` si kurir di lesson sebelumnya, tidak ada props yang lewat — `TombolTema` meloncat langsung ke saluran.
+Perhatikan `Konten`: dia benar-benar tidak ikut urusan tema. Tidak seperti `Header` si perantara di lesson sebelumnya, tidak ada props yang lewat — `TombolTema` membaca langsung dari context.
 
 ## Di project Next.js-mu
 
@@ -89,9 +89,9 @@ export function useTema() {
 Dua hal dari file ini:
 
 - File ini memakai `useState` dan `useContext`, jadi wajib `"use client"`.
-- `useTema()` adalah **custom hook** — fungsi buatanmu sendiri yang membungkus `useContext` supaya pemakaiannya satu baris dan ada pesan error jelas kalau dipakai di luar Provider. Ini pola yang sangat umum dipakai project React.
+- `useTema()` adalah **custom hook** — fungsi buatanmu sendiri yang membungkus `useContext`. Gunanya: memakai context cukup satu baris, dan ada pesan error yang jelas kalau dipakai di luar Provider. Pola ini sangat umum di project React.
 
-Pemasangannya di `project/app/layout.tsx` — root layout server membungkus semua halaman dengan komponen client `TemaProvider`, dan `children` tetap diteruskan apa adanya:
+Pemasangannya di `project/app/layout.tsx` — root layout yang server membungkus semua halaman dengan komponen client `TemaProvider`, dan `children` tetap diteruskan apa adanya:
 
 ```tsx
 <body>
@@ -99,13 +99,13 @@ Pemasangannya di `project/app/layout.tsx` — root layout server membungkus semu
 </body>
 ```
 
-Sekarang komponen mana pun — `Menu`, tombol di halaman tulisan, apa pun — tinggal `const { gelap } = useTema()` tanpa satu props pun dioper.
+Sekarang komponen mana pun — `Menu`, tombol di halaman tulisan, apa pun — tinggal `const { gelap } = useTema()`. Tidak ada satu props pun yang dioper.
 
 ## Ringkasan
 
-- ✅ Context = saluran: `createContext` membuatnya, `Provider` memasang nilainya, `useContext` membacanya
-- ✅ Komponen tengah bebas dari props yang bukan urusannya — tidak ada lagi kurir
-- ✅ File context biasanya sekaligus menyediakan `Provider` + custom hook seperti `useTema`
-- ❌ `useContext` hanya membaca dari `Provider` terdekat di atasnya — dipakai di luar Provider berarti nilai default-nya (di sini `null`)
+- ✅ Context punya tiga bagian: `createContext` membuatnya, `Provider` memasang nilainya, `useContext` membacanya
+- ✅ Komponen tengah bebas dari props yang bukan urusannya — tidak ada lagi perantara
+- ✅ File context biasanya sekaligus menyediakan `Provider` dan custom hook seperti `useTema`
+- ❌ `useContext` hanya membaca dari `Provider` terdekat di atasnya — dipakai di luar Provider, yang didapat nilai awalnya (di sini `null`)
 
-Context sudah jalan. Tapi kapan sebaiknya dipakai, dan kapan tetap pakai `useState` biasa? Itu bahasan lesson terakhir.
+Context sudah jalan. Tapi kapan sebaiknya dipakai, dan kapan tetap pakai `useState` biasa? Itu bahasan lesson berikutnya.

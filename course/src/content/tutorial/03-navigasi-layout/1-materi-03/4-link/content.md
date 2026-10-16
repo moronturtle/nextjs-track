@@ -9,14 +9,14 @@ focus: /project/app/layout.tsx
 
 # Link — pindah halaman tanpa reload
 
-Di tugas 02 kamu sudah memasang `<Link>` dari `next/link` di menu navigasi. Kenapa tidak `<a>` biasa? Jawabannya kembali ke dua masalah dari pertemuan 01:
+Di tugas 02 kamu sudah memasang `<Link>` dari `next/link` di menu navigasi. Kenapa tidak pakai `<a>` biasa? Jawabannya kembali ke dua masalah dari pertemuan 01:
 
 | | Kelebihan | Masalah |
 |---|---|---|
 | HTML biasa | Isi halaman langsung ada → bisa dibaca Google | Pindah halaman = reload total |
 | React SPA | Pindah halaman mulus tanpa reload | HTML awal kosong → tidak bisa dibaca Google |
 
-`<Link>` mengambil kelebihan keduanya. Halaman **pertama** yang dibuka tiba sebagai HTML lengkap dari server — isinya tetap terbaca Google. Tapi saat pengunjung klik `<Link>`, Next.js mengganti isi halaman langsung di browser — tanpa reload penuh, seperti SPA. Alamat di address bar tetap berubah dengan benar, dan tombol back browser tetap berfungsi.
+`<Link>` mengambil kelebihan dua-duanya. Halaman **pertama** yang dibuka tetap tiba sebagai HTML lengkap dari server — isinya bisa dibaca Google. Tapi saat pengunjung mengklik `<Link>`, Next.js mengganti isi halaman langsung di browser — tanpa reload penuh, seperti SPA. Alamat di address bar tetap berubah dengan benar, dan tombol back browser tetap berfungsi.
 
 ## Bedanya di kode nyaris tidak terlihat
 
@@ -43,17 +43,17 @@ Kalau belum yakin, ganti sementara satu `<Link>` di menu menjadi `<a>`, ulangi p
 
 ## Link hanya untuk alamat di dalam project
 
-`<Link>` mengatur perpindahan antarhalaman project-mu sendiri. Untuk tujuan di luar website — misalnya `https://github.com/namamu` — tetap pakai `<a>` biasa, karena halaman luar memang harus dimuat dari awal. Lihat contohnya di `project/app/kontak/page.tsx`.
+`<Link>` mengatur pindah halaman di dalam project-mu sendiri. Untuk tujuan di luar website — misalnya `https://github.com/namamu` — tetap pakai `<a>` biasa, karena halaman luar memang harus dimuat dari awal. Contohnya ada di `project/app/kontak/page.tsx`.
 
-## Prefetch — alasan klik terasa instan
+## Prefetch — kenapa klik terasa seketika
 
-Ada satu hal lagi yang dikerjakan `<Link>` diam-diam: **prefetch** — mengambil lebih dulu. Saat sebuah `Link` tampil di layar, Next.js menyiapkan halaman tujuannya di latar belakang. Saat kamu klik, isinya sudah siap, jadi perpindahan terasa instan. Ini otomatis — tidak perlu diatur.
+Ada satu hal lagi yang dikerjakan `<Link>` tanpa kamu sadari: **prefetch**, artinya "mengambil lebih dulu". Saat sebuah `<Link>` tampil di layar, Next.js diam-diam menyiapkan halaman tujuannya. Saat kamu klik, isinya sudah siap — jadi pindahnya terasa seketika. Semuanya otomatis, tidak perlu diatur.
 
 ## Ringkasan
 
-- ✅ `<Link>` = navigasi antarhalaman project tanpa reload penuh; halaman pertama tetap HTML lengkap
-- ✅ Prefetch otomatis menyiapkan halaman tujuan sebelum diklik — klik terasa instan
+- ✅ `<Link>` = pindah halaman di dalam project tanpa reload penuh; halaman pertama tetap HTML lengkap
+- ✅ Prefetch otomatis menyiapkan halaman tujuan sebelum diklik — klik terasa seketika
 - ✅ `<a>` tetap dipakai untuk alamat di luar project-mu
-- ❌ Jangan pakai `<Link>` untuk link keluar — halaman luar tidak bisa diprefetch Next.js
+- ❌ Jangan pakai `<Link>` untuk link keluar — halaman luar tidak bisa disiapkan Next.js
 
-`<Link>` bekerja saat pengunjung mengklik. Tapi kadang kode yang perlu memindahkan halaman — dan menu perlu tahu alamat yang sedang dibuka. Lesson terakhir pertemuan ini: `useRouter` dan `usePathname`.
+`<Link>` bekerja saat pengunjung mengklik. Tapi kadang yang memindahkan halaman adalah kode, bukan klik — dan menu perlu tahu alamat yang sedang dibuka. Lesson terakhir pertemuan ini: `useRouter` dan `usePathname`.
