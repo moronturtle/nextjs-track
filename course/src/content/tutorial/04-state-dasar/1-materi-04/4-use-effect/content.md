@@ -2,59 +2,68 @@
 type: lesson
 title: useEffect
 template: baca
-previews:
-  - port: 3000
-    title: Preview
-    pathname: /demo-efek/
-focus: /demo-efek/main.jsx
+previews: false
+terminal: false
+focus: /project/app/blog/[slug]/like-button.tsx
 ---
 
-# useEffect — kode yang jalan setelah komponen tampil
+# useEffect — menjalankan kode setelah komponen tampil
 
-:::tip{title="Lihat preview"}
-Di panel Preview ada dua jam. Jam pertama — dari server — diam sejak halaman dimuat. Jam kedua **berdetak setiap detik**. Tidak ada yang kamu klik — komponen itu bekerja sendiri setelah tampil. Itu pekerjaan `useEffect`.
-:::
+Bayangkan komponen jam yang berdetak sendiri — waktunya diperbarui setiap detik tanpa ada yang menekan tombol. Kode yang berjalan "setelah komponen tampil" seperti itu ditulis di `useEffect`.
 
-`useState` menjawab "data berubah saat pengunjung beraksi". `useEffect` menjawab pertanyaan lain: "jalankan kode ini **setelah** komponen tampil". Cocok untuk urusan yang ada di luar React: timer, `localStorage`, judul tab (`document.title`), atau mengukur lebar layar.
+`useState` menyimpan nilai yang bisa berubah. `useEffect` menjalankan kode setelah komponen tampil. Kode ini berguna untuk hal yang perlu berhubungan dengan browser, seperti timer atau `localStorage` — tempat menyimpan teks di browser agar tetap ada setelah halaman dimuat ulang.
 
-## Bagian-bagian `useEffect`
+## Melihat cara kerja `useEffect`
 
-Buka `demo-efek/main.jsx`:
+Ini kode jam yang berdetak setiap detik:
 
-```jsx
-function Jam() {
-  const [waktu, setWaktu] = React.useState(new Date());
+```tsx
+"use client";
 
-  React.useEffect(() => {
-    const id = setInterval(() => setWaktu(new Date()), 1000);
-    return () => clearInterval(id);
+import { useEffect, useState } from "react";
+
+export default function Jam() {
+  const [waktu, setWaktu] = useState(new Date());
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setWaktu(new Date());
+    }, 1000);
+
+    return () => clearInterval(timer);
   }, []);
 
   return <p>Sekarang pukul {waktu.toLocaleTimeString("id-ID")}</p>;
 }
 ```
 
-Tiga bagian penting:
-
-1. **Fungsi pertama** — kode yang dijalankan React setiap kali effect aktif. Di sini: memasang `setInterval` yang memperbarui state tiap detik.
-2. **`return () => ...`** — fungsi pembersih. React memanggilnya saat komponen dibuang dari layar, supaya timer tidak terus berjalan di komponen yang sudah tidak ada. Timer yang dibiarkan bisa menumpuk dan membuat aplikasi lambat.
-3. **`[]` di akhir** — daftar **dependency**, yaitu aturan kapan effect diulang. Array kosong artinya "jalankan sekali saja setelah komponen tampil".
-
-Daftar dependency mengatur jadwal effect:
-
-```tsx
-useEffect(fn);          // setiap render — jarang dipakai
-useEffect(fn, []);      // sekali, setelah tampil pertama kali
-useEffect(fn, [slug]);  // tiap nilai slug berubah
-```
-
-:::warning{title="Effect jalan dua kali di mode dev"}
-Saat `npm run dev`, React sengaja menjalankan effect dua kali. Tujuannya membantumu menemukan effect yang lupa menulis fungsi pembersih. Ini hanya terjadi di mode pengembangan — di versi produksi effect jalan normal.
+:::tip{title="Coba di project-mu"}
+Salin kode `Jam` di atas ke file `app/demo/jam.tsx`, lalu panggil `<Jam />` dari sebuah `page.tsx`. Jam akan berdetak setiap detik — dan semua itu terjadi tanpa kamu menekan apa pun.
 :::
 
-## Contoh di project: like yang tersimpan
+Perhatikan tiga hal:
 
-Ingat `LikeButton` dari lesson 1? Masalahnya: reload halaman, hitungan kembali nol. Dengan `useEffect` kita bisa menyimpannya ke `localStorage` — penyimpanan kecil di browser yang isinya tidak hilang walau halaman dimuat ulang. Lihat `project/app/blog/[slug]/like-button.tsx`:
+1. `setInterval` menjalankan isi fungsi setiap 1.000 milidetik, atau satu detik. Di contoh ini, waktu diperbarui setiap detik.
+2. `return () => clearInterval(timer)` menghentikan timer saat komponen tidak lagi dipakai. Ini mencegah timer terus berjalan tanpa perlu.
+3. `[]` adalah daftar nilai yang diperiksa React. Karena daftar ini kosong, effect dijalankan saat komponen pertama kali tampil, bukan setiap kali waktu berubah.
+
+Daftar tersebut disebut **dependency array** — daftar nilai yang menentukan kapan effect perlu dijalankan lagi.
+
+```tsx
+useEffect(fn, []);         // saat komponen pertama kali tampil
+useEffect(fn, [slug]);     // saat slug berubah
+useEffect(fn, [suka, slug]); // saat suka atau slug berubah
+```
+
+:::warning{title="Mengapa effect terlihat berjalan dua kali?"}
+Saat mode pengembangan aktif, React dapat menjalankan effect, membersihkannya, lalu menjalankannya lagi. React melakukan ini untuk memeriksa apakah fungsi pembersih sudah benar. Pastikan timer dihentikan dengan `clearInterval`.
+:::
+
+## Menyimpan jumlah suka
+
+Di lesson pertama, tombol suka selalu mulai dari nol. Kita bisa membaca jumlah sebelumnya dari `localStorage` saat komponen tampil.
+
+Buka `project/app/blog/[slug]/like-button.tsx`:
 
 ```tsx
 "use client";
@@ -62,41 +71,37 @@ Ingat `LikeButton` dari lesson 1? Masalahnya: reload halaman, hitungan kembali n
 import { useEffect, useState } from "react";
 
 export default function LikeButton({ slug }: { slug: string }) {
-  const [suka, setSuka] = useState(0);
+  const [jumlahSuka, setJumlahSuka] = useState(0);
 
-  // Baca simpanan saat halaman dibuka
   useEffect(() => {
-    const tersimpan = localStorage.getItem(`suka-${slug}`);
-    if (tersimpan) setSuka(Number(tersimpan));
+    const simpanan = localStorage.getItem(`suka-${slug}`);
+    setJumlahSuka(simpanan === null ? 0 : Number(simpanan));
   }, [slug]);
 
-  // Simpan setiap kali hitungan berubah
-  useEffect(() => {
-    localStorage.setItem(`suka-${slug}`, String(suka));
-  }, [suka, slug]);
+  function tambahSuka() {
+    const jumlahBaru = jumlahSuka + 1;
+    setJumlahSuka(jumlahBaru);
+    localStorage.setItem(`suka-${slug}`, String(jumlahBaru));
+  }
 
-  return (
-    <button
-      onClick={() => setSuka(suka + 1)}
-      className="rounded-lg border px-4 py-2"
-    >
-      👍 {suka}
-    </button>
-  );
+  return <button onClick={tambahSuka}>👍 {jumlahSuka}</button>;
 }
 ```
 
-Dua effect, dua jadwal. Yang pertama jalan saat `slug` berubah (membaca simpanan). Yang kedua jalan tiap `suka` berubah (menulis simpanan). Nanti di project-mu: klik tombol, reload halaman — angkanya tidak hilang.
+Effect membaca jumlah suka saat halaman tulisan tampil. Saat tombol ditekan, `tambahSuka` menaikkan angka dan menyimpan angka baru. Kita menyimpan langsung saat tombol ditekan karena penyimpanan terjadi akibat klik.
 
-:::info{title="Bukan untuk mengambil data halaman"}
-Di Next.js, mengambil data untuk halaman biasanya dilakukan di komponen server — HTML-nya tiba sudah berisi. `useEffect` dipakai untuk hal yang memang hanya ada di browser: `localStorage`, timer, ukuran layar, dan sejenisnya.
+Coba tekan tombol beberapa kali, lalu muat ulang halaman tulisan yang sama. Angka suka tetap ada karena browser menyimpannya.
+
+:::info{title="Kapan memakai useEffect?"}
+Di Next.js, data untuk membuat halaman biasanya dibaca di komponen server. `useEffect` lebih cocok untuk kode yang perlu berjalan di browser setelah komponen tampil, misalnya membaca `localStorage` atau memasang timer.
 :::
 
 ## Ringkasan
 
-- ✅ `useEffect(fn, deps)` menjalankan `fn` setelah komponen tampil — untuk urusan di luar React
-- ✅ `[]` = sekali; `[x]` = tiap `x` berubah; tanpa array = tiap render
-- ✅ `return () => ...` = pembersih saat komponen dibuang — wajib untuk timer dan pendengar event
-- ❌ Jangan memakai effect untuk hal yang bisa dihitung langsung saat render — effect jalan setelah tampil, jadi hasilnya telat satu langkah
+- ✅ `useEffect` menjalankan kode setelah komponen tampil
+- ✅ `[]` berarti effect dijalankan saat komponen pertama kali tampil
+- ✅ `[nilai]` berarti effect dijalankan lagi saat nilai tersebut berubah
+- ✅ Hentikan timer dengan fungsi pembersih, seperti `clearInterval`
+- ❌ Jangan memakai `useEffect` untuk menghitung nilai yang bisa dihitung langsung dari state
 
-Materi pertemuan 04 selesai — quiz dulu, lalu lanjutkan project-mu di tugas.
+Materi pertemuan 04 selesai. Kerjakan quiz, lalu gunakan state dan effect di tugas.

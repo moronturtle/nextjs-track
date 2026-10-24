@@ -7,24 +7,28 @@ terminal: false
 focus: /project/app/blog/daftar-tulisan.tsx
 ---
 
-# State antar komponen
+# Membagikan state antar komponen
 
-`useState` menyimpan data di dalam satu komponen. Tapi komponen jarang hidup sendiri — komponen saling memanggil, dan state sering perlu dipakai bersama.
+Di lesson sebelumnya, angka penghitung disimpan di satu komponen. Bagaimana kalau satu komponen menyimpan teks pencarian, lalu komponen lain menampilkan hasilnya?
 
-React punya aturan arus data yang tegas: **data mengalir satu arah — dari parent ke anak — lewat props**. Untuk arah sebaliknya, dipakai **callback**: parent mengirim fungsi lewat props, dan anak memanggil fungsi itu saat mau memberi kabar.
+Contohnya kotak pencarian dan daftar tulisan blog. Keduanya perlu memakai teks yang sama.
 
-## Turun lewat props, naik lewat callback
+## Parent dan anak
 
-Contoh yang akan kita pakai di tugas: kotak pencarian di atas daftar tulisan blog. Tiga file di panel File:
+Komponen yang menampilkan komponen lain disebut **parent** (induk). Komponen yang ditampilkan di dalamnya disebut **anak**.
+
+Di contoh ini, `DaftarTulisan` adalah parent. `KotakCari` adalah anak.
 
 ```text
 app/blog/
-├── page.tsx            ← server: daftar judul tulisan
-├── daftar-tulisan.tsx  ← client: pemilik state + filter
-└── kotak-cari.tsx      ← anak: kotak input yang dikendalikan parent
+├── page.tsx            ← halaman blog
+├── daftar-tulisan.tsx  ← parent: menyimpan teks pencarian
+└── kotak-cari.tsx      ← anak: menampilkan kotak input
 ```
 
-**`kotak-cari.tsx`** — komponen anak. Dia tidak punya state sendiri. Nilai input dan cara mengubahnya datang dari parent lewat props:
+## Parent mengirim data lewat props
+
+**Props** adalah data atau fungsi yang dikirim parent kepada anak. Buka `project/app/blog/kotak-cari.tsx` di panel File:
 
 ```tsx
 export default function KotakCari({
@@ -39,20 +43,20 @@ export default function KotakCari({
       value={nilai}
       onChange={(e) => saatBerubah(e.target.value)}
       placeholder="Cari tulisan..."
-      className="w-full rounded-lg border px-4 py-2"
     />
   );
 }
 ```
 
-Perhatikan dua props-nya:
+`nilai` berisi teks yang tampil di kotak. `saatBerubah` adalah fungsi yang dipanggil saat seseorang mengetik.
 
-- `nilai` — teks yang tampil di input, **dikirim turun** dari parent.
-- `saatBerubah` — fungsi yang dipanggil anak setiap kali pengunjung mengetik. Lewat fungsi inilah anak **mengirim kabar naik** ke parent.
+Kotak input tidak menyimpan teksnya sendiri. Parent mengirim teks turun lewat `nilai`. Saat ada teks baru, anak memanggil fungsi `saatBerubah` untuk memberi tahu parent.
 
-Input yang nilainya dipegang state parent seperti ini disebut **controlled input** — input yang dikendalikan React, bukan menyimpan teksnya sendiri.
+Pola ini disebut **controlled input** — nilai kotak input dikendalikan oleh state di React.
 
-**`daftar-tulisan.tsx`** — parent-nya. State `cari` ada di sini:
+## Parent menyimpan state
+
+Buka `project/app/blog/daftar-tulisan.tsx`. File ini menyimpan teks pencarian dan mengirimkannya ke `KotakCari`:
 
 ```tsx
 "use client";
@@ -61,11 +65,7 @@ import { useState } from "react";
 import Link from "next/link";
 import KotakCari from "./kotak-cari";
 
-export default function DaftarTulisan({
-  daftar,
-}: {
-  daftar: string[];
-}) {
+export default function DaftarTulisan({ daftar }: { daftar: string[] }) {
   const [cari, setCari] = useState("");
 
   const hasil = daftar.filter((slug) => slug.includes(cari));
@@ -73,7 +73,8 @@ export default function DaftarTulisan({
   return (
     <div>
       <KotakCari nilai={cari} saatBerubah={setCari} />
-      <ul className="mt-4 list-disc pl-5 underline">
+
+      <ul>
         {hasil.map((slug) => (
           <li key={slug}>
             <Link href={`/blog/${slug}`}>{slug}</Link>
@@ -85,32 +86,46 @@ export default function DaftarTulisan({
 }
 ```
 
-Alurnya begini: pengunjung mengetik → `KotakCari` memanggil `saatBerubah(teks)` → `setCari` jalan → state berubah → `DaftarTulisan` ditampilkan ulang → daftar `hasil` ikut terfilter dengan teks baru.
+`daftar` adalah daftar teks. Setiap teks adalah alamat pendek sebuah tulisan blog, misalnya `belajar-nextjs`. Tanda `string[]` pada kode berarti “daftar berisi teks”. `filter` memilih tulisan yang alamatnya memuat teks pencarian.
 
-Dan `page.tsx` tetap komponen server — daftar judul dikirim ke komponen client sebagai props:
+Perhatikan baris `<KotakCari nilai={cari} saatBerubah={setCari} />`:
+
+- `cari` dikirim ke kotak input. Karena itu, teks yang diketik tampil di kotak.
+- `setCari` juga dikirim. Saat anak memanggil fungsi ini, state parent berubah.
+
+Alurnya seperti ini:
+
+1. Pengunjung mengetik di kotak.
+2. `KotakCari` memanggil `saatBerubah` dengan teks baru.
+3. `setCari` mengubah state di `DaftarTulisan`.
+4. React memperbarui tampilan dan menampilkan hasil pencarian yang cocok.
+
+`page.tsx` tetap menjadi halaman server. Halaman ini mengirim daftar tulisan ke `DaftarTulisan`:
 
 ```tsx
+import DaftarTulisan from "./daftar-tulisan";
+
 const TULISAN = ["belajar-nextjs", "hal-baru", "target-tahun-ini"];
 
 export default function BlogPage() {
   return (
-    <main className="mx-auto max-w-3xl px-6 py-12">
-      <h1 className="text-3xl font-bold">Blog</h1>
+    <main>
+      <h1>Blog</h1>
       <DaftarTulisan daftar={TULISAN} />
     </main>
   );
 }
 ```
 
-:::info{title="Kenapa kotak-cari.tsx tidak perlu &quot;use client&quot;"}
-File yang diimpor komponen `"use client"` ikut dijalankan di browser. `KotakCari` tidak memakai hook apa pun — dia hanya menerima props dan mengembalikan JSX — jadi tidak perlu menandai dirinya sendiri.
+:::info{title="Kenapa kotak-cari.tsx tidak perlu &quot;use client&quot;?"}
+`KotakCari` tidak memakai `useState` atau hook lain. Karena `KotakCari` dipakai oleh `DaftarTulisan` yang sudah memakai `"use client"`, file anak ini tidak perlu menambahkan baris tersebut.
 :::
 
 ## Ringkasan
 
-- ✅ Data mengalir satu arah: parent → anak lewat props
-- ✅ Anak memberi kabar ke parent dengan memanggil fungsi yang dikirim lewat props (callback)
-- ✅ Pemilik state adalah parent; anak cukup dikendalikan lewat props
-- ❌ Anak tidak bisa mengubah state parent secara langsung — hanya lewat callback yang diberikan parent
+- ✅ Parent mengirim data ke anak lewat props
+- ✅ Anak memberi tahu parent dengan memanggil fungsi yang dikirim lewat props
+- ✅ State disimpan di parent karena parent dan anak sama-sama memerlukan nilainya
+- ❌ Anak tidak mengubah state parent secara langsung
 
-Tapi bagaimana kalau dua komponen **sejajar** — bukan parent-anak — butuh state yang sama? Lesson berikutnya: **lifting state up**.
+Sekarang state sudah dipakai oleh parent dan anak. Berikutnya, kita lihat cara berbagi state antara dua komponen anak.

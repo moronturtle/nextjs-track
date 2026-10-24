@@ -3,25 +3,18 @@
 import { useEffect, useState } from "react";
 
 export default function LikeButton({ slug }: { slug: string }) {
-  const [suka, setSuka] = useState(0);
+  const [jumlahSuka, setJumlahSuka] = useState(0);
 
-  // Baca simpanan saat halaman dibuka
   useEffect(() => {
-    const tersimpan = localStorage.getItem(`suka-${slug}`);
-    if (tersimpan) setSuka(Number(tersimpan));
+    const simpanan = localStorage.getItem(`suka-${slug}`);
+    setJumlahSuka(simpanan === null ? 0 : Number(simpanan));
   }, [slug]);
 
-  // Simpan setiap kali hitungan berubah
-  useEffect(() => {
-    localStorage.setItem(`suka-${slug}`, String(suka));
-  }, [suka, slug]);
+  function tambahSuka() {
+    const jumlahBaru = jumlahSuka + 1;
+    setJumlahSuka(jumlahBaru);
+    localStorage.setItem(`suka-${slug}`, String(jumlahBaru));
+  }
 
-  return (
-    <button
-      onClick={() => setSuka(suka + 1)}
-      className="rounded-lg border px-4 py-2"
-    >
-      👍 {suka}
-    </button>
-  );
+  return <button onClick={tambahSuka}>👍 {jumlahSuka}</button>;
 }

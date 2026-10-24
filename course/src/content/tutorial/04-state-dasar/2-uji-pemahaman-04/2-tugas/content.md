@@ -7,17 +7,17 @@ terminal: false
 editor: false
 ---
 
-# Tugas: tombol suka dan pencarian
+# Tugas: tombol suka dan kotak pencarian
 
-Lanjutan dari project yang sama — project yang di pertemuan 03 sudah punya `/blog`, halaman `[slug]`, layout khusus blog, dan menu yang menandai halaman aktif.
+Lanjutkan project dari pertemuan 03. Project tersebut sudah punya halaman `/blog`, halaman tulisan dengan alamat dinamis seperti `/blog/belajar-nextjs`, layout blog, dan menu.
 
-Kali ini kamu membuat blog-mu interaktif: tombol suka yang tersimpan, dan kotak pencarian yang memfilter daftar tulisan.
+Sekarang tambahkan dua hal: tombol suka yang mengingat jumlah klik, dan kotak pencarian untuk mencari tulisan di daftar blog.
 
 ## Yang dikerjakan
 
 ### 1. Tombol suka di halaman tulisan
 
-Buat `app/blog/[slug]/like-button.tsx` — komponen `"use client"` dengan `useState` yang menghitung klik:
+Buat `app/blog/[slug]/like-button.tsx`. Komponen ini memakai `useState` untuk menghitung klik. `useEffect` membaca jumlah sebelumnya dari `localStorage` saat halaman dibuka:
 
 ```tsx
 "use client";
@@ -25,38 +25,40 @@ Buat `app/blog/[slug]/like-button.tsx` — komponen `"use client"` dengan `useSt
 import { useEffect, useState } from "react";
 
 export default function LikeButton({ slug }: { slug: string }) {
-  const [suka, setSuka] = useState(0);
+  const [jumlahSuka, setJumlahSuka] = useState(0);
 
   useEffect(() => {
-    const tersimpan = localStorage.getItem(`suka-${slug}`);
-    if (tersimpan) setSuka(Number(tersimpan));
+    const simpanan = localStorage.getItem(`suka-${slug}`);
+    setJumlahSuka(simpanan === null ? 0 : Number(simpanan));
   }, [slug]);
 
-  useEffect(() => {
-    localStorage.setItem(`suka-${slug}`, String(suka));
-  }, [suka, slug]);
+  function tambahSuka() {
+    const jumlahBaru = jumlahSuka + 1;
+    setJumlahSuka(jumlahBaru);
+    localStorage.setItem(`suka-${slug}`, String(jumlahBaru));
+  }
 
   return (
-    <button onClick={() => setSuka(suka + 1)} className="rounded-lg border px-4 py-2">
-      👍 {suka}
+    <button onClick={tambahSuka} className="rounded-lg border px-4 py-2">
+      👍 {jumlahSuka}
     </button>
   );
 }
 ```
 
-Pasang di `app/blog/[slug]/page.tsx` — halaman meneruskan `slug` sebagai props: `<LikeButton slug={slug} />`.
+Pasang tombol di `app/blog/[slug]/page.tsx` — halaman mengirim alamat tulisan (`slug`) ke tombol: `<LikeButton slug={slug} />`.
 
-Setelah jalan, coba: klik beberapa kali, reload halaman — hitungan tetap. Karena key-nya pakai `suka-${slug}`, tiap tulisan punya hitungan sendiri.
+Setelah jalan, klik tombol beberapa kali lalu muat ulang halaman tulisan yang sama. Jumlah suka tetap tersimpan. Setiap tulisan memiliki jumlah sendiri karena nama simpanannya memakai alamat tulisan, misalnya `suka-belajar-nextjs`.
 
 ### 2. Pencarian di daftar tulisan
 
-Sekarang `/blog` hanya menampilkan daftar `<Link>` biasa. Ubah jadi daftar yang bisa dicari, pakai pola dari materi:
+Sekarang `/blog` hanya menampilkan daftar link. Ubah menjadi daftar yang bisa dicari. Gunakan pola dari materi:
 
-- `app/blog/kotak-cari.tsx` — input yang menerima `nilai` dan `saatBerubah` sebagai props (tidak perlu `"use client"` sendiri).
-- `app/blog/daftar-tulisan.tsx` — komponen `"use client"` yang memegang state `cari`, memfilter daftar, dan merender `<KotakCari>` + `<ul>` berisi `<Link>`.
-- `app/blog/page.tsx` — tetap komponen server; daftar slug tulisan dikirim ke `<DaftarTulisan>` lewat props.
+- `app/blog/kotak-cari.tsx` — kotak input yang menerima teks dan fungsi lewat props. File ini tidak perlu `"use client"` sendiri.
+- `app/blog/daftar-tulisan.tsx` — komponen `"use client"` yang menyimpan teks pencarian, memilih tulisan yang cocok, lalu menampilkan `<KotakCari>` dan daftar `<Link>`.
+- `app/blog/page.tsx` — halaman server yang mengirim daftar alamat tulisan ke `<DaftarTulisan>` lewat props.
 
-State `cari` tinggal di `DaftarTulisan`, bukan di dalam input — inilah controlled input dari materi.
+Simpan state `cari` di `DaftarTulisan`, bukan di dalam kotak input. Dengan begitu, komponen daftar dapat memakai teks yang diketik untuk memilih tulisan yang cocok.
 
 ### 3. Periksa hasilnya
 
@@ -66,21 +68,21 @@ npx prettier --write app
 npx tsc --noEmit
 ```
 
-Kalau project-mu memakai pnpm atau Yarn, sesuaikan perintahnya seperti biasa.
+Kalau project-mu memakai pnpm atau Yarn, gunakan perintah yang sesuai.
 
 Lalu uji di browser:
 
-- tombol 👍 menambah hitungan, dan tetap tersimpan setelah reload
-- hitungan di `/blog/a` dan `/blog/b` tidak saling mempengaruhi
-- mengetik di kotak cari memfilter daftar tulisan secara langsung
+- tombol 👍 menambah jumlah suka, dan jumlahnya tetap tersimpan setelah halaman dimuat ulang
+- jumlah suka di dua halaman tulisan berbeda tidak saling mengubah
+- mengetik di kotak pencarian hanya menampilkan tulisan yang cocok
 - menu aktif dari tugas 03 masih bekerja
 
 ## Kriteria selesai
 
 - [ ] Project yang sama dengan tugas pertemuan sebelumnya
-- [ ] `app/blog/[slug]/like-button.tsx` ada dan hitungan tersimpan per slug lewat `localStorage`
-- [ ] `app/blog` punya kotak cari yang memfilter daftar tulisan
-- [ ] State pencarian tinggal di komponen parent (`daftar-tulisan.tsx`), input hanya menerima props
+- [ ] `app/blog/[slug]/like-button.tsx` menghitung jumlah suka dan menyimpannya per tulisan di `localStorage`
+- [ ] Halaman `/blog` punya kotak pencarian yang menampilkan tulisan yang cocok
+- [ ] `daftar-tulisan.tsx` menyimpan teks pencarian; `kotak-cari.tsx` menerima teks dan fungsi lewat props
 - [ ] `npm run lint` dan `npx tsc --noEmit` selesai tanpa error
 
 ## Cara mengumpulkan

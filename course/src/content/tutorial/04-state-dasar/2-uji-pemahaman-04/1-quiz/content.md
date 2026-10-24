@@ -12,10 +12,10 @@ previews:
 
 # Quiz — cek pemahamanmu
 
-Ada **6 soal pilihan ganda** tentang `useState`, state antar komponen, lifting state, dan `useEffect`. Kerjakan di panel Preview.
+Ada **6 soal pilihan ganda** tentang `useState`, cara berbagi state antar komponen, memindahkan state ke parent, dan `useEffect`. Kerjakan di panel Preview.
 
 - Pilih satu jawaban untuk setiap soal.
-- Jawaban langsung dinilai. Jika jawabanmu belum tepat, quiz menunjukkan jawaban yang benar dan alasannya.
-- Setelah soal terakhir, kamu bisa melihat skor dan mengulang quiz.
+- Setelah memilih jawaban, kamu akan melihat hasil dan penjelasannya.
+- Setelah soal terakhir, lihat skormu atau ulangi quiz.
 
 Quiz ini adalah latihan mandiri. Setelah selesai, buka tugas dan lanjutkan project yang sama dari pertemuan sebelumnya.

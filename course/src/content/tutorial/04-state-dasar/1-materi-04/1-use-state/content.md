@@ -2,60 +2,78 @@
 type: lesson
 title: useState
 template: baca
-previews:
-  - port: 3000
-    title: Preview
-    pathname: /demo-state/
-focus: /demo-state/main.jsx
+previews: false
+terminal: false
+focus: /project/app/blog/[slug]/like-button.tsx
 ---
 
-# useState — data yang bisa berubah
+# useState — menyimpan nilai yang berubah
 
-Sampai pertemuan 03, semua halamanmu statis — isinya sudah tetap sejak ditulis. Sekarang kita buat halaman yang **bereaksi saat pengunjung beraksi**.
+Di materi sebelumnya, kita membuat halaman dan mengatur cara berpindah halaman. Sekarang kita akan membuat penghitung sederhana. Angkanya berubah setiap kali tombol ditekan — tanpa memuat ulang halaman.
 
-:::tip{title="Coba di preview"}
-Klik tombol **Tambah** beberapa kali di panel Preview. Angkanya berubah — tapi perhatikan jam server di bawah halaman: tetap sama. Artinya halaman tidak dimuat ulang; JavaScript di browser yang mengubah tampilannya.
-:::
+## Apa itu state?
 
-## State itu apa?
+**State** adalah nilai yang disimpan React untuk sebuah komponen. Contohnya angka penghitung yang akan kita buat.
 
-**State** adalah data yang bisa berubah selama aplikasi berjalan. Setiap kali state berubah, React menampilkan ulang komponennya dengan nilai yang baru. Angka counter di demo tadi adalah state.
+Saat nilai state berubah, React memperbarui tampilan komponen. Jadi angka di layar ikut berubah.
 
-Variabel biasa tidak bisa dipakai untuk ini. Kalau kamu menulis `let count = 0` lalu mengubahnya, React tidak tahu ada perubahan — tampilan tidak ikut berubah. React hanya menampilkan ulang saat **state** berubah.
+Variabel biasa tidak cukup untuk melakukan ini. Misalnya, mengubah `let jumlah = 0` menjadi `let jumlah = 1` tidak memberi tahu React. React tidak tahu bahwa tampilan perlu diperbarui.
 
-## `useState`
+## Menyimpan nilai dengan `useState`
 
-Buka `demo-state/main.jsx` di panel File:
+Ini kode lengkap penghitungnya:
 
 ```jsx
-function App() {
-  const [count, setCount] = React.useState(0);
+"use client";
+
+import { useState } from "react";
+
+export default function Penghitung() {
+  const [jumlah, setJumlah] = useState(0);
 
   return (
     <main>
-      <h1>Counter</h1>
-      <p>Nilai: {count}</p>
-      <button onClick={() => setCount(count + 1)}>Tambah</button>
-      <button onClick={() => setCount(0)}>Reset</button>
+      <h1>Penghitung</h1>
+      <p>Jumlah: {jumlah}</p>
+      <button onClick={() => setJumlah(jumlah + 1)}>Tambah</button>
+      <button onClick={() => setJumlah(jumlah - 1)}>Kurang</button>
+      <button onClick={() => setJumlah(0)}>Ulangi dari nol</button>
     </main>
   );
 }
 ```
 
-`useState(0)` mengembalikan dua hal sekaligus:
+`useState(0)` menyiapkan nilai awal `0`. Hasilnya disimpan dalam dua nama:
 
-- **`count`** — nilai state saat ini. `0` di dalam kurung adalah nilai awalnya.
-- **`setCount`** — satu-satunya cara yang benar untuk mengubahnya.
+- **`jumlah`** — nilai yang sedang ditampilkan.
+- **`setJumlah`** — fungsi untuk memberi React nilai yang baru.
 
-Saat tombol diklik, `setCount(count + 1)` memberi tahu React: "state berubah, tampilkan lagi". React menjalankan ulang fungsi `App`, dan `{count}` di layar menampilkan nilai baru.
+Saat tombol **Tambah** ditekan, `setJumlah(jumlah + 1)` memberi nilai baru kepada React. React lalu memperbarui angka di layar.
 
-:::warning{title="Jangan ubah langsung"}
-`count = count + 1` memang mengubah variabelnya, tapi React tidak tahu — tampilan tidak berubah. Selalu lewat `setCount`. Anggap `count` itu hanya untuk dibaca, tidak bisa ditulis.
+Saat tombol **Kurang** ditekan, angka berkurang satu. Tombol **Ulangi dari nol** mengubah angkanya kembali menjadi `0`.
+
+:::tip{title="Coba di project-mu"}
+Salin kode di atas ke file `app/demo/penghitung.tsx`, lalu panggil `<Penghitung />` dari sebuah `page.tsx`. Jalankan dev server dan tekan tombolnya — angkanya berubah tanpa halaman dimuat ulang.
 :::
 
-## Di project Next.js-mu
+`useState(0)` menyiapkan nilai awal `0`. Hasilnya disimpan dalam dua nama:
 
-Hook seperti `useState` hanya hidup di browser — ingat aturan dari pertemuan 03: file yang memakai hook harus diawali `"use client"`. Contoh tombol suka untuk halaman tulisan — lihat `project/app/blog/[slug]/like-button.tsx`:
+- **`jumlah`** — nilai yang sedang ditampilkan.
+- **`setJumlah`** — fungsi untuk memberi React nilai yang baru.
+
+Saat tombol **Tambah** ditekan, `setJumlah(jumlah + 1)` memberi nilai baru kepada React. React lalu memperbarui angka di layar.
+
+Saat tombol **Kurang** ditekan, angka berkurang satu. Tombol **Ulangi dari nol** mengubah angkanya kembali menjadi `0`.
+
+:::warning{title="Ubah nilai dengan fungsi set"}
+Jangan menulis `jumlah = jumlah + 1`. React tidak akan tahu bahwa nilainya berubah. Gunakan `setJumlah(jumlah + 1)` supaya React memperbarui tampilan.
+:::
+
+## Memakai `useState` di project Next.js
+
+File yang memakai `useState` harus diawali dengan `"use client"`. Ini aturan dari pertemuan 03. Baris tersebut memberi tahu Next.js bahwa komponen ini perlu berjalan di browser agar tombol bisa digunakan.
+
+Contoh berikut membuat tombol suka. Buka `project/app/blog/[slug]/like-button.tsx` di panel File:
 
 ```tsx
 "use client";
@@ -63,30 +81,24 @@ Hook seperti `useState` hanya hidup di browser — ingat aturan dari pertemuan 0
 import { useState } from "react";
 
 export default function LikeButton() {
-  const [suka, setSuka] = useState(0);
+  const [jumlahSuka, setJumlahSuka] = useState(0);
 
   return (
-    <button
-      onClick={() => setSuka(suka + 1)}
-      className="rounded-lg border px-4 py-2"
-    >
-      👍 {suka}
+    <button onClick={() => setJumlahSuka(jumlahSuka + 1)}>
+      👍 {jumlahSuka}
     </button>
   );
 }
 ```
 
-Halaman `app/blog/[slug]/page.tsx` tetap komponen server biasa — dia tinggal memanggil `<LikeButton />`. Setiap `LikeButton` punya state sendiri: menekan tombol di satu tulisan tidak mengubah hitungan di tulisan lain.
-
-:::info{title="Tentang file demo"}
-Demo di preview memakai React versi `React.createElement` (lihat `demo-state/main.js`) supaya jalan tanpa install — sama seperti demo SPA di pertemuan 01. `main.jsx` adalah versi JSX-nya, persis seperti yang kamu tulis di project.
-:::
+Setiap `LikeButton` punya nilai sendiri. Menekan tombol suka di satu halaman tulisan tidak mengubah angka di halaman tulisan lain.
 
 ## Ringkasan
 
-- ✅ State = data yang bisa berubah; saat berubah, React menampilkan ulang komponen
-- ✅ `const [nilai, setNilai] = useState(awal)` — `nilai` untuk dibaca, `setNilai` untuk mengubahnya
-- ✅ File yang memakai `useState` wajib `"use client"`; page boleh tetap komponen server yang memanggilnya
-- ❌ Jangan mengubah state tanpa fungsi `set`-nya — tampilan tidak ikut berubah
+- ✅ State adalah nilai yang disimpan React dan dapat berubah
+- ✅ `useState(0)` menyiapkan nilai awal; fungsi seperti `setJumlah` memberi nilai baru
+- ✅ React memperbarui tampilan setelah fungsi `set` dipanggil
+- ✅ File Next.js yang memakai `useState` harus diawali `"use client"`
+- ❌ Jangan mengubah nilai state langsung dengan `=`
 
-State di satu komponen sudah bisa. Tapi bagaimana kalau dua komponen perlu data yang sama? Lesson berikutnya: **state antar komponen**.
+Kita sudah menyimpan nilai di satu komponen. Berikutnya, kita belajar membagikan nilai antara komponen.

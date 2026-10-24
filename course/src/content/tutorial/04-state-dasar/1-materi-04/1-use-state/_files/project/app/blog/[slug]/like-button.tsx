@@ -3,14 +3,14 @@
 import { useState } from "react";
 
 export default function LikeButton() {
-  const [suka, setSuka] = useState(0);
+  const [jumlahSuka, setJumlahSuka] = useState(0);
 
   return (
     <button
-      onClick={() => setSuka(suka + 1)}
+      onClick={() => setJumlahSuka(jumlahSuka + 1)}
       className="rounded-lg border px-4 py-2"
     >
-      👍 {suka}
+      👍 {jumlahSuka}
     </button>
   );
 }

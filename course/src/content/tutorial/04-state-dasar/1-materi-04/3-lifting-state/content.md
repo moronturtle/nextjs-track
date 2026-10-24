@@ -7,30 +7,29 @@ terminal: false
 focus: /project/app/alat/konversi-suhu.tsx
 ---
 
-# Lifting state — menaikkan state ke parent
+# Lifting state — memindahkan state ke parent
 
-Lesson sebelumnya: state ada di parent, dibagi ke anak lewat props. Sekarang kasus yang lebih umum: **dua komponen sejajar** — bukan parent-anak — butuh data yang sama.
+Di lesson sebelumnya, parent menyimpan state lalu mengirimkannya ke anak. Sekarang kita punya dua komponen anak yang sama-sama perlu memakai satu nilai.
 
-## Masalahnya
+## Dua komponen perlu nilai yang sama
 
-Bayangkan alat konversi suhu. Ada komponen input untuk mengetik Celcius, dan komponen lain yang menampilkan hasil dalam Fahrenheit:
+Bayangkan alat untuk mengubah suhu dari Celsius ke Fahrenheit. Satu kotak dipakai untuk mengetik suhu Celsius. Komponen lain menampilkan hasil Fahrenheit.
 
 ```text
 KonversiSuhu (parent)
-├── InputCelcius      ← mengetik angka di sini
-└── TampilFahrenheit  ← hasil konversi tampil di sini
+├── InputCelcius      ← tempat mengetik suhu
+└── TampilFahrenheit  ← tempat melihat hasilnya
 ```
 
-Kalau state `celcius` disimpan di dalam `InputCelcius`, `TampilFahrenheit` tidak bisa membacanya. Props hanya mengalir turun ke anak — tidak bisa menyamping ke komponen saudara. Dua komponen sejajar tidak bisa saling membaca state.
+`InputCelcius` dan `TampilFahrenheit` adalah komponen anak dari `KonversiSuhu`.
 
-## Solusinya: naikkan ke parent bersama
+Kalau nilai suhu disimpan di `InputCelcius`, `TampilFahrenheit` tidak bisa membacanya. Kedua komponen adalah anak yang sejajar. Props mengalir dari parent ke anak, bukan dari satu anak ke anak lainnya.
 
-Jawabannya adalah **lifting state up** — "menaikkan state ke atas". Pindahkan `useState` ke parent yang membungkus kedua komponen, lalu bagi lewat props seperti biasa:
+## Pindahkan state ke parent
 
-- `InputCelcius` menerima `nilai` dan `saatBerubah` → mengetik memanggil callback ke parent.
-- `TampilFahrenheit` menerima `celcius` → langsung menghitung hasilnya.
+Solusinya adalah **lifting state up** — memindahkan state dari anak ke parent yang menampilkan kedua anak itu.
 
-Buka `project/app/alat/konversi-suhu.tsx` — parent yang memegang state-nya:
+Buka `project/app/alat/konversi-suhu.tsx`. State suhu disimpan di `KonversiSuhu`:
 
 ```tsx
 "use client";
@@ -51,53 +50,62 @@ export default function KonversiSuhu() {
 }
 ```
 
-Sekarang mengetik di `InputCelcius` mengubah state parent → kedua komponen ditampilkan ulang → `TampilFahrenheit` langsung menunjukkan hasil konversi terbaru. Satu state untuk dua komponen — tidak ada data kembar yang isinya bisa berbeda.
+`KonversiSuhu` mengirim nilai suhu ke dua anak:
 
-Dua anaknya sederhana — hanya menerima props:
+- `InputCelcius` menerima nilai dan fungsi `setCelcius`. Saat angka diubah, fungsi itu memberi nilai baru kepada parent.
+- `TampilFahrenheit` menerima nilai yang sama. Komponen ini menghitung dan menampilkan suhu Fahrenheit.
+
+Ketik angka baru di kotak Celsius. `setCelcius` mengubah state parent. Setelah itu, React memperbarui kedua anak. Kotak menampilkan angka baru dan hasil Fahrenheit ikut berubah.
+
+Berikut kode singkat untuk kedua anak:
 
 ```tsx
-// input-celcius.tsx — memberi kabar ke atas lewat callback
+// input-celcius.tsx — menampilkan kotak untuk mengetik suhu
 export default function InputCelcius({
   nilai,
   saatBerubah,
 }: {
   nilai: number;
-  saatBerubah: (n: number) => void;
+  saatBerubah: (angka: number) => void;
 }) {
   return (
-    <input
-      type="number"
-      value={nilai}
-      onChange={(e) => saatBerubah(Number(e.target.value))}
-      className="rounded-lg border px-4 py-2"
-    />
+    <label>
+      Suhu Celsius:
+      <input
+        type="number"
+        value={nilai}
+        onChange={(e) => saatBerubah(Number(e.target.value))}
+      />
+    </label>
   );
 }
 ```
 
 ```tsx
-// tampil-fahrenheit.tsx — hanya membaca props
+// tampil-fahrenheit.tsx — menghitung dan menampilkan hasil
 export default function TampilFahrenheit({ celcius }: { celcius: number }) {
   const fahrenheit = (celcius * 9) / 5 + 32;
-  return <p className="mt-2">{celcius}°C = {fahrenheit}°F</p>;
+  return <p>{celcius}°C = {fahrenheit}°F</p>;
 }
 ```
 
-## Kapan state perlu dinaikkan?
+## Di mana state sebaiknya disimpan?
 
-Patokannya sederhana: **letakkan state di komponen paling bawah yang masih membungkus semua pemakainya.**
+Simpan state di komponen paling bawah yang menjadi parent bagi semua komponen yang memakainya.
 
-- Dipakai satu komponen saja → state di komponen itu (seperti `LikeButton` di lesson 1).
-- Dipakai anak-anaknya → state di parent (seperti `DaftarTulisan`).
-- Dipakai dua komponen sejajar → state di parent bersama, dibagi lewat props.
+- Kalau satu komponen saja yang perlu nilai itu, simpan state di komponen tersebut.
+- Kalau parent dan anak perlu nilai itu, simpan state di parent.
+- Kalau dua komponen anak perlu nilai yang sama, simpan state di parent keduanya.
 
-Ada batasnya juga. Kalau state harus melewati lima lapis komponen yang sebenarnya tidak membutuhkannya, props jadi operan panjang yang melelahkan. Masalah itu dijawab di pertemuan 05 dengan `useContext`.
+Jangan membuat salinan state yang sama di beberapa komponen. Nilainya bisa berbeda dan lebih sulit diperbaiki.
+
+Kalau data harus melewati banyak parent yang tidak memakainya, ada cara lain yang akan kita pelajari di pertemuan 05: `useContext`.
 
 ## Ringkasan
 
-- ✅ Dua komponen sejajar tidak bisa berbagi state langsung — props hanya mengalir turun
-- ✅ Lifting state up = pindahkan `useState` ke parent bersama, lalu bagi nilai dan `set`-nya lewat props
-- ✅ Satu sumber data di parent = dua tampilan selalu sama
-- ❌ Jangan menyalin state yang sama di dua komponen — isinya bisa berbeda dan sulit dilacak
+- ✅ Dua komponen anak tidak berbagi state secara langsung
+- ✅ Pindahkan state ke parent yang menampilkan kedua komponen
+- ✅ Parent mengirim nilai dan fungsi pengubah lewat props
+- ❌ Jangan menyimpan salinan state yang sama di dua komponen
 
-Tiga cara mengatur state sudah kamu kuasai. Satu hook lagi untuk melengkapi dasar-dasarnya: `useEffect`.
+Kita sudah membahas state di satu komponen dan antar komponen. Berikutnya, kita belajar `useEffect` untuk menjalankan kode setelah komponen tampil.
