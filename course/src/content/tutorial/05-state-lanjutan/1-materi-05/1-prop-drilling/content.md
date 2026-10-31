@@ -1,59 +1,76 @@
 ---
 type: lesson
-title: Masalah prop drilling
+title: Pertemuan 05 — Prop drilling
 template: baca
 previews: false
 terminal: false
-focus: /project/app/header.tsx
+focus: /project/components/header.tsx
 ---
 
-# Masalah prop drilling
+# Saat props harus diteruskan berulang
 
-Pertemuan 04 mengajarkan: state dinaikkan ke parent, lalu dibagi turun lewat props. Cara itu bagus untuk dua atau tiga komponen. Sekarang kita lihat batasnya.
+Di pertemuan 04, kita belajar mengirim data dari parent ke anak lewat props. Cara ini cocok kalau hanya perlu melewati satu atau dua komponen.
 
-## Skenario: nama pengguna di pojok atas
+Sekarang bayangkan nama pengguna yang sudah masuk ke website perlu tampil di menu halaman. Data nama dibuat di `layout.tsx`, tetapi tulisan nama ditampilkan oleh `MenuProfil`.
 
-Katakanlah project-mu punya data pengguna yang sedang login. Nama itu harus tampil di pojok kanan atas menu — tepatnya di komponen `MenuProfil`. Posisi `MenuProfil` ada di dalam `Header`, dan `Header` ada di dalam `layout.tsx`:
+Susunan komponennya seperti ini:
 
 ```text
 layout.tsx
-└── Header          (header.tsx)
-    └── MenuProfil  (menu-profil.tsx)  ← nama dibutuhkan di sini
+└── Header
+    └── MenuProfil  ← menampilkan nama pengguna
 ```
 
-Props hanya bisa mengalir turun satu tingkat per langkah. Jadi `namaUser` harus dioper berantai: `layout.tsx` → `Header` → `MenuProfil`. Buka ketiga file di panel File dan perhatikan `header.tsx`:
+`Header` berada di antara `layout.tsx` dan `MenuProfil`. Karena props hanya dikirim dari parent ke anak, `layout.tsx` harus mengirim nama ke `Header`. Lalu `Header` harus mengirim nama yang sama ke `MenuProfil`.
+
+## Lihat aliran datanya
+
+Buka tiga file di panel File:
+
+- `app/layout.tsx` — membuat nilai nama dan mengirimkannya ke `Header`.
+- `components/header.tsx` — menerima nama, lalu meneruskannya ke `MenuProfil`.
+- `components/menu-profil.tsx` — menerima nama dan menampilkannya.
+
+Perhatikan tempat file-nya. `layout.tsx` tetap di `app/` karena file itu bagian dari routing. `Header` dan `MenuProfil` ada di `components/` — folder untuk komponen yang dipakai oleh bagian lain. Aturan gampangnya: `app/` untuk `page.tsx` dan `layout.tsx`, `components/` untuk komponen.
+
+Di `components/header.tsx`, perhatikan bahwa `Header` tidak menggunakan nama itu untuk tampilannya sendiri:
 
 ```tsx
 export default function Header({ namaUser }: { namaUser: string }) {
   return (
-    <header className="flex items-center justify-between border-b p-4">
-      <span className="font-bold">Blog Saya</span>
+    <header>
+      <span>Blog Saya</span>
       <MenuProfil namaUser={namaUser} />
     </header>
   );
 }
 ```
 
-`Header` sama sekali tidak memakai `namaUser` — dia hanya meneruskannya ke bawah. Komponen ini jadi perantara: menerima data, meneruskan, tanpa pernah memakainya.
+`Header` hanya menerima `namaUser` lalu mengirimnya lagi ke `MenuProfil`.
 
-## Kenapa ini jadi masalah
+Kalau ada banyak komponen di antara sumber data dan pemakainya, semua komponen perantara harus menerima dan meneruskan props yang sama. Cara meneruskan props melalui banyak komponen seperti ini disebut **prop drilling**.
 
-Props yang dioper berlapis-lapis seperti ini disebut **prop drilling**. Akibatnya:
+## Kapan prop drilling terasa merepotkan?
 
-- **Komponen tengah ikut kotor.** `Header` harus menulis props yang bukan urusannya. Kalau lapisannya ada lima, empat komponen jadi perantara.
-- **Susah diubah.** Mengganti nama `namaUser` berarti mengedit semua komponen di rantai — bukan hanya yang memakai.
-- **Susah dilacak.** Saat membaca `MenuProfil`, kamu harus menelusuri ke atas untuk mencari tahu dari mana `namaUser` berasal.
+Prop drilling bukan selalu masalah. Mengirim props ke anak secara langsung adalah cara yang wajar.
 
-Contoh nyata yang sering kena: data pengguna yang login, tema tampilan, bahasa aplikasi — hal-hal yang dibutuhkan banyak komponen di banyak tingkat berbeda.
+Prop drilling mulai merepotkan kalau:
 
-:::info{title="Prop drilling bukan selalu salah"}
-Mengoper props satu-dua tingkat itu normal dan justru bagus — jelas terlihat dari mana data berasal. Prop drilling jadi masalah saat komponen tengah dipaksa membawa data yang tidak dia pakai, hanya untuk diteruskan lagi.
+- Banyak komponen perantara harus meneruskan data yang tidak mereka pakai.
+- Nama atau bentuk data berubah, sehingga banyak file perlu ikut diedit.
+- Kamu harus membuka banyak file untuk mencari asal data.
+
+Contoh data yang mungkin dibutuhkan banyak bagian website adalah nama pengguna, tema warna, atau bahasa tampilan.
+
+:::tip{title="Coba di project-mu"}
+Salin ketiga file ini ke project-mu, lalu jalankan `npm run dev`. Ganti nilai `namaUser` di `layout.tsx` dari `"Budi"` ke namamu. Nama baru muncul di `MenuProfil` — melewati `Header` yang tidak memakainya.
 :::
 
 ## Ringkasan
 
-- ✅ Prop drilling = props dioper berlapis ke komponen dalam; komponen tengah jadi perantara yang tidak memakai datanya
-- ✅ Terjadi karena props hanya mengalir turun — tidak bisa melompat ke cucu
-- ❌ Jangan biarkan banyak komponen membawa props yang tidak mereka pakai — rapuh dan susah dirawat
+- ✅ Props mengirim data dari parent ke anak.
+- ✅ Meneruskan props melalui banyak komponen disebut prop drilling.
+- ✅ Props tetap cocok untuk hubungan parent-anak yang dekat.
+- ❌ Jangan membuat komponen perantara menerima props yang tidak dipakainya jika rantainya sudah panjang.
 
-React punya jawaban resmi untuk masalah ini: **Context** — cara membaca data langsung dari atas, tanpa dioper lewat props. Lesson berikutnya.
+Berikutnya, kita pelajari Context. Context membantu komponen membaca data tanpa harus meneruskan props melalui setiap komponen perantara.

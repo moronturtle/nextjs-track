@@ -1,12 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useFavorit } from "./use-favorit";
+import { useFavorit } from "@/store/use-favorit";
 
 export default function Menu() {
-  const pathname = usePathname();
-  const jumlahFavorit = useFavorit((s) => s.daftar.length);
+  const { daftar } = useFavorit();
+  const jumlahFavorit = daftar.length;
 
   return (
     <nav className="flex gap-4 border-b p-4">

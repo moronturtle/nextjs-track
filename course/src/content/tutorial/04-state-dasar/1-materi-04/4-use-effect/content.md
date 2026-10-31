@@ -38,7 +38,7 @@ export default function Jam() {
 ```
 
 :::tip{title="Coba di project-mu"}
-Salin kode `Jam` di atas ke file `app/demo/jam.tsx`, lalu panggil `<Jam />` dari sebuah `page.tsx`. Jam akan berdetak setiap detik — dan semua itu terjadi tanpa kamu menekan apa pun.
+Salin kode `Jam` di atas ke file `components/jam.tsx`, lalu panggil `<Jam />` dari sebuah `page.tsx`. Jam akan berdetak setiap detik — dan semua itu terjadi tanpa kamu menekan apa pun.
 :::
 
 Perhatikan tiga hal:

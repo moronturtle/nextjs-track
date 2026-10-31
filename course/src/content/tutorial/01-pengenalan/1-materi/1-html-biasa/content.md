@@ -1,6 +1,6 @@
 ---
 type: lesson
-title: HTML biasa
+title: Pertemuan 01 — HTML biasa
 template: baca
 previews:
   - port: 3000

@@ -1,6 +1,6 @@
 ---
 type: lesson
-title: useState
+title: Pertemuan 04 — useState
 template: baca
 previews: false
 terminal: false
@@ -53,7 +53,7 @@ Saat tombol **Tambah** ditekan, `setJumlah(jumlah + 1)` memberi nilai baru kepad
 Saat tombol **Kurang** ditekan, angka berkurang satu. Tombol **Ulangi dari nol** mengubah angkanya kembali menjadi `0`.
 
 :::tip{title="Coba di project-mu"}
-Salin kode di atas ke file `app/demo/penghitung.tsx`, lalu panggil `<Penghitung />` dari sebuah `page.tsx`. Jalankan dev server dan tekan tombolnya — angkanya berubah tanpa halaman dimuat ulang.
+Salin kode di atas ke file `components/penghitung.tsx`, lalu panggil `<Penghitung />` dari sebuah `page.tsx`. Jalankan dev server dan tekan tombolnya — angkanya berubah tanpa halaman dimuat ulang.
 :::
 
 `useState(0)` menyiapkan nilai awal `0`. Hasilnya disimpan dalam dua nama:

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useTema } from "./tema-context";
+import { useTema } from "@/context/tema-context";
 
 export default function Menu() {
   const pathname = usePathname();

@@ -1,84 +1,100 @@
 ---
 type: lesson
-title: Global state dengan Context
+title: Memakai global state
 template: baca
 previews: false
 terminal: false
-focus: /project/app/menu.tsx
+focus: /project/components/menu.tsx
 ---
 
-# Global state dengan Context
+# Memakai global state
 
-Gabungkan dua hal yang sudah kamu pelajari: `useState` menyimpan data, `Context` membagikannya ke komponen mana pun. Keduanya bersatu jadi **global state** — data yang bisa dibaca dan diubah banyak komponen di banyak halaman, dari satu sumber.
+Di lesson sebelumnya, Context membagikan pilihan tema dari satu Provider. Sekarang kita gunakan tema itu dari dua tempat:
 
-## Polanya: Provider memegang state
+- Tombol di halaman mengubah tema.
+- Menu di bagian atas menampilkan pilihan tema saat ini.
 
-Lihat lagi `project/app/tema-context.tsx` dari lesson sebelumnya. Sebenarnya dialah global state-nya: Provider menampung `useState`, lalu membagikan nilai **dan** fungsi pengubahnya lewat `value`.
+Data yang dipakai beberapa komponen seperti ini disebut **global state**. “Global” di sini berarti dapat dipakai oleh banyak komponen di area yang dibungkus Provider. Data tidak otomatis tersedia di seluruh project.
 
-Jadi polanya selalu sama:
+## Satu nilai dipakai di dua tempat
 
-```text
-context.tsx      ← "use client": createContext + Provider (berisi useState) + custom hook
-layout.tsx       ← pasang <Provider> membungkus bagian yang butuh
-komponen apa pun ← const { ... } = useTema() — baca atau ubah
-```
+Buka file-file di panel File:
 
-## Satu sumber, banyak pembaca
+- `context/tema-context.tsx` — menyimpan pilihan tema dan membagikan nilainya lewat Provider.
+- `components/tombol-tema.tsx` — mengubah pilihan tema.
+- `components/menu.tsx` — membaca dan menampilkan pilihan tema.
+- `app/layout.tsx` — memasang Provider supaya menu dan halaman bisa membaca tema.
 
-Kekuatannya terlihat di `project/app/menu.tsx` — komponen yang beda halaman dengan tombol tema, tapi membaca sumber yang sama:
+Di `components/menu.tsx`, menu membaca tema dari Context:
 
 ```tsx
 "use client";
 
-import { useTema } from "./tema-context";
+import { useTema } from "@/context/tema-context";
 
 export default function Menu() {
   const { gelap } = useTema();
 
-  return (
-    <nav className="flex gap-4 border-b p-4">
-      {/* ...link navigasi... */}
-      <span className="ml-auto text-sm">
-        Tema: {gelap ? "Gelap" : "Terang"}
-      </span>
-    </nav>
-  );
+  return <p>Tema saat ini: {gelap ? "Gelap" : "Terang"}</p>;
 }
 ```
 
-`TombolTema` di satu halaman menekan tombol → `Menu` di layout langsung ikut berubah. Saat `value` Provider berubah, **semua** komponen yang membacanya ditampilkan ulang otomatis. Satu sumber data, semua tampilan selalu sama.
+Di `components/tombol-tema.tsx`, tombol mengubah nilai yang sama:
 
-## Provider ditaruh di mana?
+```tsx
+"use client";
 
-Letak Provider menentukan siapa yang bisa membaca — komponen hanya melihat Provider **di atasnya**:
+import { useTema } from "@/context/tema-context";
 
-| Provider dipasang di | Yang bisa membaca |
+export default function TombolTema() {
+  const { ubahTema } = useTema();
+
+  return <button onClick={ubahTema}>Ganti tema</button>;
+}
+```
+
+Saat tombol ditekan, nilai di Provider berubah. Menu membaca nilai baru dan menampilkan pilihan tema yang terbaru. Tombol dan menu tidak perlu saling mengirim props.
+
+## Tentukan bagian yang boleh memakai data
+
+Tempat Provider dipasang menentukan komponen mana yang bisa membaca Context:
+
+| Provider dipasang di | Komponen yang dapat membaca |
 |---|---|
-| `app/layout.tsx` | Seluruh halaman |
-| `app/blog/layout.tsx` | Hanya halaman di bawah `/blog` |
-| Di dalam satu `page.tsx` | Hanya isi halaman itu |
+| `app/layout.tsx` | Menu dan semua halaman di project |
+| `app/blog/layout.tsx` | Halaman di dalam bagian blog |
+| Di dalam satu `page.tsx` | Hanya komponen di halaman tersebut |
 
-Pasang di tingkat paling bawah yang masih membungkus semua pemakainya — patokan yang sama seperti lifting state di pertemuan 04.
+Pasang Provider di bagian paling kecil yang masih mencakup semua pemakai data. Kalau hanya halaman blog yang memakai data, Provider tidak harus membungkus halaman lain.
 
-## Kapan TIDAK pakai Context
+## Kapan memakai Context?
 
-Context bukan pengganti semua state. Tetap pakai cara dari pertemuan 04 kalau:
+Pilih cara yang paling sederhana untuk kebutuhanmu:
 
-- Data hanya dipakai satu komponen → `useState` biasa sudah cukup.
-- Dipakai parent dan satu-dua anak → props + callback lebih jelas alurnya.
-- Datanya berubah sangat sering, misalnya posisi mouse yang bergerak terus → tiap perubahan `value` menampilkan ulang semua pembaca; untuk data sesibuk itu ada alat lain yang lebih efisien.
+- Satu komponen memakai data → simpan dengan `useState` di komponen itu.
+- Parent dan anak memakai data → kirim lewat props.
+- Banyak komponen di bagian berbeda memakai data yang sama → Context dapat membantu.
 
-Context cocok untuk data yang **dipakai banyak komponen di banyak tingkat**: tema, pengguna yang login, bahasa, keranjang belanja.
+Context bukan jawaban untuk semua state. Misalnya, teks yang sedang diketik di satu kotak pencarian cukup disimpan dengan `useState`.
 
-:::info{title="Kenal dulu: library state global"}
-Di project besar kamu akan bertemu **Zustand**, **Redux**, atau **Jotai** — library khusus untuk mengelola global state, dengan kode lebih sedikit daripada Context biasa. Context bawaan React sudah cukup untuk project seukuran tugasmu — tapi lesson berikutnya mengenalkan Zustand, yang paling gampang dipahami dari ketiganya.
+## Kebiasaan yang baik saat memakai Context
+
+Beberapa hal yang biasa dilakukan di project nyata:
+
+- **Satu Context untuk satu kebutuhan.** Tema, data pengguna, dan isi keranjang masing-masing punya Context sendiri. Jangan menggabungkan semuanya dalam satu Context besar — saat satu data berubah, semua komponen pemakai ikut ditampilkan ulang.
+- **Context untuk data yang jarang berubah.** Tema, bahasa, dan data pengguna yang sedang masuk cocok untuk Context. Data yang berubah setiap detik atau hanya dipakai satu-dua komponen cukup memakai `useState` dan props.
+- **`value={{ gelap, ubahTema }}` dibuat baru setiap Provider ditampilkan ulang.** Untuk project kecil ini tidak masalah. Kalau nanti halaman terasa lambat, nilai ini bisa dibungkus dengan `useMemo` — cukup kenali namanya dulu.
+- **Buat perubahan terlihat.** Di contoh kita, tema hanya mengubah tulisan. Di project nyata, tema gelap biasanya menambahkan class `dark` ke elemen `<html>` agar warna seluruh halaman berubah. Kalau pilihan tema ingin tersimpan, gunakan `localStorage` seperti di pertemuan 04 — ingat untuk membacanya dengan `useEffect` karena `localStorage` hanya ada di browser.
+
+:::tip{title="Coba di project-mu"}
+Pasang file-file ini di project-mu. Ubah tema dari isi halaman — tulisan tema di menu ikut berubah. Pindah ke halaman lain, lalu kembali. Pilihan tema tetap sama karena `TemaProvider` dipasang di layout, bukan di halaman.
 :::
 
 ## Ringkasan
 
-- ✅ Global state = `useState` di dalam Provider Context — satu sumber dibaca banyak komponen
-- ✅ Semua pembaca `useContext` ikut ditampilkan ulang saat `value` berubah — tampilan selalu sama
-- ✅ Pasang Provider di tingkat paling bawah yang membungkus semua pemakai (layout untuk seluruh app)
-- ❌ Context bukan pengganti `useState` biasa — state lokal tetap pakai `useState`, parent-anak dekat tetap pakai props
+- ✅ Global state adalah data yang dipakai beberapa komponen.
+- ✅ Context membagikan state kepada komponen yang berada di dalam Provider.
+- ✅ Provider di root layout dapat membagikan data ke menu dan semua halaman.
+- ✅ State yang hanya dipakai satu komponen tetap cocok memakai `useState`.
 
-Context sudah menjawab kebutuhan global state kita. Satu lesson lagi untuk melihat cara yang lebih ringkas di dunia nyata: **Zustand**.
+Context sudah cukup untuk banyak project kecil. Berikutnya, kita lihat Zustand — library yang membuat cara berbagi state ini lebih ringkas.

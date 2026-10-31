@@ -1,79 +1,58 @@
 ---
 type: lesson
-title: useContext
+title: Membaca data dengan Context
 template: baca
-previews:
-  - port: 3000
-    title: Preview
-    pathname: /demo-tema/
-focus: /demo-tema/main.jsx
+previews: false
+terminal: false
+focus: /project/context/tema-context.tsx
 ---
 
-# useContext — baca data langsung, tanpa props
+# Membaca data dengan Context
 
-Prop drilling dari lesson sebelumnya punya jawaban resmi di React: **Context**. Context seperti papan pengumuman — kamu memasang nilai di atas, dan komponen mana pun di bawahnya bisa membacanya langsung. Tidak perlu dioper lewat props.
+Di lesson sebelumnya, `Header` harus meneruskan nama pengguna ke `MenuProfil`, walaupun `Header` tidak memakai nama itu.
 
-:::tip{title="Coba di preview"}
-Klik tombol **Ganti ke Gelap** di panel Preview. Seluruh tampilan berubah — padahal kalau kamu buka `demo-tema/main.jsx`, komponen `Konten` di tengah tidak membawa props apa pun. Tombol di dalamnya membaca dan mengubah tema langsung dari context.
-:::
+React punya cara untuk menghindari penerusan props seperti itu. Namanya **Context**. Context membagikan nilai ke komponen-komponen di bawahnya.
 
-## Tiga bagian context
+## Tiga bagian Context
 
-```jsx
-// 1. Buat context-nya — sekali, di file terpisah
-const TemaContext = React.createContext(null);
+Contoh kita memakai tema terang atau gelap:
 
-function App() {
-  const [gelap, setGelap] = useState(false);
+1. `createContext` membuat tempat untuk membagikan nilai.
+2. `Provider` menyediakan nilai untuk komponen di bawahnya.
+3. `useContext` membaca nilai tersebut dari komponen.
 
-  return (
-    // 2. Pasang nilainya di atas — semua komponen di dalam Provider bisa membaca
-    <TemaContext.Provider value={{ gelap, setGelap }}>
-      <Konten />
-    </TemaContext.Provider>
-  );
-}
+Sebelum membaca isinya, perhatikan dulu tempat file-file disimpan:
 
-function Konten() {
-  // komponen tengah — tidak tahu apa-apa soal tema, tidak bawa props
-  return (
-    <section>
-      <TombolTema />
-    </section>
-  );
-}
-
-function TombolTema() {
-  // 3. Komponen dalam membaca langsung — tak peduli ada berapa lapis di antaranya
-  const { gelap, setGelap } = React.useContext(TemaContext);
-  return (
-    <button onClick={() => setGelap(!gelap)}>
-      {gelap ? "Ganti ke Terang" : "Ganti ke Gelap"}
-    </button>
-  );
-}
+```text
+app/            ← khusus routing: page.tsx dan layout.tsx
+components/     ← komponen yang dipakai oleh bagian lain
+context/        ← Context dan Provider
 ```
 
-Perhatikan `Konten`: dia benar-benar tidak ikut urusan tema. Tidak seperti `Header` si perantara di lesson sebelumnya, tidak ada props yang lewat — `TombolTema` membaca langsung dari context.
-
-## Di project Next.js-mu
-
-Pola yang sama dipakai di `app/`, hanya dibagi ke file terpisah. Buka `project/app/tema-context.tsx` — file yang memegang context biasanya sekaligus menyediakan Provider-nya:
+Buka `project/context/tema-context.tsx` di panel File:
 
 ```tsx
 "use client";
 
 import { createContext, useContext, useState } from "react";
+import type { ReactNode } from "react";
 
-type Tema = { gelap: boolean; setGelap: (v: boolean) => void };
+type Tema = {
+  gelap: boolean;
+  ubahTema: () => void;
+};
 
 const TemaContext = createContext<Tema | null>(null);
 
-export function TemaProvider({ children }: { children: React.ReactNode }) {
+export function TemaProvider({ children }: { children: ReactNode }) {
   const [gelap, setGelap] = useState(false);
 
+  function ubahTema() {
+    setGelap((nilaiLama) => !nilaiLama);
+  }
+
   return (
-    <TemaContext.Provider value={{ gelap, setGelap }}>
+    <TemaContext.Provider value={{ gelap, ubahTema }}>
       {children}
     </TemaContext.Provider>
   );
@@ -81,17 +60,51 @@ export function TemaProvider({ children }: { children: React.ReactNode }) {
 
 export function useTema() {
   const tema = useContext(TemaContext);
-  if (!tema) throw new Error("useTema hanya bisa di dalam TemaProvider");
+  if (tema === null) {
+    throw new Error("useTema harus dipakai di dalam TemaProvider");
+  }
   return tema;
 }
 ```
 
-Dua hal dari file ini:
+Mari baca bagian pentingnya:
 
-- File ini memakai `useState` dan `useContext`, jadi wajib `"use client"`.
-- `useTema()` adalah **custom hook** — fungsi buatanmu sendiri yang membungkus `useContext`. Gunanya: memakai context cukup satu baris, dan ada pesan error yang jelas kalau dipakai di luar Provider. Pola ini sangat umum di project React.
+- **`gelap`** menyimpan pilihan tema saat ini.
+- **`ubahTema`** membalik pilihan tema.
+- **`TemaContext.Provider`** membagikan `gelap` dan `ubahTema` ke komponen yang ada di dalamnya.
+- **`useTema()`** adalah fungsi kecil agar komponen mudah membaca Context. Fungsi ini juga memberi pesan jika komponen tidak berada di dalam Provider.
 
-Pemasangannya di `project/app/layout.tsx` — root layout yang server membungkus semua halaman dengan komponen client `TemaProvider`, dan `children` tetap diteruskan apa adanya:
+File ini diawali dengan `"use client"` karena memakai `useState` dan `useContext`. Kedua hook tersebut berjalan di Client Component.
+
+`import type { ReactNode }` mengambil tipe `ReactNode` dari React. `ReactNode` adalah tipe untuk isi yang bisa ditampilkan di dalam komponen — teks, elemen, atau komponen lain. Kata `type` berarti hanya tipenya yang diambil, bukan kode yang dijalankan.
+
+## Pakai Context di tombol
+
+Buka `project/components/tombol-tema.tsx`. Tombol membaca dan mengubah tema lewat `useTema()`:
+
+```tsx
+"use client";
+
+import { useTema } from "@/context/tema-context";
+
+export default function TombolTema() {
+  const { gelap, ubahTema } = useTema();
+
+  return (
+    <button onClick={ubahTema}>
+      {gelap ? "Ganti ke terang" : "Ganti ke gelap"}
+    </button>
+  );
+}
+```
+
+`TombolTema` tidak menerima `gelap` atau `ubahTema` lewat props. Tombol membaca keduanya langsung dari Context.
+
+Tanda `@/` di baris import menunjuk ke folder utama project. Jadi `@/context/tema-context` berarti file `tema-context.tsx` di dalam folder `context`. Dengan `@/`, import tidak berubah walaupun file yang mengimpor dipindah ke folder lain.
+
+## Pasang Provider
+
+Komponen hanya bisa membaca Context jika berada di dalam Provider. Buka `project/app/layout.tsx` — root layout yang memasang Provider untuk halaman project:
 
 ```tsx
 <body>
@@ -99,13 +112,17 @@ Pemasangannya di `project/app/layout.tsx` — root layout yang server membungkus
 </body>
 ```
 
-Sekarang komponen mana pun — `Menu`, tombol di halaman tulisan, apa pun — tinggal `const { gelap } = useTema()`. Tidak ada satu props pun yang dioper.
+Karena `TemaProvider` membungkus `{children}`, halaman yang ditampilkan di dalamnya dapat memakai `useTema()`.
+
+:::tip{title="Coba di project-mu"}
+Buat ketiga file ini di project-mu, lalu jalankan `npm run dev`. Tekan tombol di halaman — tulisan di tombol berubah mengikuti tema yang dibaca dari Context. Tambahkan komponen lain yang memanggil `useTema()`; nilai yang sama langsung terbaca tanpa props.
+:::
 
 ## Ringkasan
 
-- ✅ Context punya tiga bagian: `createContext` membuatnya, `Provider` memasang nilainya, `useContext` membacanya
-- ✅ Komponen tengah bebas dari props yang bukan urusannya — tidak ada lagi perantara
-- ✅ File context biasanya sekaligus menyediakan `Provider` dan custom hook seperti `useTema`
-- ❌ `useContext` hanya membaca dari `Provider` terdekat di atasnya — dipakai di luar Provider, yang didapat nilai awalnya (di sini `null`)
+- ✅ `createContext` membuat Context, `Provider` membagikan nilai, dan `useContext` membaca nilai.
+- ✅ Komponen di bawah Provider dapat membaca nilai tanpa menerima props satu per satu.
+- ✅ Provider harus membungkus komponen yang ingin membaca Context.
+- ❌ Komponen di luar Provider tidak dapat membaca nilai Context yang disediakan Provider tersebut.
 
-Context sudah jalan. Tapi kapan sebaiknya dipakai, dan kapan tetap pakai `useState` biasa? Itu bahasan lesson berikutnya.
+Context menghindari penerusan props yang panjang. Berikutnya, kita lihat contoh satu nilai yang dipakai oleh menu dan halaman — inilah salah satu bentuk **global state**.

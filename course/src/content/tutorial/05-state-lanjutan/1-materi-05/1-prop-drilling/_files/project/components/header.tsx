@@ -1,4 +1,4 @@
-import MenuProfil from "./menu-profil";
+import MenuProfil from "@/components/menu-profil";
 
 export default function Header({ namaUser }: { namaUser: string }) {
   return (

@@ -1,116 +1,138 @@
 ---
 type: lesson
-title: "Kenalan dengan Zustand"
+title: Menyimpan global state dengan Zustand
 template: baca
 previews: false
 terminal: false
-focus: /project/app/use-favorit.ts
+focus: /project/store/use-favorit.ts
 ---
 
-# Zustand — global state tanpa ribet
+# Menyimpan global state dengan Zustand
 
-Context dari dua lesson sebelumnya sudah cukup untuk project seukuran tugasmu. Tapi di project sungguhan, banyak orang memilih jalan yang lebih praktis: **library state global**. Yang paling gampang dipahami adalah **Zustand**.
+Di lesson sebelumnya, kita memakai Context untuk membagikan tema. Ada cara lain yang sering dipakai di project React, yaitu **Zustand**. Zustand adalah library — paket berisi kode siap pakai — untuk menyimpan data bersama agar bisa dipakai banyak komponen.
 
-Kabar baiknya: Zustand jauh lebih sederhana dari Context. Tidak ada `createContext`, tidak ada `Provider`, tidak ada custom hook untuk mengecek Provider. **Satu file untuk satu store — dan itu saja.**
+Perbedaan awalnya mudah dilihat:
 
-Pasang dulu paketnya:
+- Context perlu Provider untuk membagikan nilainya.
+- Zustand membuat tempat penyimpanan data yang bisa dibaca komponen tanpa Provider.
+
+## Pasang Zustand
+
+Di project Next.js, pasang paketnya dengan perintah:
 
 ```bash
 npm install zustand
 ```
 
-## Satu file: store sekaligus hook
+## Buat tempat menyimpan favorit
 
-Buka `project/app/use-favorit.ts` — ini seluruh kode global state favorit kita:
+Store Zustand biasanya disimpan di folder `store`, bersebelahan dengan `app/` dan `components/`:
+
+```text
+app/            ← khusus routing: page.tsx dan layout.tsx
+components/     ← komponen yang dipakai oleh bagian lain
+store/          ← store Zustand
+```
+
+Buka `project/store/use-favorit.ts` di panel File. File ini membuat satu tempat untuk menyimpan daftar favorit dan fungsi untuk mengubah daftar:
 
 ```ts
 import { create } from "zustand";
 
 type FavoritState = {
   daftar: string[];
-  toggle: (slug: string) => void;
+  ubahFavorit: (slug: string) => void;
 };
 
-export const useFavorit = create<FavoritState>((set) => ({
+export const useFavorit = create<FavoritState>((setState) => ({
   daftar: [],
 
-  toggle: (slug) =>
-    set((state) => ({
-      daftar: state.daftar.includes(slug)
-        ? state.daftar.filter((s) => s !== slug)
-        : [...state.daftar, slug],
-    })),
+  ubahFavorit: (slug) =>
+    setState((stateLama) => {
+      const sudahDisimpan = stateLama.daftar.includes(slug);
+
+      if (sudahDisimpan) {
+        return {
+          daftar: stateLama.daftar.filter((item) => item !== slug),
+        };
+      }
+
+      return {
+        daftar: [...stateLama.daftar, slug],
+      };
+    }),
 }));
 ```
 
-Yang terjadi di sini:
+Mari baca bagian-bagiannya:
 
-- **`create(...)`** — membuat **store**: tempat penyimpanan data di luar komponen. Nama file-nya bebas; kita pakai `use-favorit.ts` supaya jelas ini hook favorit.
-- **`daftar: []`** — nilai awal state, seperti `useState([])`.
-- **`toggle`** — fungsi pengubah, ikut disimpan di store. `set` di sini seperti `setDaftar`: menerima state lama, mengembalikan bagian yang baru.
-- Aturan array tetap sama seperti `useState` — **jangan ubah array yang ada, selalu buat yang baru** (`filter` untuk menghapus, `[...lama, baru]` untuk menambah).
+- **`create`** membuat tempat penyimpanan Zustand. Tempat ini disebut **store**.
+- **`daftar`** adalah data yang disimpan. Tipe `string[]` berarti daftar yang berisi teks. Awalnya daftar masih kosong.
+- **`ubahFavorit`** adalah fungsi yang kita buat. Fungsi ini menambah tulisan ke favorit atau menghapusnya jika sudah ada.
+- **`setState`** adalah fungsi dari Zustand untuk mengubah isi store. Mirip setter dari `useState`, tetapi mengubah data yang dibagikan store.
+- **`stateLama`** adalah isi store sebelum diperbarui. Kalau tulisan sudah ada, `filter` membuat daftar baru tanpa tulisan tersebut. Kalau belum ada, `[...stateLama.daftar, slug]` membuat daftar baru dengan tulisan tambahan.
 
-Dan hasilnya? `useFavorit` langsung jadi **hook** yang bisa dipakai komponen mana pun. Tidak perlu dipasang di `layout.tsx`, tidak perlu Provider — Zustand yang mengurus semuanya.
+Nama `useFavorit` diawali `use` karena fungsi tersebut adalah **hook** — fungsi React untuk memakai fitur tertentu di dalam komponen. Komponen yang membutuhkan data favorit dapat memanggilnya.
 
-## Dipakai di komponen — tinggal panggil
+## Baca dan ubah data dari komponen
 
-`project/app/tombol-favorit.tsx`:
+Buka `project/components/tombol-favorit.tsx`. Tombol membaca daftar dan fungsi `ubahFavorit` dari Zustand:
 
 ```tsx
 "use client";
 
-import { useFavorit } from "./use-favorit";
+import { useFavorit } from "@/store/use-favorit";
 
 export default function TombolFavorit({ slug }: { slug: string }) {
-  const daftar = useFavorit((s) => s.daftar);
-  const toggle = useFavorit((s) => s.toggle);
-  const aktif = daftar.includes(slug);
+  const { daftar, ubahFavorit } = useFavorit();
+  const sudahDisimpan = daftar.includes(slug);
 
   return (
-    <button
-      onClick={() => toggle(slug)}
-      className="rounded-lg border px-4 py-2"
-    >
-      {aktif ? "★ Tersimpan" : "☆ Simpan ke favorit"}
+    <button onClick={() => ubahFavorit(slug)}>
+      {sudahDisimpan ? "★ Tersimpan" : "☆ Simpan ke favorit"}
     </button>
   );
 }
 ```
 
-`useFavorit((s) => s.daftar)` artinya "ambil bagian `daftar` dari store". Komponen yang membacanya akan ditampilkan ulang saat bagian itu berubah — sama seperti `useContext`, tapi tanpa Provider.
+`useFavorit()` membaca isi store. Baris `const { daftar, ubahFavorit }` mengambil daftar favorit dan fungsi untuk mengubahnya.
 
-Dan karena tidak ada Provider, komponen lain di tempat jauh bisa membaca sumber yang sama. `project/app/menu.tsx` menampilkan jumlah favorit — tanpa satu baris setup pun:
+Saat tombol ditekan, `ubahFavorit(slug)` berjalan. Fungsi itu memanggil `setState` di store. Zustand lalu memberi nilai terbaru kepada komponen yang membaca store tersebut.
+
+Contohnya, menu dapat membaca jumlah tulisan favorit:
 
 ```tsx
-const jumlahFavorit = useFavorit((s) => s.daftar.length);
+const { daftar } = useFavorit();
+const jumlahFavorit = daftar.length;
 ```
 
-Tekan tombol di halaman tulisan → angka di menu langsung ikut berubah. Global state tanpa kode tambahan.
+Tombol favorit dan menu tidak perlu saling mengirim props. Keduanya membaca data dari tempat yang sama. Inilah global state.
 
-:::tip{title="Bonus: simpan ke localStorage otomatis"}
-Zustand punya fitur `persist` yang menulis store ke `localStorage` sendiri — cukup bungkus dengan satu fungsi, tanpa menulis `useEffect` seperti di materi. Bentuknya `create()(persist((set) => ({...})))`. Kenal dulu saja; detailnya bisa kamu baca di dokumentasi Zustand saat butuh.
+:::info{title="Nanti, setelah paham"}
+Contoh ini membaca isi store dengan `useFavorit()`, supaya hubungan antara store dan komponen mudah dilihat. Zustand juga bisa memilih satu bagian saja, misalnya `useFavorit((state) => state.daftar)`. Cara memilih bagian ini berguna saat store sudah besar.
+:::
+
+:::tip{title="Coba di project-mu"}
+Pasang `zustand`, buat store `use-favorit.ts` dan tombolnya di project-mu. Tekan tombol pada beberapa tulisan — komponen lain yang membaca `daftar` ikut menerima nilai terbaru, tanpa Provider sama sekali.
 :::
 
 ## Context atau Zustand?
 
-| | Context bawaan | Zustand |
+| | Context | Zustand |
 |---|---|---|
-| Instal | Sudah ada di React | Satu paket kecil: `zustand` |
-| Setup | `createContext` + `Provider` di layout + custom hook | Satu file `create` — langsung jadi hook |
-| Komponen tengah | Harus ada di dalam Provider | Bebas — store bisa dibaca dari mana saja |
-| Cocok untuk | Data sederhana yang dibaca banyak komponen | Sama — tapi lebih sedikit kode |
+| Perlu dipasang? | Provider membungkus komponen pemakai | Tidak perlu Provider |
+| Cara membaca | `useContext` atau fungsi bantu | Panggil hook dari store, misalnya `useFavorit` |
+| Cocok untuk | Membagikan data sederhana di bagian tertentu | Membagikan state yang dipakai banyak komponen |
+| Perlu paket tambahan? | Tidak | Ya, pasang `zustand` |
 
-Patokan praktis: **dua-duanya boleh**. Context lebih "bawaan" jadi tidak perlu install apa pun; Zustand lebih ringkas ditulis. Yang penting kamu paham konsepnya — global state = satu sumber data dibaca banyak komponen.
-
-:::info{title="Kenal nama saja: Redux"}
-Di lowongan kerja dan project lama kamu mungkin menemukan **Redux Toolkit** — library global state yang lebih tua dan lebih rumit: ada slice, store, `dispatch`, `useSelector`. Konsepnya sama (satu sumber data, komponen membaca), tapi kodenya jauh lebih banyak. Untuk projectmu, Zustand atau Context sudah lebih dari cukup.
-:::
+Keduanya dapat dipakai untuk berbagi data. Mulailah dengan `useState` untuk data lokal. Gunakan Context atau Zustand saat beberapa komponen perlu membaca data yang sama.
 
 ## Ringkasan
 
-- ✅ Zustand = library state global yang ringkas — `create` membuat store sekaligus hook-nya dalam satu file
-- ✅ Tidak ada Provider — komponen membaca langsung dengan `useStore((s) => s.bagian)`
-- ✅ `set` di dalam `create` mengubah state; aturan array sama seperti `useState` — selalu buat array baru
-- ❌ Jangan kira global state harus selalu pakai library — Context bawaan React tetap valid untuk kasus sederhana
+- ✅ Zustand adalah library untuk menyimpan state yang dipakai beberapa komponen.
+- ✅ `create` membuat store dan hook yang dapat dipakai komponen.
+- ✅ Komponen membaca data dengan `useFavorit()` dan memanggil fungsi `ubahFavorit` untuk mengubahnya.
+- ✅ Zustand tidak perlu Provider di layout.
+- ❌ Jangan memakai global state jika datanya hanya dibutuhkan satu komponen.
 
-Materi pertemuan 05 selesai. Saatnya quiz, lalu lanjutkan project-mu di tugas.
+Materi pertemuan 05 selesai. Kerjakan quiz, lalu tambahkan fitur favorit ke project yang sama di tugas.

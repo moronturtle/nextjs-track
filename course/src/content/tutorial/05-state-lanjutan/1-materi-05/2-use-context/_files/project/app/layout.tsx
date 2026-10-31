@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
-import { TemaProvider } from "./tema-context";
-import "./globals.css";
+import { TemaProvider } from "@/context/tema-context";
 
 export const metadata: Metadata = {
   title: "Latihan Next.js",

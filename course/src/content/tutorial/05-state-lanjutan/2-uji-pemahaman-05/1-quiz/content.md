@@ -12,10 +12,10 @@ previews:
 
 # Quiz — cek pemahamanmu
 
-Ada **7 soal pilihan ganda** tentang prop drilling, Context, `useContext`, global state, dan Zustand. Kerjakan di panel Preview.
+Ada **7 soal pilihan ganda** tentang meneruskan props, Context, global state, dan Zustand. Kerjakan di panel Preview.
 
 - Pilih satu jawaban untuk setiap soal.
-- Jawaban langsung dinilai. Jika jawabanmu belum tepat, quiz menunjukkan jawaban yang benar dan alasannya.
-- Setelah soal terakhir, kamu bisa melihat skor dan mengulang quiz.
+- Setelah memilih jawaban, kamu akan melihat hasil dan penjelasannya.
+- Setelah soal terakhir, lihat skormu atau ulangi quiz.
 
-Quiz ini adalah latihan mandiri. Setelah selesai, buka tugas dan lanjutkan project yang sama dari pertemuan sebelumnya.
+Quiz ini latihan mandiri. Setelah selesai, lanjutkan project yang sama dari pertemuan 01 sampai 04 di tugas pertemuan ini.

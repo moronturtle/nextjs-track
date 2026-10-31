@@ -1,6 +1,6 @@
 ---
 type: lesson
-title: Lihat hasilnya dulu
+title: Pertemuan 06 — Mini Project Todo
 template: baca
 previews:
   - port: 3000

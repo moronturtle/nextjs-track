@@ -1,6 +1,6 @@
 ---
 type: lesson
-title: Setup project dan package.json
+title: Pertemuan 02 — Setup project
 template: baca
 previews: false
 terminal: false
