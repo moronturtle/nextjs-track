@@ -1,0 +1,97 @@
+.page {
+  margin: 0 auto;
+  width: min(100%, 44rem);
+  padding: 2rem 1.5rem 4rem;
+}
+
+.card {
+  border: 1px solid #dbe3ef;
+  border-radius: 1rem;
+  background: white;
+  padding: 1.25rem;
+  box-shadow: 0 12px 32px rgb(15 23 42 / 7%);
+}
+
+.form {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.input {
+  min-width: 0;
+  flex: 1;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.625rem;
+  padding: 0.7rem 0.85rem;
+}
+
+.button {
+  border: 0;
+  border-radius: 0.625rem;
+  background: #0f766e;
+  padding: 0.7rem 1rem;
+  color: white;
+  font-weight: 700;
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.filter {
+  border: 1px solid #cbd5e1;
+  border-radius: 999px;
+  background: white;
+  padding: 0.4rem 0.8rem;
+  color: #475569;
+}
+
+.filterActive {
+  border-color: #0f766e;
+  background: #ccfbf1;
+  color: #115e59;
+}
+
+.list {
+  margin-top: 1rem;
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.75rem;
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.85rem 1rem;
+}
+
+.item + .item {
+  border-top: 1px solid #e2e8f0;
+}
+
+.itemText {
+  color: #1e293b;
+}
+
+.done {
+  color: #94a3b8;
+  text-decoration: line-through;
+}
+
+.remove {
+  margin-left: auto;
+  border: 0;
+  background: transparent;
+  color: #be123c;
+  font-weight: 700;
+}
+
+.note {
+  margin-top: 1rem;
+  color: #64748b;
+  font-size: 0.875rem;
+}

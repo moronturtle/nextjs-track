@@ -78,6 +78,39 @@
           pembahasan: "Pola dari pertemuan 03 dan 04: page.tsx menyusun halaman sebagai komponen server, dan semua yang memakai hook pindah ke komponen \"use client\" di file sendiri.",
         },
         {
+          soal: "Apa yang disimpan oleh useMemo?",
+          opsi: [
+            "Hasil hitungan yang dibuat dari data lain",
+            "Alamat halaman yang sedang dibuka",
+            "Fungsi untuk memindahkan halaman",
+            "Data yang diketik di kotak input",
+          ],
+          jawaban: 0,
+          pembahasan: "useMemo menyimpan hasil hitungan. Jika data yang menjadi dasar hitungan belum berubah, React dapat memakai hasil sebelumnya.",
+        },
+        {
+          soal: "Apa kegunaan useCallback pada fungsi yang dikirim ke komponen anak?",
+          opsi: [
+            "Menyimpan isi input agar tidak hilang",
+            "Menjaga fungsi tetap sama saat data yang dipakainya tidak berubah",
+            "Mengubah fungsi menjadi halaman",
+            "Menyimpan fungsi ke localStorage",
+          ],
+          jawaban: 1,
+          pembahasan: "useCallback menjaga fungsi tetap sama selama dependency-nya belum berubah. Ini dapat membantu komponen anak yang memakai memo.",
+        },
+        {
+          soal: "Di folder mana kita menyimpan komponen yang hanya dipakai oleh fitur Todo?",
+          opsi: [
+            "app/",
+            "constants/",
+            "app/todo/_components/",
+            "styles/",
+          ],
+          jawaban: 2,
+          pembahasan: "app/todo/_components/ berisi komponen yang hanya dipakai oleh fitur Todo. components/ di root project dipakai untuk komponen umum.",
+        },
+        {
           soal: "Saat menambah tugas kita menulis setTodos([...todos, baru]). Kenapa tidak todos.push(baru)?",
           opsi: [
             "push lebih lambat daripada spread",
@@ -86,7 +119,7 @@
             "spread lebih pendek ditulis",
           ],
           jawaban: 1,
-          pembahasan: "React mendeteksi perubahan dari identitas state-nya. push mengubah array lama di tempat, sehingga React menganggap tidak ada yang berubah. Pola yang sama berlaku untuk mengubah (map) dan menghapus (filter).",
+          pembahasan: "push mengubah isi daftar lama. React bisa tidak mengenali perubahan itu sebagai daftar baru. Spread membuat daftar baru, jadi React dapat melihat bahwa datanya berubah. Untuk mengubah tugas, gunakan map; untuk menghapusnya, gunakan filter.",
         },
         {
           soal: "Kenapa todos harus melewati JSON.stringify saat disimpan dan JSON.parse saat dibaca?",
@@ -100,26 +133,26 @@
           pembahasan: "Penyimpanan browser seperti localStorage hanya mengenal string. Ini pola yang sama dengan tombol suka di pertemuan 04 — bedanya hanya isinya yang sekarang array.",
         },
         {
-          soal: "Halaman detail /todo/42 membaca daftar tugas dari localStorage, bukan dari props atau Context. Kenapa?",
+          soal: "Bagaimana halaman detail /todo/42 membaca daftar Todo yang sama dengan halaman /todo?",
           opsi: [
-            "Karena localStorage lebih cepat dibaca",
-            "Karena pindah ke halaman lain berarti komponen dan state-nya dibuat ulang — tapi localStorage milik browser, jadi bisa dibaca halaman mana pun",
-            "Karena Context tidak bisa dipakai di project ini",
-            "Karena props tidak bisa berisi angka",
+            "Panggil useTodos dari TodoProvider yang membungkus kedua halaman",
+            "Buat daftar Todo baru di halaman detail",
+            "Baca state dari TodoForm",
+            "Gunakan usePathname untuk membaca isi daftar",
           ],
-          jawaban: 1,
-          pembahasan: "State useState hilang saat pindah halaman. localStorage disimpan browser di luar React, jadi berfungsi sebagai sumber data bersama untuk daftar dan halaman detail.",
+          jawaban: 0,
+          pembahasan: "TodoProvider di app/todo/layout.tsx membungkus halaman daftar dan detail. Keduanya dapat membaca state yang sama dengan memanggil useTodos.",
         },
         {
-          soal: "Di detail-todo.tsx ada useState<Todo | null>(null) dan if (!todo). Untuk apa?",
+          soal: "Kenapa fungsi useTodos menampilkan error jika dipanggil di luar TodoProvider?",
           opsi: [
-            "Supaya TypeScript tidak error saat compile",
-            "Menandai data belum tentu ada — komponen menampilkan \"tidak ditemukan\" sebelum tugasnya ketemu di localStorage atau kalau id-nya salah",
-            "Agar komponen tidak render sama sekali",
-            "Karena Todo wajib berpasangan dengan null",
+            "Agar komponen tidak perlu memakai \"use client\"",
+            "Supaya kesalahan penggunaan Context terlihat jelas",
+            "Agar semua Todo otomatis terhapus",
+            "Supaya route dinamis dapat dibuat",
           ],
           jawaban: 1,
-          pembahasan: "Nilai awalnya null — belum ada tugas. Effect mengisinya begitu menemukan id yang cocok. if (!todo) menjaga komponen supaya tidak mencoba menampilkan data yang belum ada.",
+          pembahasan: "useTodos hanya bisa membaca data yang disediakan TodoProvider. Pesan error membantu kita menemukan komponen yang lupa dibungkus Provider.",
         },
         {
           soal: "Menu \"Todo\" tetap ditandai aktif saat kamu ada di /todo/42. Apa yang membuatnya begitu?",
@@ -130,7 +163,7 @@
             "Karena layout.tsx mendeteksi halaman anaknya",
           ],
           jawaban: 1,
-          pembahasan: "Ini trik usePathname dari pertemuan 03: selain cocok persis, menu juga menandai href yang jadi awalan alamat saat ini — jadi /todo/42 tetap dianggap bagian dari Todo.",
+          pembahasan: "Menu memeriksa apakah alamat saat ini diawali /todo. Karena itu, tautan Todo tetap ditandai saat alamatnya /todo/42.",
         },
       ];
 

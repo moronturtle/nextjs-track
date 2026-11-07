@@ -1,132 +1,109 @@
 ---
 type: lesson
-title: "Tugas: sempurnakan aplikasi todo"
+title: "Tugas: kembangkan aplikasi Todo"
 template: baca
 previews: false
 terminal: false
 editor: false
 ---
 
-# Tugas: sempurnakan aplikasi todo
+# Tugas: kembangkan aplikasi Todo
 
-Lanjutan dari project yang sama — sekarang sudah ada aplikasi todo yang berjalan dari materi pertemuan ini.
+Teruskan project yang sama dari tugas pertemuan 01 sampai 05. Materi 06 sudah memberi kerangka aplikasi Todo. Sekarang pastikan fitur dasarnya berjalan, lalu kembangkan dengan idemu sendiri.
 
-Aplikasinya sudah jalan, tapi ada dua hal yang belum: daftar tugas belum bisa difilter, dan jumlah tugas belum bisa dilihat dari halaman lain. Menu, misalnya, seharusnya bisa menampilkan "3 tugas tersisa" di semua halaman — tapi sekarang dia tidak bisa, karena `todos` terkunci di dalam `todo-app.tsx`.
+## Pastikan fitur dasar berjalan
 
-## Yang dikerjakan
+- Tambah tugas, tandai selesai, dan hapus tugas.
+- Simpan daftar supaya tetap ada setelah halaman dimuat ulang.
+- Buka halaman detail setiap tugas dengan alamat dinamis `/todo/[id]`.
+- Sediakan tautan Todo di menu umum.
+- Gunakan `useMemo` untuk hasil hitungan yang sesuai, misalnya daftar setelah filter.
+- Gunakan `useCallback` bila fungsi dikirim ke komponen anak yang memakai `memo`. Tidak perlu memakai hook ini pada setiap fungsi.
 
-### 1. Pindahkan todos ke Context
+## Pertahankan susunan folder
 
-State `useState` di `todo-app.tsx` tidak bisa dibaca komponen lain — menu di `layout.tsx` termasuk korbannya. Ini persis masalah global state dari pertemuan 05, dan jawabannya sama: **Context**.
+```text
+app/
+├── layout.tsx
+└── todo/
+    ├── layout.tsx
+    ├── page.tsx
+    ├── [id]/page.tsx
+    └── _components/
+        ├── todo-app.tsx
+        ├── todo-form.tsx
+        ├── todo-filter.tsx
+        ├── todo-list.tsx
+        ├── todo-item.tsx
+        └── todo-detail.tsx
 
-Buat `app/todo-context.tsx` — polanya sama dengan `favorit-context.tsx` dari tugas 05, tapi isinya daftar todo lengkap dengan `tambah`, `toggle`, dan `hapus`. Dua `useEffect` untuk `localStorage` pindah ke dalam Provider juga:
+components/
+└── menu.tsx                 ← komponen umum
 
-```tsx
-"use client";
-
-import { createContext, useContext, useEffect, useState } from "react";
-
-type Todo = { id: number; teks: string; selesai: boolean };
-
-type TodoState = {
-  todos: Todo[];
-  tambah: (teks: string) => void;
-  toggle: (id: number) => void;
-  hapus: (id: number) => void;
-};
-
-const TodoContext = createContext<TodoState | null>(null);
-
-export function TodoProvider({ children }: { children: React.ReactNode }) {
-  const [todos, setTodos] = useState<Todo[]>([]);
-
-  useEffect(() => {
-    const tersimpan = localStorage.getItem("todos");
-    if (tersimpan) setTodos(JSON.parse(tersimpan));
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem("todos", JSON.stringify(todos));
-  }, [todos]);
-
-  const tambah = (teks: string) =>
-    setTodos([...todos, { id: Date.now(), teks, selesai: false }]);
-
-  const toggle = (id: number) =>
-    setTodos(todos.map((t) => (t.id === id ? { ...t, selesai: !t.selesai } : t)));
-
-  const hapus = (id: number) => setTodos(todos.filter((t) => t.id !== id));
-
-  return (
-    <TodoContext.Provider value={{ todos, tambah, toggle, hapus }}>
-      {children}
-    </TodoContext.Provider>
-  );
-}
-
-export function useTodos() {
-  const ctx = useContext(TodoContext);
-  if (!ctx) throw new Error("useTodos hanya bisa di dalam TodoProvider");
-  return ctx;
-}
+contexts/todo-context.tsx
+data/todo.ts
+types/todo.ts
+lib/todo-storage.ts
+styles/todo.module.css
 ```
 
-Lalu pasang `<TodoProvider>` di `app/layout.tsx` membungkus `Menu` dan `{children}` — sama seperti `FavoritProvider`.
+- `app/` khusus untuk alamat halaman.
+- `components/` untuk komponen umum yang dipakai beberapa halaman.
+- `app/todo/_components/` untuk komponen khusus Todo. Tanda `_` berarti folder ini tidak membuat alamat halaman.
+- `contexts/` untuk Context, Provider, dan hook `useTodos`.
+- `data/` untuk nilai tetap dan contoh data.
+- `types/` untuk bentuk data TypeScript.
+- `lib/` untuk fungsi bantu, termasuk fungsi baca dan simpan `localStorage`.
+- `styles/` untuk CSS Module.
 
-Setelah Provider terpasang, perbarui komponennya:
+Project latihan ini menggunakan `app/` di root, jadi folder lainnya berada di samping `app/`. Jika project-mu menggunakan `src/app/`, letakkan folder lainnya di dalam `src/`.
 
-- `todo-app.tsx` — hapus `useState` todos dan fungsi-fungsinya; ganti dengan `const { todos, tambah, toggle, hapus } = useTodos();`. `useState` untuk `teks` tetap — itu state lokal form, bukan urusan global.
-- `detail-todo.tsx` — ganti `useEffect` dan pembacaan `localStorage` dengan `const { todos } = useTodos();` lalu `todos.find((t) => String(t.id) === id)`. Lebih pendek, dan tidak menyentuh `localStorage` langsung — `localStorage` tetap dipakai, tapi sekarang hanya Provider yang berbicara dengannya.
+Kamu boleh menambah file atau folder jika fitur yang kamu pilih memerlukannya. Pertahankan aturan dasarnya: simpan setiap bagian di tempat yang sesuai dan beri nama file yang menjelaskan isinya.
 
-### 2. Jumlah tersisa di menu
+## Pilih fitur tambahanmu
 
-`app/menu.tsx` sudah `"use client"` dari tugas 03. Tambahkan `useTodos()` dan tampilkan sisa tugas di ujung kanan menu — misalnya `Todo: {sisa}` di mana `sisa = todos.filter((t) => !t.selesai).length`.
+Tambahkan **setidaknya satu** fitur yang kamu pilih sendiri. Kamu boleh memilih contoh berikut atau membuat ide lain:
 
-Uji: tambah tugas di `/todo`, lalu pindah ke `/blog` — angka di menu ikut berubah. Inilah global state bekerja: satu sumber di Provider, dibaca dari halaman mana pun.
+- kelompokkan tugas dengan kategori;
+- tambahkan tingkat prioritas;
+- simpan tanggal batas tugas;
+- cari tugas berdasarkan kata;
+- tampilkan jumlah tugas selesai dan belum selesai;
+- ubah warna atau tata letak aplikasi.
 
-### 3. Filter daftar
+Jelaskan di README atau deskripsi pull request: fitur apa yang kamu buat, file mana yang menanganinya, dan kenapa kamu memilih susunan state tersebut.
 
-Di `todo-app.tsx`, tambahkan satu state lokal:
+## Tantangan tambahan (opsional)
 
-```tsx
-const [filter, setFilter] = useState<"semua" | "belum" | "selesai">("semua");
-```
+Pindahkan `TodoProvider` dari `app/todo/layout.tsx` ke `app/layout.tsx`, lalu gunakan `useTodos()` di `components/menu.tsx` untuk menampilkan jumlah tugas yang belum selesai. Dengan begitu, menu umum dan halaman Todo membaca daftar dari Context yang sama.
 
-Lalu tiga tombol di atas daftar untuk memilihnya. Daftar yang ditampilkan adalah `todos` yang sudah disaring:
+## Periksa project
 
-```tsx
-const tampil = todos.filter((t) =>
-  filter === "semua" ? true : filter === "selesai" ? t.selesai : !t.selesai
-);
-```
-
-Perhatikan: `filter` sengaja tetap `useState` lokal — pilihan filter hanya urusan halaman ini, tidak perlu dinaikkan ke Context. Ini keputusan dari pertemuan 05: global untuk yang dipakai banyak halaman, lokal untuk yang dipakai satu tempat.
-
-### 4. Periksa hasilnya
+Pastikan halaman dan fitur dari tugas sebelumnya tetap berjalan. Lalu jalankan:
 
 ```bash
 npm run lint
-npx prettier --write app
+npx prettier --write app components contexts data lib types styles
 npx tsc --noEmit
 ```
 
+Jika project-mu memakai pnpm atau Yarn, gunakan perintah yang sesuai dengan project tersebut.
+
 ## Kriteria selesai
 
-- [ ] Project yang sama dengan tugas pertemuan sebelumnya
-- [ ] `app/todo-context.tsx` berisi `TodoProvider` (state + `localStorage`) dan hook `useTodos`
-- [ ] `TodoProvider` terpasang di `app/layout.tsx`
-- [ ] `todo-app.tsx` dan `detail-todo.tsx` membaca data lewat `useTodos` — tidak ada lagi `localStorage` di luar Provider
-- [ ] Menu menampilkan jumlah tugas tersisa dan ikut berubah dari halaman mana pun
-- [ ] Filter Semua / Belum selesai / Selesai bekerja dengan state lokal
-- [ ] `npm run lint` dan `npx tsc --noEmit` selesai tanpa error
-
-## Bonus (opsional): edit tugas
-
-Tambahkan tombol pensil di `TodoItem`. Saat ditekan, teks berubah menjadi input berisi isi tugas; Enter menyimpan (lewat fungsi `ubah(id, teksBaru)` yang kamu tambahkan di Provider), Escape membatalkan. Ini latihan gabungan: state lokal untuk mode edit, callback naik ke Context.
+- [ ] Saya melanjutkan project yang sama dari pertemuan 01–05.
+- [ ] Tambah, centang, hapus, penyimpanan, dan halaman detail Todo berjalan.
+- [ ] Menu umum ada di `components/`; komponen Todo ada di `app/todo/_components/`.
+- [ ] `TodoProvider` membagikan daftar ke halaman daftar dan detail.
+- [ ] Data tetap, tipe data, dan style memiliki file masing-masing.
+- [ ] Saya menambahkan setidaknya satu fitur pilihan sendiri.
+- [ ] Halaman dan fitur dari pertemuan sebelumnya tetap berjalan.
+- [ ] Saya menjelaskan fitur dan susunan file di pull request.
+- [ ] Lint dan pemeriksaan TypeScript selesai tanpa error.
 
 ## Cara mengumpulkan
 
-Lewat pull request di repo yang sama, dari branch utama terbaru:
+Kirim tugas melalui pull request di repo yang sama. Mulai dari branch utama terbaru:
 
 ```bash
 git checkout main && git pull
@@ -140,7 +117,7 @@ Buat pull request dari `tugas-06` ke `main` (atau `master`), lalu tulis komentar
 
 **[→ Buka thread pengumpulan tugas 06](/pengumpulan?t=tugas-06)**
 
-Tunggu approve mentor, lalu merge sendiri dan samakan branch utama di komputermu:
+Tunggu mentor menyetujui pull request. Setelah disetujui, merge pull request dan perbarui branch utama di komputermu:
 
 ```bash
 git checkout main && git pull
