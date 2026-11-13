@@ -47,34 +47,34 @@ export default function DaftarTugas() {
 
 ## Kenapa fetch dipanggil di dalam useEffect?
 
-Komponen ini adalah Client Component, yaitu komponen yang berjalan di browser. `useEffect` menjalankan kode setelah komponen tampil. Kita menaruh request di sana agar:
+Komponen ini adalah Client Component, yaitu komponen yang berjalan di browser. `useEffect` menjalankan kode setelah komponen tampil. Kita menaruh permintaan di sana agar:
 
-- request dimulai setelah komponen tampil di browser;
-- request tidak terkirim ulang setiap kali komponen dirender.
+- permintaan dimulai setelah komponen tampil di browser;
+- permintaan tidak dikirim ulang setiap kali React memperbarui tampilan komponen.
 
-Array kosong `[]` berarti effect ini dijalankan saat komponen pertama kali tampil. Ini mirip pola membaca `localStorage` yang sudah kita pakai di pertemuan 06.
+Array kosong `[]` membuat effect ini dijalankan setelah komponen pertama kali tampil. Polanya mirip saat kita mengambil data dari `localStorage` di pertemuan 06.
 
 ## Kenapa ada fungsi `muat`?
 
-Fungsi effect tidak bisa ditulis sebagai fungsi `async`. Karena itu, kita membuat fungsi `muat` di dalam effect, lalu memanggilnya. Kata kunci `await` dipakai di dalam fungsi `muat` untuk menunggu jawaban API.
+Fungsi yang diberikan ke `useEffect` tidak bisa langsung ditulis sebagai fungsi `async`. Jadi, kita membuat fungsi `muat` di dalamnya, lalu memanggil fungsi tersebut. Di dalam `muat`, kita memakai `await` untuk menunggu jawaban API.
 
 ## Urutan kejadiannya
 
-1. Komponen tampil. Nilai `sedangMemuat` masih `true`, jadi layar menampilkan "Memuat daftar tugas...".
+1. Komponen tampil. Nilai `sedangMemuat` masih `true`, jadi halaman menampilkan "Memuat daftar tugas...".
 2. Fungsi `muat()` meminta data lewat `fetch`.
 3. Server mengirim JSON. `res.json()` membacanya, lalu `data.todos` berisi daftar Todo.
-4. `setTodos(data.todos)` menyimpan daftar. Komponen dirender ulang dan menampilkan tugas.
+4. `setTodos(data.todos)` menyimpan daftar. React memperbarui tampilan dan menampilkan tugas.
 
-State `sedangMemuat` memberi tahu pengguna bahwa jawaban server masih ditunggu. Tanpa state ini, halaman tampak kosong selama data belum datang.
+State `sedangMemuat` memberi tahu pengguna bahwa aplikasi masih menunggu jawaban server. Tanpa state ini, halaman tampak kosong selama data belum datang.
 
 ## Coba di project
 
-Buat komponen `DaftarTugas` seperti contoh, lalu tampilkan di halaman. Setelah data diterima, daftar Todo dari server akan muncul.
+Buat komponen `DaftarTugas` seperti contoh, lalu tampilkan di halaman. Daftar Todo dari server akan muncul setelah data diterima.
 
 ## Ringkasan
 
 - ✅ `useEffect` menjalankan permintaan setelah komponen tampil.
-- ✅ `sedangMemuat` memberi tahu bahwa data masih diminta dari server.
+- ✅ `sedangMemuat` memberi tahu bahwa aplikasi masih menunggu data dari server.
 - ✅ `res.json()` membaca jawaban, lalu `setTodos` menyimpannya ke state.
 
-Berikutnya, kita tangani dua keadaan gagal: server memberi jawaban error atau tidak bisa dihubungi.
+Berikutnya, kita tangani dua keadaan gagal: server mengirim status gagal atau browser tidak bisa terhubung ke server.

@@ -12,7 +12,7 @@ previews:
 
 # Quiz — cek pemahaman
 
-Ada **9 soal pilihan ganda** tentang API, `fetch`, jawaban JSON, status berhasil atau gagal, dan cara aplikasi Todo membaca data dari server. Kerjakan di panel Preview.
+Ada **9 soal pilihan ganda** tentang API, `fetch`, jawaban JSON, status berhasil atau gagal, dan cara aplikasi Todo mengambil data dari server. Kerjakan di panel Preview.
 
 - Pilih satu jawaban untuk setiap soal.
 - Quiz langsung memberi tahu apakah jawabanmu tepat. Jika belum tepat, baca jawaban yang benar dan penjelasannya.

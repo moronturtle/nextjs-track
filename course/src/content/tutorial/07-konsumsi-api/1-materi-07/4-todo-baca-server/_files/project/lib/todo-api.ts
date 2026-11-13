@@ -1,9 +1,9 @@
 import type { Todo } from "@/types/todo";
 
-// Alamat API latihan yang sudah online.
+// Alamat API untuk latihan ini.
 export const API_URL = "https://nextjs-track-api.vercel.app";
 
-// Server membungkus jawaban dengan info tambahan: jumlah data dan halaman.
+// Jawaban API berisi daftar Todo dan informasi halaman.
 export type DaftarTodos = {
   todos: Todo[];
   total: number;
