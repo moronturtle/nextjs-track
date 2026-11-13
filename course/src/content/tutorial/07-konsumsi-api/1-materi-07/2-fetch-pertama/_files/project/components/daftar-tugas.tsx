@@ -9,7 +9,9 @@ export default function DaftarTugas() {
 
   useEffect(() => {
     async function muat() {
-      const res = await fetch("http://localhost:3001/api/todos?owner=demo");
+      const res = await fetch(
+        "https://nextjs-track-api.vercel.app/api/todos?owner=demo",
+      );
       const data = await res.json();
       setTodos(data.todos);
       setSedangMemuat(false);

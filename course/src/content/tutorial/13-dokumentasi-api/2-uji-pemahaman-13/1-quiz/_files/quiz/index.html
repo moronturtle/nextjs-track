@@ -67,18 +67,18 @@
     <script>
       const SOAL = [
         {
-          soal: "Apa itu OpenAPI?",
+          soal: "Untuk apa OpenAPI digunakan?",
           opsi: [
-            "Format standar (JSON) untuk menuliskan seluruh kontrak API — alamat, method, parameter, dan jawabannya",
-            "Library untuk memanggil API",
-            "Bahasa pemrograman untuk backend",
-            "Database untuk menyimpan dokumentasi",
+            "Menjelaskan alamat API, data yang dikirim, dan jawaban server",
+            "Memasang library untuk memanggil API",
+            "Menulis kode backend",
+            "Menyimpan data aplikasi",
           ],
           jawaban: 0,
-          pembahasan: "OpenAPI adalah kontrak tertulis: satu file JSON menjelaskan semua endpoint, parameter, dan response — tanpa perlu membaca kode servernya.",
+          pembahasan: "Dokumen OpenAPI menjelaskan cara memakai API. Kita bisa melihat alamat, parameter, data yang dikirim, dan jawaban server di sana.",
         },
         {
-          soal: "Di bagian mana openapi.json ditulis bahwa parameter status hanya boleh semua/belum/selesai?",
+          soal: "Di bagian mana dokumen menyebutkan pilihan untuk parameter status?",
           opsi: [
             "parameters → status → schema → enum",
             "responses → 200",
@@ -86,62 +86,62 @@
             "securitySchemes",
           ],
           jawaban: 0,
-          pembahasan: "enum di dalam schema parameter mencantumkan nilai yang diizinkan. Mengirim nilai lain (misalnya 'done') akan dijawab 400 — tertulis juga di responses.",
+          pembahasan: "Bagian enum mencantumkan nilai yang boleh dipakai. API juga menjelaskan jawaban yang dikirim jika nilainya tidak sesuai.",
         },
         {
           soal: "Apa arti \"$ref\": \"#/components/schemas/Todo\"?",
           opsi: [
-            "Bentuknya merujuk ke definisi Todo di bagian components — tidak ditulis ulang di tiap endpoint",
+            "Gunakan bentuk data Todo yang sudah dijelaskan di bagian components",
             "Menuju ke URL lain di internet",
             "Menandai endpoint yang tidak aktif",
             "Kode error server",
           ],
           jawaban: 0,
-          pembahasan: "$ref menghindari duplikasi: satu definisi Todo di components dipakai oleh semua endpoint yang mengembalikan bentuk itu.",
+          pembahasan: "$ref menunjuk ke definisi Todo yang sama. Dengan begitu, bentuk data tidak perlu ditulis ulang di setiap endpoint.",
         },
         {
-          soal: "Bagaimana kamu tahu cara autentikasi sebuah API dari openapi.json?",
+          soal: "Di mana kamu mencari tahu cara mengirim token ke API?",
           opsi: [
-            "Baca components → securitySchemes — bearerAuth berarti header Authorization: Bearer <token>",
+            "Baca components → securitySchemes — bearerAuth memakai header Authorization: Bearer <token>",
             "Menebak dari nama endpoint",
             "Mencoba semua kemungkinan",
             "Membaca bagian title",
           ],
           jawaban: 0,
-          pembahasan: "securitySchemes menyatakan skema autentikasi. bearerAuth di API kita artinya: login dulu, lalu kirim token di header Authorization.",
+          pembahasan: "securitySchemes menjelaskan cara autentikasi. Pada API ini, token dikirim di header Authorization.",
         },
         {
-          soal: "Apa fungsi tombol Try it out di Swagger UI?",
+          soal: "Apa yang dilakukan tombol Try it out di Swagger UI?",
           opsi: [
-            "Mengirim request sungguhan ke server langsung dari halaman dokumentasi",
+            "Membuka form untuk mengirim request ke server",
             "Menghapus endpoint",
             "Mengubah kode server",
             "Mengunduh file JSON",
           ],
           jawaban: 0,
-          pembahasan: "Try it out mengubah dokumentasi menjadi form request — kamu bisa mengisi body, menekan Execute, dan melihat jawaban nyata beserta kodenya.",
+          pembahasan: "Isi form, tekan Execute, lalu lihat jawaban server dan kode statusnya.",
         },
         {
-          soal: "Setelah menekan tombol Authorize dan menempel token, apa yang terjadi?",
+          soal: "Apa yang terjadi setelah kamu memasukkan token lewat tombol Authorize?",
           opsi: [
-            "Semua request dari Try it out otomatis membawa header Authorization: Bearer <token>",
+            "Request yang dicoba mengirim header Authorization: Bearer <token>",
             "Token dihapus dari localStorage",
             "Dokumentasi berubah warna",
             "Semua endpoint menjadi gratis tanpa token",
           ],
           jawaban: 0,
-          pembahasan: "Authorize menyimpan token dan menyertakannya di setiap percobaan — persis seperti kirimRequest di aplikasimu yang menambahkan header otomatis.",
+          pembahasan: "Swagger UI menambahkan token ke header Authorization pada request yang kamu coba.",
         },
         {
-          soal: "Kenapa dokumentasi OpenAPI penting untuk frontend developer?",
+          soal: "Kenapa dokumentasi OpenAPI membantu developer frontend?",
           opsi: [
-            "Semua pertanyaan 'kirim apa, terima apa' terjawab dari dokumen — tidak perlu menebak atau menunggu penjelasan orang",
+            "Dokumen menjelaskan data yang perlu dikirim dan jawaban yang akan diterima",
             "Supaya tidak perlu menulis kode",
             "Karena API tanpa docs tidak bisa dipakai",
             "Supaya server lebih cepat",
           ],
           jawaban: 0,
-          pembahasan: "Kontrak tertulis menjadikan frontend dan backend membaca sumber yang sama — kamu bisa bekerja tanpa menebak bentuk request atau response.",
+          pembahasan: "Dokumentasi membantu developer frontend memahami bentuk request dan jawaban server sebelum menulis kode.",
         },
       ];
 

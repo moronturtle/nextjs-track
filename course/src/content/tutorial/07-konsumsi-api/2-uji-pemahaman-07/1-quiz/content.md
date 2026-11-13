@@ -10,12 +10,12 @@ previews:
     pathname: /quiz/
 ---
 
-# Quiz — cek pemahamanmu
+# Quiz — cek pemahaman
 
-Ada **9 soal pilihan ganda** tentang API, `fetch`, `res.json()`, `res.ok`, loading state, error state, dan cara Todo membaca dari server. Kerjakan di panel Preview.
+Ada **9 soal pilihan ganda** tentang API, `fetch`, jawaban JSON, status berhasil atau gagal, dan cara aplikasi Todo membaca data dari server. Kerjakan di panel Preview.
 
 - Pilih satu jawaban untuk setiap soal.
-- Jawaban langsung dinilai. Jika jawabanmu belum tepat, quiz menunjukkan jawaban yang benar dan alasannya.
-- Setelah soal terakhir, kamu bisa melihat skor dan mengulang quiz.
+- Quiz langsung memberi tahu apakah jawabanmu tepat. Jika belum tepat, baca jawaban yang benar dan penjelasannya.
+- Setelah soal terakhir, lihat skor atau ulangi quiz.
 
-Quiz ini adalah latihan mandiri. Setelah selesai, buka tugas dan lanjutkan project yang sama dari pertemuan sebelumnya.
+Setelah selesai, buka tugas dan lanjutkan project yang sama dari pertemuan sebelumnya.

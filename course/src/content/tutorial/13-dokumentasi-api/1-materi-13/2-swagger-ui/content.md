@@ -6,58 +6,60 @@ previews: false
 terminal: false
 ---
 
-# Swagger UI — dokumentasi yang bisa dicoba
+# Swagger UI — mencoba API dari browser
 
-File `openapi.json` itu untuk mesin dan pembaca tekun. Untuk manusia, ada **Swagger UI** — halaman yang membaca file OpenAPI yang sama dan menampilkannya sebagai dokumentasi interaktif. API latihan kita menyediakannya di **`/docs`**: `http://localhost:3001/docs`.
+**Swagger UI** adalah halaman yang membaca dokumen OpenAPI lalu menampilkan daftar endpoint dalam bentuk yang bisa dicoba. Buka dokumentasi API latihan di:
 
-## Membaca halaman /docs
+```text
+https://nextjs-track-api.vercel.app/docs
+```
 
-Setiap endpoint tampil sebagai satu kotak berwarna sesuai methodnya:
+## Mengenali daftar endpoint
 
-- 🟩 hijau `GET`, 🟦 biru `POST`, 🟧 oranye `PATCH`, 🟥 merah `DELETE`.
+Setiap endpoint menampilkan method dan alamatnya. Contohnya, `GET /api/todos` untuk membaca daftar dan `POST /api/todos` untuk menambahkan Todo.
 
-Buka kotak `GET /api/todos` — di dalamnya terbaca semua yang tadi ada di JSON: daftar parameter (`q`, `status`, `page`, `limit`) beserta tipe dan nilai yang diizinkan, lalu daftar response per kode beserta contoh body-nya.
+Klik `GET /api/todos`. Kamu akan melihat parameter seperti `owner`, `q`, `status`, `page`, dan `limit`, serta kode jawaban yang mungkin dikirim server.
 
-## Try it out: kirim request langsung dari dokumen
+## Try it out: kirim request dari halaman dokumentasi
 
-Ini bagian yang paling berguna. Di dalam kotak endpoint ada tombol **Try it out** — mengubah dokumentasi menjadi form pengirim request sungguhan:
+Tombol **Try it out** membuka kolom untuk mengisi request. Kita akan mendapatkan token agar request berikutnya bisa memakai identitas akun.
 
-1. Klik **Try it out** di `POST /api/auth/login`.
-2. Isi body: `{"nama": "budi"}` → klik **Execute**.
-3. Di bawahnya muncul jawaban nyata: kode `200` dan `{token, nama}` — dari server betulan.
+1. Jika belum punya akun latihan, buka `POST /api/auth/register`. Klik **Try it out**, lalu isi `{"nama":"budi","password":"rahasia123"}`.
+2. Klik **Execute**. Jika nama belum pernah dipakai, server membalas `201` dan mengirim token.
+3. Jika akun sudah ada, gunakan `POST /api/auth/login` dengan nama dan password yang sama. Login berhasil membalas `200` dan token.
 
-Kamu baru saja login tanpa menulis fetch sama sekali. Ini cara developer mengecek API sebelum menulis satu baris kode pun.
+Kita bisa mencoba API dari browser tanpa menulis kode `fetch`.
 
-## Authorize: token untuk endpoint terproteksi
+## Authorize: pakai token pada request
 
-Di bagian atas halaman ada tombol **Authorize** — karena spec menyatakan `bearerAuth`, Swagger tahu API ini menerima token:
+Tombol **Authorize** membantu Swagger UI mengirim token pada request:
 
-1. Salin `token` dari jawaban login tadi.
-2. Klik **Authorize** → tempel token → **Authorize** lagi.
-3. Sekarang semua request dari Try it out otomatis membawa `Authorization: Bearer <token>` — sama seperti `kirimRequest` di aplikasimu.
+1. Salin nilai `token` dari jawaban register atau login.
+2. Klik **Authorize**, tempel token, lalu klik **Authorize** lagi.
+3. Coba `GET /api/todos`. Request akan membawa header `Authorization: Bearer <token>`. Server memakai nama di token untuk memilih daftar Todo.
 
-## Menjawab pertanyaan tanpa membaca kode
+## Cari jawaban di dokumentasi
 
-Dengan `/docs`, pertanyaan-pertanyaan ini terjawab sendiri:
+Detail endpoint di `/docs` membantu menjawab pertanyaan seperti:
 
-- "Method apa yang dipakai untuk mengubah sebagian todo?" → `PATCH /api/todos/{id}`.
-- "Nilai apa saja yang boleh untuk `status`?" → `semua`, `belum`, `selesai` — terlihat dari dropdown enum-nya.
-- "Apa isi body POST yang wajib?" → `teks`, bertanda `required`.
-- "Apa yang terjadi kalau id tidak ada?" → `404`, ada contoh pesannya.
+- Bagaimana mengubah sebagian isi Todo? Gunakan `PATCH /api/todos/{id}`.
+- Nilai apa yang boleh dikirim untuk `status`? `semua`, `belum`, atau `selesai`.
+- Apa yang dikirim saat menambahkan Todo? Body JSON berisi `teks`.
+- Apa jawaban server jika Todo tidak ditemukan? Status `404`.
 
-Dokumentasi yang baik menjadikan pertanyaan "bagaimana cara pakai API ini?" terjawab tanpa menunggu balasan chat dari backend developer.
+Biasakan membaca dokumentasi sebelum menebak alamat atau isi request.
 
 ## Buktikan sendiri
 
-- Di `/docs`, coba `POST /api/auth/login` dengan `{"nama": "ab"}` → jawabannya `400` beserta pesan error — persis yang materi bilang.
-- Login dengan nama benar → Authorize dengan tokennya → `GET /api/todos` → daftar milikmu tampil.
-- `DELETE` todo yang tidak ada → `404` dengan `{"error": "Todo tidak ditemukan"}`.
+- Coba login dengan `{"nama":"budi","password":"salah123"}`. Jika password tidak cocok, server membalas `401` dengan pesan bahwa nama atau password salah.
+- Gunakan token hasil register atau login, lalu jalankan `GET /api/todos`. Daftar Todo untuk akun tersebut akan muncul.
+- Sebelum mencoba `POST` atau `DELETE`, periksa body dan ID yang kamu isi. Request Try it out dikirim ke API live dan bisa mengubah data.
 
 ## Ringkasan
 
-- ✅ Swagger UI menampilkan `openapi.json` sebagai dokumentasi interaktif di `/docs`.
-- ✅ **Try it out** mengirim request sungguhan — cara cepat memahami API sebelum menulis kode.
-- ✅ **Authorize** menempelkan token ke semua percobaan — seperti `kirimRequest` versi dokumentasi.
-- ✅ Jawaban "cara pakai API" ada di dokumen, bukan di kepala orang lain.
+- ✅ Swagger UI menampilkan daftar endpoint dan cara memakainya.
+- ✅ **Try it out** mengirim request sungguhan dari browser.
+- ✅ **Authorize** menambahkan token ke request yang dicoba.
+- ✅ Periksa request sebelum menekan **Execute**, karena API ini menyimpan data latihan.
 
-Selanjutnya quiz dan tugas — tugas terakhir track ini: membuktikan kamu bisa memakai API hanya dengan membaca dokumentasinya.
+Selanjutnya, kerjakan quiz dan tugas. Di tugas, kamu akan menambahkan fitur dengan mengikuti dokumentasi API.

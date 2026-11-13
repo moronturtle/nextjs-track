@@ -7,82 +7,85 @@ terminal: false
 focus: /project/lib/todo-api.ts
 ---
 
-# Pertemuan 07 — Konsumsi API
+# Pertemuan 07 — Membaca data dari API
 
-Di pertemuan 06, daftar Todo disimpan di `localStorage`. Data itu hanya ada di browser milikmu — buka project di komputer lain, daftarnya kosong lagi. Pertemuan ini kita pindahkan penyimpanan ke **server**, supaya datamu sama di mana pun project dibuka.
+Di pertemuan 06, daftar Todo disimpan di `localStorage`, yaitu penyimpanan di browser. Data itu hanya ada di browser tersebut. Sekarang kita akan membaca daftar dari server. Dengan begitu, data yang sama bisa dibuka dari perangkat lain.
 
 ## API itu apa?
 
-API (Application Programming Interface) adalah cara dua program bertukar data lewat alamat URL. Polanya selalu dua langkah:
+API (Application Programming Interface) adalah cara satu program meminta data atau layanan dari program lain.
 
-1. Kamu mengirim **request** ke sebuah alamat.
-2. Server menjawab dengan **response** — untuk API latihan kita, isinya teks JSON.
+Contohnya, aplikasi Todo mengirim **request** (permintaan) ke server. Server lalu mengirim **response** (jawaban) berupa data JSON.
 
-JSON adalah format data berbentuk teks yang susunannya mirip objek JavaScript:
+JSON adalah format teks untuk bertukar data. Bentuknya mirip objek JavaScript:
 
 ```json
 { "id": 1, "teks": "Belajar dasar fetch", "selesai": true }
 ```
 
-## API latihan kita
+## Alamat API latihan
 
-Kita punya server latihan dengan alamat seperti ini — mentor memberikan alamat pastinya di kelas:
-
-```text
-GET http://localhost:3001/api/todos?owner=budi
-```
-
-Tempel alamat itu di address bar browser. Server menjawab dengan teks JSON berisi daftar Todo.
-
-Perhatikan `?owner=budi` di ujung alamat. Bagian itu disebut **parameter query** — penanda milik siapa data ini. Ganti `budi` dengan namamu dan kamu mendapat daftar sendiri, terpisah dari murid lain. Kalau `owner` tidak diisi, server memakai `demo`.
-
-Parameter query tidak harus satu — beberapa digabung dengan tanda `&`:
+API latihan kita sudah tersedia di internet. Alamat dasarnya adalah `https://nextjs-track-api.vercel.app`. Untuk meminta daftar Todo milik Budi, buka alamat ini di browser:
 
 ```text
-GET /api/todos?owner=budi&status=belum
+https://nextjs-track-api.vercel.app/api/todos?owner=budi
 ```
 
-Artinya "todo milik budi, yang belum selesai". Kita baru pakai satu parameter saja untuk sekarang; parameter lainnya (`status`, `q`, `page`) kita aktifkan di pertemuan 10.
+Server mengirim daftar Todo dalam bentuk JSON. Saat pertama kali nama owner dipakai, server menyiapkan data contoh untuk nama tersebut.
+
+Perhatikan `?owner=budi` di alamat. Bagian setelah tanda tanya disebut **parameter query**. `owner` memberi tahu server daftar milik siapa yang diminta. Ganti `budi` dengan nama pilihanmu agar daftar yang kamu lihat terpisah dari nama lain.
+
+Untuk pertemuan ini, kita belum memakai login. Jadi nama pada `owner` hanya dipakai untuk memilih daftar. Nanti, mulai pertemuan 12, identitas pemilik data dibaca dari token login.
+
+Satu alamat bisa memiliki beberapa parameter query. Pisahkan parameter berikutnya dengan tanda `&`:
+
+```text
+https://nextjs-track-api.vercel.app/api/todos?owner=budi&status=belum
+```
+
+Alamat itu meminta Todo milik Budi yang belum selesai. Kita akan membahas pencarian, filter, dan halaman data lebih lanjut di pertemuan 10.
 
 ## Membaca API dari kode: fetch
 
-JavaScript punya fungsi bawaan `fetch` untuk mengirim request:
+JavaScript menyediakan fungsi bawaan bernama `fetch` untuk mengirim request. Contohnya:
 
 ```ts
-const res = await fetch("http://localhost:3001/api/todos?owner=demo");
+const res = await fetch(
+  "https://nextjs-track-api.vercel.app/api/todos?owner=demo",
+);
 const data = await res.json();
 ```
 
-Dua hal yang perlu diingat:
+Perhatikan dua langkahnya:
 
-- `fetch()` mengembalikan `Promise` — jawaban server tidak datang seketika, jadi dipanggil dengan `await`.
-- `res.json()` membaca isi response dan mengubah teks JSON menjadi objek atau array JavaScript. Ini juga perlu `await` karena membaca isi response butuh waktu.
+- `fetch()` mengirim permintaan dan mengembalikan `Promise`, yaitu penanda bahwa hasilnya akan tersedia nanti. `await` membuat kode menunggu hasil tersebut.
+- `res.json()` membaca jawaban server dan mengubah teks JSON menjadi data JavaScript. Proses membaca ini juga perlu ditunggu dengan `await`.
 
-Buka `project/lib/todo-api.ts` di panel File. Fungsi `bacaTodos` membungkus dua langkah itu menjadi satu fungsi siap pakai — kita bedah isinya di lesson berikutnya.
+Buka `project/lib/todo-api.ts` di panel File. File ini berisi fungsi `bacaTodos`, yang memakai `fetch` untuk mengambil daftar Todo. Kita akan membaca isi file tersebut di lesson berikutnya.
 
-:::info{title="Kenapa ada data.todos?"}
-Server tidak membalas dengan array polos. Jawabannya dibungkus objek seperti `{ "todos": [...], "total": 12, "page": 1 }` supaya kita juga tahu jumlah dan halaman data. Karena itu `bacaTodos` mengambil `data.todos`, bukan `data` langsung. Info `page` dan `total` baru kita pakai di pertemuan 10.
+:::info{title="Kenapa daftar ada di data.todos?"}
+Server mengirim objek seperti `{ "todos": [...], "total": 12, "page": 1 }`, bukan array saja. Daftar Todo ada di bagian `todos`, jadi kode mengambil `data.todos`. Informasi jumlah dan halaman akan kita pakai di pertemuan 10.
 :::
 
 :::tip{title="Ilmu tambahan: ada juga axios"}
-`fetch` adalah fungsi bawaan browser — tidak perlu install apa pun, jadi kita pakai itu di materi ini. Di dunia kerja kamu akan sering menemui **axios**, library pihak ketiga yang sangat populer. Dia punya kemudahan sendiri: JSON otomatis jadi objek (`data` langsung bisa dipakai), dan fitur "interceptor" untuk menyisipkan header auth di semua request sekaligus. Contoh pemakaiannya:
+`fetch` sudah tersedia di browser, jadi kita tidak perlu memasang library tambahan. Di beberapa project, kamu juga akan menemukan **Axios**, library untuk mengirim request. Axios mengubah jawaban JSON menjadi objek secara otomatis. Axios juga punya fitur interceptor, yaitu tempat untuk menambahkan header yang sama ke banyak request.
 
 ```ts
 import axios from "axios";
-const res = await axios.get("http://localhost:3001/api/todos", {
-  params: { owner: "demo" }, // axios menyusun ?owner=demo sendiri
+const res = await axios.get("https://nextjs-track-api.vercel.app/api/todos", {
+  params: { owner: "demo" }, // Axios menambahkan ?owner=demo ke alamat
 });
-const todos = res.data.todos; // JSON sudah jadi objek, tanpa res.json()
+const todos = res.data.todos; // Jawaban JSON sudah menjadi objek
 ```
 
-Konsep HTTP-nya sama persis — GET ke alamat, terima response. Cuma axios yang menyiapkan detailnya. Karena materi ini mengajarkan konsep HTTP, kita pakai `fetch` supaya kamu melihat langsung `res.ok` dan `res.json()`. Kalau nanti project kerja memakai axios, kamu tetap paham apa yang terjadi di baliknya.
+Keduanya bisa dipakai untuk meminta data. Di materi ini kita memakai `fetch` agar kamu melihat langsung cara memeriksa `res.ok` dan membaca jawaban dengan `res.json()`.
 :::
 
 ## Ringkasan
 
-- ✅ API = bertukar data lewat URL; server menjawab dengan teks JSON.
-- ✅ `?owner=` memisahkan data tiap murid di API latihan.
-- ✅ `fetch` + `res.json()` = dua langkah membaca API.
-- ✅ `await` dipakai karena jawaban server butuh waktu.
+- ✅ API menerima permintaan dari aplikasi dan mengirim jawaban berupa data.
+- ✅ `?owner=` memilih daftar Todo yang ingin dibaca.
+- ✅ `fetch` meminta data, lalu `res.json()` membaca jawaban JSON.
+- ✅ `await` menunggu jawaban sebelum kode memakai datanya.
 
-Berikutnya kita pakai `fetch` di dalam komponen dan menampilkan hasilnya di layar.
+Berikutnya, kita pakai `fetch` di komponen React dan menampilkan daftar dari server.

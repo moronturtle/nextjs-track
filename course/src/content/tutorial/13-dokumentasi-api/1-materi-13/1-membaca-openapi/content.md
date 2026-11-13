@@ -7,17 +7,25 @@ terminal: false
 focus: /project/contoh-openapi.json
 ---
 
-# Pertemuan 13 — Dokumentasi API
+# Pertemuan 13 — Membaca dokumentasi API
 
-Selama enam pertemuan kamu mengetahui endpoint API latihan dari materi. Di kerja nyata, tidak ada mentor yang menjelaskan satu per satu — yang ada adalah **dokumentasi API**. Pertemuan ini mengajari caramu membacanya.
+Di pertemuan sebelumnya, kita memakai alamat API yang sudah dijelaskan di materi. Saat bekerja, kita juga perlu tahu cara memakai API yang belum pernah kita coba. Biasanya, informasi itu tersedia di **dokumentasi API**.
 
-## OpenAPI: kontrak tertulis sebuah API
+## OpenAPI: panduan untuk memakai API
 
-**OpenAPI** adalah format standar (JSON) untuk menuliskan seluruh kontrak sebuah API: alamat apa yang ada, method apa yang diterima, parameter apa yang dibutuhkan, dan jawaban apa yang dikembalikan. Satu file `openapi.json` menjawab semua pertanyaan itu — tanpa membaca kode servernya.
+**OpenAPI** adalah format standar untuk menjelaskan cara memakai API. Dokumen OpenAPI mencatat alamat, jenis request, parameter, data yang perlu dikirim, dan jawaban dari server. Satu alamat untuk satu pekerjaan disebut **endpoint**. Method seperti `GET` dan `POST` menjelaskan jenis pekerjaan yang diminta. Dengan membaca dokumen ini, kita tidak perlu menebak bentuk request.
 
-API latihan kita menyediakannya di `GET /api/openapi.json`. Buka `project/contoh-openapi.json` — potongan nyata dari file tersebut.
+API latihan kita menyediakan dokumen OpenAPI di alamat berikut:
 
-## Bagian-bagian yang kamu baca
+```text
+https://nextjs-track-api.vercel.app/api/openapi.json
+```
+
+Buka `project/contoh-openapi.json` di panel File. File itu berisi contoh bagian penting dari dokumen OpenAPI API latihan.
+
+## Bagian yang perlu kamu kenali
+
+Cuplikan berikut diringkas agar mudah dibaca. Tanda `...` berarti ada bagian lain yang tidak ditampilkan.
 
 ```json
 {
@@ -28,6 +36,7 @@ API latihan kita menyediakannya di `GET /api/openapi.json`. Buka `project/contoh
       "get": {
         "summary": "Daftar todo",
         "parameters": [
+          { "name": "owner", "in": "query", "schema": { "type": "string" } },
           { "name": "q", "in": "query", "schema": { "type": "string" } },
           { "name": "status", "in": "query", "schema": { "type": "string", "enum": ["semua", "belum", "selesai"] } },
           { "name": "page", "in": "query", "schema": { "type": "number" } }
@@ -37,7 +46,17 @@ API latihan kita menyediakannya di `GET /api/openapi.json`. Buka `project/contoh
         }
       },
       "post": {
-        "requestBody": { "content": { "application/json": { "schema": { "$ref": "#/components/schemas/TodoInput" } } } },
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["teks"],
+                "properties": { "teks": { "type": "string" } }
+              }
+            }
+          }
+        },
         "responses": {
           "201": { "description": "Todo berhasil dibuat" },
           "400": { "description": "Validasi gagal" }
@@ -61,32 +80,34 @@ API latihan kita menyediakannya di `GET /api/openapi.json`. Buka `project/contoh
 
 Cara membacanya:
 
-| Bagian | Menjawab pertanyaan |
-| --- | --- |
-| `paths` → `"/api/todos"` → `get`/`post` | Alamat dan method apa yang ada? |
-| `parameters` | Query/path parameter apa, wajib atau tidak, tipe apa, nilai yang diizinkan (`enum`)? |
-| `requestBody` → `schema` | Body JSON apa yang harus dikirim? |
-| `responses` → `200`/`201`/`400`/`404` | Kode apa yang kembali, dan isinya seperti apa? |
-| `components` → `schemas` | Bentuk tiap objek (`Todo` punya `id`, `teks`, `selesai`)? |
-| `components` → `securitySchemes` → `bearerAuth` | Bagaimana cara autentikasi? |
+| Bagian                                          | Menjawab pertanyaan                                               |
+| ----------------------------------------------- | ----------------------------------------------------------------- |
+| `paths` → `"/api/todos"` → `get`/`post`         | Alamat dan method apa yang ada?                                   |
+| `parameters`                                    | Nilai tambahan apa yang bisa dikirim? Apakah pilihannya dibatasi? |
+| `requestBody` → `schema`                        | Data JSON apa yang perlu dikirim?                                 |
+| `responses` → `200`/`201`/`400`/`404`           | Kode apa yang bisa dijawab server?                                |
+| `components` → `schemas`                        | Apa saja isi objek seperti `Todo`?                                |
+| `components` → `securitySchemes` → `bearerAuth` | Bagaimana bentuk header token?                                    |
 
-`"$ref": "#/components/schemas/Todo"` adalah rujukan — artinya "bentuknya sama dengan definisi `Todo` di bawah", jadi tidak ditulis ulang di tiap endpoint.
+`"$ref": "#/components/schemas/Todo"` berarti bagian itu memakai bentuk data `Todo` yang dijelaskan di `components`. Bentuk yang sama tidak perlu ditulis berulang kali.
 
-## Kenapa kontrak tertulis penting?
+Parameter juga memberi tahu letak nilainya. Contohnya, `owner` berada di query, seperti `?owner=budi`. Sementara itu, `id` pada `/api/todos/{id}` berada di bagian path, seperti `/api/todos/5`.
 
-- **Frontend tidak menebak** — parameter `status` punya `enum: ["semua","belum","selesai"]`; kamu tahu `"done"` akan ditolak `400` tanpa mencoba.
-- **Satu sumber kebenaran** — frontend dan backend membaca dokumen yang sama, bukan ingatan masing-masing.
-- **Mesin bisa ikut membaca** — dari file ini, alat bisa membuat dokumentasi interaktif, klien otomatis, bahkan tes.
+## Kenapa dokumentasi ini berguna?
+
+- Kita bisa melihat data apa yang perlu dikirim sebelum menulis kode.
+- Frontend dan backend memakai panduan yang sama.
+- Alat seperti Swagger UI bisa membaca OpenAPI dan membuat halaman untuk mencoba request.
 
 ## Buktikan sendiri
 
-Buka `http://localhost:3001/api/openapi.json` di browser. Temukan `paths → /api/todos/{id} → patch` — baca `requestBody`-nya: field apa saja yang boleh diubah? Cocokkan dengan yang kamu kirim di `ubahTodo` — persis sama.
+Buka `https://nextjs-track-api.vercel.app/api/openapi.json` di browser. Cari `paths` → `/api/todos/{id}` → `patch`. Lihat `requestBody`-nya. Di sana tertulis bahwa request boleh mengirim `teks`, `selesai`, atau keduanya. Cocokkan dengan data yang dikirim fungsi `ubahTodo`.
 
 ## Ringkasan
 
-- ✅ OpenAPI = kontrak tertulis API dalam satu file JSON standar.
-- ✅ `paths` menjawab "alamat + method", `parameters`/`requestBody` menjawab "kirim apa", `responses` menjawab "kembali apa".
-- ✅ `components/schemas` adalah definisi bentuk data yang dipakai ulang via `$ref`.
-- ✅ `securitySchemes` memberi tahu cara autentikasi — `bearerAuth` = header `Authorization: Bearer`.
+- ✅ OpenAPI menjelaskan cara mengirim request dan membaca jawaban API.
+- ✅ `paths` berisi alamat; `parameters` dan `requestBody` menjelaskan data yang dikirim.
+- ✅ `responses` menjelaskan jawaban server; `schemas` menjelaskan bentuk data.
+- ✅ `bearerAuth` menjelaskan cara mengirim token lewat header `Authorization`.
 
-File JSON mentah itu sulit dibaca manusia — berikutnya kita lihat bentuk ramahnya: Swagger UI di `/docs`.
+Dokumen JSON lebih mudah dibaca oleh kode daripada manusia. Berikutnya kita buka Swagger UI, halaman yang menampilkan dokumentasi dalam bentuk yang lebih mudah dicoba.

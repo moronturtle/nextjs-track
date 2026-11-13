@@ -1,32 +1,32 @@
 ---
 type: lesson
-title: "Tugas: hidup dari dokumentasi"
+title: "Tugas: membuat fitur dari dokumentasi"
 template: baca
 previews: false
 terminal: false
 editor: false
 ---
 
-# Tugas: hidup dari dokumentasi
+# Tugas: membuat fitur dari dokumentasi
 
-Lanjutkan **project yang sama** dari tugas pertemuan 01 sampai 12. Jangan membuat project atau repo baru.
+Lanjutkan **project yang sama** dari pertemuan 01 sampai 12. Jangan membuat project atau repo baru.
 
 ## Yang dikerjakan
 
-Tugas penutup track ini melatih kebiasaan developer nyata: **memakai API hanya berbekal dokumentasinya**.
+Di tugas penutup ini, kamu akan memakai dokumentasi API untuk membuat satu fitur. Lanjutkan tiga langkah berikut.
 
-1. **Jelajahi `/docs`.** Buka halaman dokumentasi API (`http://localhost:3001/docs` atau alamat dari mentor). Lewat Try it out, jalankan sendiri: login → Authorize dengan token → `GET`, `POST`, `PATCH`, `DELETE`. Saksikan kode `200`/`201`/`204`/`400`/`404` datang dari server betulan.
+1. **Buka dokumentasi API.** Kunjungi [halaman `/docs`](https://nextjs-track-api.vercel.app/docs). Jika belum punya akun latihan, daftar lewat `POST /api/auth/register`. Jika sudah punya akun, login lewat `POST /api/auth/login`. Keduanya memerlukan `nama` dan `password`. Gunakan **Authorize** untuk mengirim token pada request berikutnya. Coba `GET` untuk membaca data. Hindari mengubah atau menghapus data yang bukan milikmu.
 
-2. **Tambahkan satu fitur hanya dari dokumen.** Di `docs`, cari cara membaca **satu todo** — `GET /api/todos/{id}` dengan parameter `id` di path. Tanpa melihat materi lama, tambahkan ke `lib/todo-api.ts` fungsi `bacaTodo(id)` lalu pakai di halaman detail `app/todo/[id]/page.tsx`: saat halaman dibuka, ambil todo itu dari server (loading → data / pesan error kalau `404`).
+2. **Tambahkan fitur detail Todo.** Di dokumentasi, cari `GET /api/todos/{id}`. `{id}` adalah bagian alamat untuk memilih satu Todo. Baca parameter dan bentuk jawaban server. Lalu tambahkan fungsi `bacaTodo(id)` di `lib/todo-api.ts` dan pakai fungsi itu di `app/todo/[id]/page.tsx`, yaitu file halaman detail Todo. Tampilkan pesan memuat saat request berjalan, Todo jika berhasil, atau pesan jika server menjawab `404`.
 
-3. **Tulis kontrakmu sendiri.** Di `README.md`, tambahkan bagian "API yang dipakai" berisi tabel kecil: endpoint, method, apa yang dikirim, apa yang kembali — untuk semua pemanggilan di `lib/todo-api.ts`-mu. Ini dokumen kontrak versimu sendiri.
+3. **Catat request yang dipakai.** Di `README.md`, tambahkan bagian "API yang dipakai". Buat tabel berisi alamat, method, data yang dikirim, dan jawaban yang diterima untuk setiap fungsi di `lib/todo-api.ts`.
 
 ## Buktikan sendiri
 
-- `GET /api/todos/1` lewat Try it out → `200` + satu objek todo.
-- Detail `/todo/1` di aplikasimu menampilkan teks yang sama — diambil lewat `bacaTodo(1)`.
-- `/todo/999` → pesan "Todo tidak ditemukan" (server `404`).
-- README berisi tabel endpoint yang cocok dengan `/docs`.
+- `GET /api/todos/{id}` membalas satu objek Todo jika ID tersebut ada di daftar milikmu. Pilih ID dari hasil GET daftar Todo.
+- Halaman detail `/todo/{id}` menampilkan data yang sama melalui fungsi `bacaTodo(id)`.
+- Halaman detail menampilkan pesan jika ID tidak ditemukan dan server menjawab `404`.
+- Tabel di `README.md` sesuai dengan request yang dijalankan aplikasi.
 
 ## Periksa project
 
@@ -47,7 +47,7 @@ npx tsc --noEmit
 
 ## Cara mengumpulkan
 
-Kirim tugas melalui pull request di repo yang sama. Mulai dari branch utama terbaru:
+Kirim tugas melalui pull request di repo yang sama. Mulai dari branch utama terbaru. Nama branch utama bisa `main` atau `master`; sesuaikan perintah pertama dengan nama branch di repo-mu:
 
 ```bash
 git checkout main && git pull
@@ -57,11 +57,11 @@ git commit -m "Tugas 13"
 git push -u origin tugas-13
 ```
 
-Buat pull request dari `tugas-13` ke `main` (atau `master`), lalu tulis komentar di thread pengumpulan dengan format `[nama]_[link PR]`.
+Buat pull request dari `tugas-13` ke branch utama (`main` atau `master`), lalu tulis komentar di thread pengumpulan dengan format `[nama]_[link PR]`.
 
 **[→ Buka thread pengumpulan tugas 13](/pengumpulan?t=tugas-13)**
 
-Tunggu mentor menyetujui pull request. Setelah disetujui, merge pull request dan perbarui branch utama di komputermu:
+Setelah mentor menyetujui pull request, gabungkan perubahan ke branch utama. Lalu perbarui branch utama di komputermu:
 
 ```bash
 git checkout main && git pull

@@ -7,9 +7,9 @@ terminal: false
 focus: /project/components/daftar-tugas.tsx
 ---
 
-# Langkah 1: fetch pertama di komponen
+# Langkah 1: ambil data di komponen
 
-Sekarang kita pakai `fetch` di dalam komponen dan menampilkan hasilnya. Buka `project/components/daftar-tugas.tsx` di panel File:
+Kita akan mengambil daftar Todo dari API dan menampilkannya di halaman. Buka `project/components/daftar-tugas.tsx` — file komponen yang menampilkan daftar tugas:
 
 ```tsx
 "use client";
@@ -23,7 +23,9 @@ export default function DaftarTugas() {
 
   useEffect(() => {
     async function muat() {
-      const res = await fetch("http://localhost:3001/api/todos?owner=demo");
+      const res = await fetch(
+        "https://nextjs-track-api.vercel.app/api/todos?owner=demo",
+      );
       const data = await res.json();
       setTodos(data.todos);
       setSedangMemuat(false);
@@ -43,36 +45,36 @@ export default function DaftarTugas() {
 }
 ```
 
-## Kenapa fetch ada di dalam useEffect?
+## Kenapa fetch dipanggil di dalam useEffect?
 
-Dua alasan:
+Komponen ini adalah Client Component, yaitu komponen yang berjalan di browser. `useEffect` menjalankan kode setelah komponen tampil. Kita menaruh request di sana agar:
 
-- `fetch` mengirim request ke internet — kerja ini milik browser, jadi dijalankan setelah komponen tampil, bukan saat React menyusun tampilan.
-- Kalau `fetch` dipanggil langsung di badan komponen, request dikirim **di setiap render** — daftar berubah → render ulang → kirim request lagi → berubah lagi, begitu terus.
+- request dimulai setelah komponen tampil di browser;
+- request tidak terkirim ulang setiap kali komponen dirender.
 
-`useEffect` dengan `[]` artinya "jalankan sekali setelah komponen pertama tampil" — persis seperti saat membaca `localStorage` di pertemuan 06.
+Array kosong `[]` berarti effect ini dijalankan saat komponen pertama kali tampil. Ini mirip pola membaca `localStorage` yang sudah kita pakai di pertemuan 06.
 
-## Kenapa ada fungsi muat di dalamnya?
+## Kenapa ada fungsi `muat`?
 
-`useEffect` tidak menerima fungsi `async` langsung, jadi kita membuat fungsi `muat` di dalamnya lalu memanggilnya. Di dalam `muat` barulah `await` boleh dipakai.
+Fungsi effect tidak bisa ditulis sebagai fungsi `async`. Karena itu, kita membuat fungsi `muat` di dalam effect, lalu memanggilnya. Kata kunci `await` dipakai di dalam fungsi `muat` untuk menunggu jawaban API.
 
 ## Urutan kejadiannya
 
-1. Komponen tampil → `sedangMemuat` masih `true` → layar menampilkan "Memuat daftar tugas...".
-2. `muat()` berjalan → `fetch` mengirim request → server menjawab.
-3. `res.json()` mengubah teks JSON menjadi objek → `data.todos` berisi array Todo.
-4. `setTodos(data.todos)` → render ulang → `sedangMemuat` sudah `false` → daftar tampil.
+1. Komponen tampil. Nilai `sedangMemuat` masih `true`, jadi layar menampilkan "Memuat daftar tugas...".
+2. Fungsi `muat()` meminta data lewat `fetch`.
+3. Server mengirim JSON. `res.json()` membacanya, lalu `data.todos` berisi daftar Todo.
+4. `setTodos(data.todos)` menyimpan daftar. Komponen dirender ulang dan menampilkan tugas.
 
-State `sedangMemuat` adalah cara kita mengatakan "tunggu, jawaban server belum datang". Tanpa state itu, layar langsung menampilkan daftar kosong padahal data sedang diperjalanan.
+State `sedangMemuat` memberi tahu pengguna bahwa jawaban server masih ditunggu. Tanpa state ini, halaman tampak kosong selama data belum datang.
 
-## Coba di project-mu
+## Coba di project
 
-Buat komponen `DaftarTugas` seperti contoh, lalu pasang di sebuah halaman. Kamu akan melihat "Memuat..." sekejap, lalu daftar tugas muncul. Itu bukti request-mu sampai ke server dan kembali.
+Buat komponen `DaftarTugas` seperti contoh, lalu tampilkan di halaman. Setelah data diterima, daftar Todo dari server akan muncul.
 
 ## Ringkasan
 
-- ✅ `fetch` dipanggil di dalam `useEffect` supaya request terkirim sekali, setelah komponen tampil.
-- ✅ `sedangMemuat` menandai "jawaban server belum datang" supaya layar tidak menampilkan daftar kosong palsu.
-- ✅ Jawaban server dibaca lewat `res.json()`, lalu disimpan ke state.
+- ✅ `useEffect` menjalankan permintaan setelah komponen tampil.
+- ✅ `sedangMemuat` memberi tahu bahwa data masih diminta dari server.
+- ✅ `res.json()` membaca jawaban, lalu `setTodos` menyimpannya ke state.
 
-Tapi ada yang belum dijawab: kalau servernya mati atau alamatnya salah, apa yang terjadi? Itu bahasan lesson berikutnya.
+Berikutnya, kita tangani dua keadaan gagal: server memberi jawaban error atau tidak bisa dihubungi.
