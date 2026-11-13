@@ -9,7 +9,7 @@ editor: false
 
 # Tugas: kembangkan aplikasi Todo
 
-Teruskan project yang sama dari tugas pertemuan 01 sampai 05. Materi 06 sudah memberi kerangka aplikasi Todo. Sekarang pastikan fitur dasarnya berjalan, lalu kembangkan dengan idemu sendiri.
+Teruskan project yang sama dari tugas pertemuan 01 sampai 05. Jangan membuat project atau repo baru. Materi 06 sudah memberi kerangka aplikasi Todo. Sekarang pastikan fitur dasarnya berjalan, lalu kembangkan dengan idemu sendiri.
 
 ## Pastikan fitur dasar berjalan
 

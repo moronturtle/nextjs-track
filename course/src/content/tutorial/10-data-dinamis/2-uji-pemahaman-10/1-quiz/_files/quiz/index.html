@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quiz — Data Dinamis</title>
+    <style>
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      body {
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        padding: 2rem 1rem;
+        background: #0f1117;
+        color: #e4e6e9;
+        font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      }
+      .kartu { width: 100%; max-width: 560px; }
+      .progres { margin-bottom: 0.5rem; color: #8b94a3; font-size: 0.85rem; }
+      h1 { margin-bottom: 1.25rem; font-size: 1.35rem; line-height: 1.4; }
+      .opsi {
+        display: block;
+        width: 100%;
+        margin-bottom: 0.6rem;
+        padding: 0.85rem 1rem;
+        border: 1px solid #2a2f3f;
+        border-radius: 8px;
+        background: #1a1d27;
+        color: #e4e6e9;
+        font-size: 0.95rem;
+        text-align: left;
+        cursor: pointer;
+      }
+      .opsi:hover:not(:disabled) { border-color: #5b8def; }
+      .opsi:disabled { cursor: default; }
+      .opsi.benar { border-color: #3ecf8e; background: #16332a; }
+      .opsi.salah { border-color: #f47272; background: #3a2222; }
+      .pembahasan {
+        display: none;
+        margin-top: 1rem;
+        padding: 0.9rem 1rem;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        line-height: 1.5;
+      }
+      .pembahasan.tampil { display: block; }
+      .pembahasan.benar { border: 1px solid #3ecf8e; background: #16332a; }
+      .pembahasan.salah { border: 1px solid #f47272; background: #3a2222; }
+      .lanjut {
+        display: none;
+        margin-top: 1.25rem;
+        padding: 0.7rem 1.5rem;
+        border: 0;
+        border-radius: 8px;
+        background: #5b8def;
+        color: #fff;
+        font-size: 0.95rem;
+        cursor: pointer;
+      }
+      .lanjut.tampil { display: inline-block; }
+      .skor { margin: 1rem 0; font-size: 2.5rem; font-weight: 700; }
+      .pesan { margin-bottom: 1.5rem; color: #aeb5c2; line-height: 1.5; }
+    </style>
+  </head>
+  <body>
+    <main class="kartu" id="app" aria-live="polite"></main>
+    <script>
+      const SOAL = [
+        {
+          soal: "Kenapa filter dan pencarian dipindah ke server untuk data yang besar?",
+          opsi: [
+            "Karena mengirim sepuluh ribu data ke browser itu lambat — lebih baik server menyaring dan mengirim hasilnya saja",
+            "Karena useMemo tidak bisa dipakai di project besar",
+            "Karena server tidak boleh mengirim semua data",
+            "Karena filter di browser tidak pernah benar",
+          ],
+          jawaban: 0,
+          pembahasan: "Filter lokal dengan useMemo baik untuk data kecil yang sudah di tangan. Untuk data besar, server yang menyaring supaya browser hanya menerima hasilnya.",
+        },
+        {
+          soal: "Apa arti alamat /api/todos?q=belajar&status=belum&page=2?",
+          opsi: [
+            "Todo yang teksnya mengandung 'belajar', yang belum selesai, halaman kedua",
+            "Todo nomor 2 milik belajar",
+            "Semua todo, lalu dibaca dari halaman kedua",
+            "Todo yang dibuat pada halaman 2",
+          ],
+          jawaban: 0,
+          pembahasan: "q untuk mencari teks, status untuk memfilter selesai/belum, page untuk nomor halaman. Server menyaring semuanya sebelum menjawab.",
+        },
+        {
+          soal: "Apa gunanya URLSearchParams saat menyusun alamat API?",
+          opsi: [
+            "Menyusun ?kunci=nilai&kunci2=nilai2 tanpa salah tulis tanda ? dan &",
+            "Membuat request lebih aman dari peretas",
+            "Mengubah JSON menjadi URL",
+            "Menghapus parameter owner",
+          ],
+          jawaban: 0,
+          pembahasan: "URLSearchParams menyusun parameter query dengan benar — parameter yang kosong tinggal tidak ditulis, tidak perlu merangkai string sendiri.",
+        },
+        {
+          soal: "Apa yang dilakukan debounce pada kotak pencarian?",
+          opsi: [
+            "Request baru dikirim 300 ms setelah huruf terakhir diketik — bukan di setiap huruf",
+            "Menghapus huruf yang salah ketik",
+            "Membuat request lebih cepat sampai",
+            "Menyimpan hasil pencarian di localStorage",
+          ],
+          jawaban: 0,
+          pembahasan: "setTimeout di useEffect menahan request; clearTimeout saat cleanup membatalkan timer sebelumnya. Mengetik 'belajar' mengirim satu request, bukan tujuh.",
+        },
+        {
+          soal: "Di jawaban server, apa kegunaan total dan totalHalaman?",
+          opsi: [
+            "Menghidupkan pagination — kita tahu ada berapa halaman dan berapa data yang cocok",
+            "Menghitung ukuran response",
+            "Menandai data yang sudah dibaca",
+            "Mengurutkan daftar dari yang terbaru",
+          ],
+          jawaban: 0,
+          pembahasan: "total = semua data yang lolos saringan; totalHalaman = jumlah halaman. Tombol 'Berikutnya' dinonaktifkan saat page mencapai totalHalaman.",
+        },
+        {
+          soal: "Kenapa setQ dan setStatus juga memanggil setPage(1)?",
+          opsi: [
+            "Pencarian atau filter baru belum tentu punya halaman yang sedang dibuka — kembali ke halaman 1 mencegah halaman kosong",
+            "Supaya requestnya lebih cepat",
+            "Karena page hanya boleh bernilai 1",
+            "Supaya tombol pagination terlihat",
+          ],
+          jawaban: 0,
+          pembahasan: "Kalau kamu di halaman 3 lalu mencari kata yang hasilnya cuma satu halaman, 'halaman 3' tidak ada — daftar tampak kosong. Kembali ke halaman 1 mencegah itu.",
+        },
+        {
+          soal: "Setelah tambahTodo atau hapusTodo sukses, kenapa Provider memanggil muat() lagi?",
+          opsi: [
+            "Supaya daftar yang tampil selalu sesuai filter dan halaman yang sedang aktif di server",
+            "Karena setTodos tidak boleh dipakai",
+            "Supaya localStorage ikut diperbarui",
+            "Karena server menghapus request sebelumnya",
+          ],
+          jawaban: 0,
+          pembahasan: "Dengan filter dan pagination di server, daftar yang tampil ditentukan server — minta ulang lebih pasti daripada menyunting state sendiri.",
+        },
+        {
+          soal: "Pencarian tidak menemukan apa pun dan server menjawab todos: []. Apa yang ditampilkan?",
+          opsi: [
+            "Keadaan kosong — 'Belum ada tugas di pilihan ini' atau pesan serupa",
+            "Daftar lama tetap tampil",
+            "Halaman error 404",
+            "Form tambah tugas menutup",
+          ],
+          jawaban: 0,
+          pembahasan: "Hasil kosong adalah keadaan sah, bukan error. Layar perlu menampilkannya dengan jelas supaya pengguna tahu pencariannya tidak menemukan apa pun.",
+        },
+      ];
+
+      let nomor = 0;
+      let skor = 0;
+      const app = document.getElementById("app");
+
+      function tampilSoal() {
+        const s = SOAL[nomor];
+        app.innerHTML = `
+          <p class="progres">Soal ${nomor + 1} dari ${SOAL.length}</p>
+          <h1>${s.soal}</h1>
+          ${s.opsi.map((opsi, i) => `<button class="opsi" data-i="${i}">${opsi}</button>`).join("")}
+          <div class="pembahasan" id="pembahasan"></div>
+          <button class="lanjut" id="lanjut">${nomor + 1 === SOAL.length ? "Lihat hasil" : "Soal berikutnya"}</button>
+        `;
+        document.querySelectorAll(".opsi").forEach((button) => {
+          button.addEventListener("click", () => jawab(Number(button.dataset.i)));
+        });
+        document.getElementById("lanjut").addEventListener("click", () => {
+          nomor++;
+          nomor < SOAL.length ? tampilSoal() : tampilHasil();
+        });
+      }
+
+      function jawab(pilihan) {
+        const s = SOAL[nomor];
+        const benar = pilihan === s.jawaban;
+        if (benar) skor++;
+        document.querySelectorAll(".opsi").forEach((button) => {
+          const index = Number(button.dataset.i);
+          button.disabled = true;
+          if (index === s.jawaban) button.classList.add("benar");
+          else if (index === pilihan) button.classList.add("salah");
+        });
+        const box = document.getElementById("pembahasan");
+        box.className = `pembahasan tampil ${benar ? "benar" : "salah"}`;
+        box.innerHTML = benar
+          ? `<strong>Benar.</strong> ${s.pembahasan}`
+          : `<strong>Belum tepat.</strong> Jawaban benar: <em>${s.opsi[s.jawaban]}</em>. ${s.pembahasan}`;
+        document.getElementById("lanjut").classList.add("tampil");
+      }
+
+      function tampilHasil() {
+        const pesan = skor === SOAL.length
+          ? "Semua jawabanmu tepat. Kamu siap melanjutkan project tugas."
+          : skor >= 3
+            ? "Bagus. Baca kembali bagian yang jawabannya belum tepat, lalu lanjutkan ke tugas."
+            : "Buka kembali materi yang jawabannya belum tepat, lalu coba quiz sekali lagi.";
+        app.innerHTML = `
+          <p class="progres">Quiz selesai</p>
+          <h1>Skor kamu</h1>
+          <p class="skor">${skor}/${SOAL.length}</p>
+          <p class="pesan">${pesan}</p>
+          <button class="lanjut tampil" id="ulang">Ulangi quiz</button>
+        `;
+        document.getElementById("ulang").addEventListener("click", () => {
+          nomor = 0;
+          skor = 0;
+          tampilSoal();
+        });
+      }
+
+      tampilSoal();
+    </script>
+  </body>
+</html>

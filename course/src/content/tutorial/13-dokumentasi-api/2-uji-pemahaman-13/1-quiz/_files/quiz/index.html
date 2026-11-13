@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quiz — Dokumentasi API</title>
+    <style>
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      body {
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        padding: 2rem 1rem;
+        background: #0f1117;
+        color: #e4e6e9;
+        font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      }
+      .kartu { width: 100%; max-width: 560px; }
+      .progres { margin-bottom: 0.5rem; color: #8b94a3; font-size: 0.85rem; }
+      h1 { margin-bottom: 1.25rem; font-size: 1.35rem; line-height: 1.4; }
+      .opsi {
+        display: block;
+        width: 100%;
+        margin-bottom: 0.6rem;
+        padding: 0.85rem 1rem;
+        border: 1px solid #2a2f3f;
+        border-radius: 8px;
+        background: #1a1d27;
+        color: #e4e6e9;
+        font-size: 0.95rem;
+        text-align: left;
+        cursor: pointer;
+      }
+      .opsi:hover:not(:disabled) { border-color: #5b8def; }
+      .opsi:disabled { cursor: default; }
+      .opsi.benar { border-color: #3ecf8e; background: #16332a; }
+      .opsi.salah { border-color: #f47272; background: #3a2222; }
+      .pembahasan {
+        display: none;
+        margin-top: 1rem;
+        padding: 0.9rem 1rem;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        line-height: 1.5;
+      }
+      .pembahasan.tampil { display: block; }
+      .pembahasan.benar { border: 1px solid #3ecf8e; background: #16332a; }
+      .pembahasan.salah { border: 1px solid #f47272; background: #3a2222; }
+      .lanjut {
+        display: none;
+        margin-top: 1.25rem;
+        padding: 0.7rem 1.5rem;
+        border: 0;
+        border-radius: 8px;
+        background: #5b8def;
+        color: #fff;
+        font-size: 0.95rem;
+        cursor: pointer;
+      }
+      .lanjut.tampil { display: inline-block; }
+      .skor { margin: 1rem 0; font-size: 2.5rem; font-weight: 700; }
+      .pesan { margin-bottom: 1.5rem; color: #aeb5c2; line-height: 1.5; }
+    </style>
+  </head>
+  <body>
+    <main class="kartu" id="app" aria-live="polite"></main>
+    <script>
+      const SOAL = [
+        {
+          soal: "Apa itu OpenAPI?",
+          opsi: [
+            "Format standar (JSON) untuk menuliskan seluruh kontrak API — alamat, method, parameter, dan jawabannya",
+            "Library untuk memanggil API",
+            "Bahasa pemrograman untuk backend",
+            "Database untuk menyimpan dokumentasi",
+          ],
+          jawaban: 0,
+          pembahasan: "OpenAPI adalah kontrak tertulis: satu file JSON menjelaskan semua endpoint, parameter, dan response — tanpa perlu membaca kode servernya.",
+        },
+        {
+          soal: "Di bagian mana openapi.json ditulis bahwa parameter status hanya boleh semua/belum/selesai?",
+          opsi: [
+            "parameters → status → schema → enum",
+            "responses → 200",
+            "info → description",
+            "securitySchemes",
+          ],
+          jawaban: 0,
+          pembahasan: "enum di dalam schema parameter mencantumkan nilai yang diizinkan. Mengirim nilai lain (misalnya 'done') akan dijawab 400 — tertulis juga di responses.",
+        },
+        {
+          soal: "Apa arti \"$ref\": \"#/components/schemas/Todo\"?",
+          opsi: [
+            "Bentuknya merujuk ke definisi Todo di bagian components — tidak ditulis ulang di tiap endpoint",
+            "Menuju ke URL lain di internet",
+            "Menandai endpoint yang tidak aktif",
+            "Kode error server",
+          ],
+          jawaban: 0,
+          pembahasan: "$ref menghindari duplikasi: satu definisi Todo di components dipakai oleh semua endpoint yang mengembalikan bentuk itu.",
+        },
+        {
+          soal: "Bagaimana kamu tahu cara autentikasi sebuah API dari openapi.json?",
+          opsi: [
+            "Baca components → securitySchemes — bearerAuth berarti header Authorization: Bearer <token>",
+            "Menebak dari nama endpoint",
+            "Mencoba semua kemungkinan",
+            "Membaca bagian title",
+          ],
+          jawaban: 0,
+          pembahasan: "securitySchemes menyatakan skema autentikasi. bearerAuth di API kita artinya: login dulu, lalu kirim token di header Authorization.",
+        },
+        {
+          soal: "Apa fungsi tombol Try it out di Swagger UI?",
+          opsi: [
+            "Mengirim request sungguhan ke server langsung dari halaman dokumentasi",
+            "Menghapus endpoint",
+            "Mengubah kode server",
+            "Mengunduh file JSON",
+          ],
+          jawaban: 0,
+          pembahasan: "Try it out mengubah dokumentasi menjadi form request — kamu bisa mengisi body, menekan Execute, dan melihat jawaban nyata beserta kodenya.",
+        },
+        {
+          soal: "Setelah menekan tombol Authorize dan menempel token, apa yang terjadi?",
+          opsi: [
+            "Semua request dari Try it out otomatis membawa header Authorization: Bearer <token>",
+            "Token dihapus dari localStorage",
+            "Dokumentasi berubah warna",
+            "Semua endpoint menjadi gratis tanpa token",
+          ],
+          jawaban: 0,
+          pembahasan: "Authorize menyimpan token dan menyertakannya di setiap percobaan — persis seperti kirimRequest di aplikasimu yang menambahkan header otomatis.",
+        },
+        {
+          soal: "Kenapa dokumentasi OpenAPI penting untuk frontend developer?",
+          opsi: [
+            "Semua pertanyaan 'kirim apa, terima apa' terjawab dari dokumen — tidak perlu menebak atau menunggu penjelasan orang",
+            "Supaya tidak perlu menulis kode",
+            "Karena API tanpa docs tidak bisa dipakai",
+            "Supaya server lebih cepat",
+          ],
+          jawaban: 0,
+          pembahasan: "Kontrak tertulis menjadikan frontend dan backend membaca sumber yang sama — kamu bisa bekerja tanpa menebak bentuk request atau response.",
+        },
+      ];
+
+      let nomor = 0;
+      let skor = 0;
+      const app = document.getElementById("app");
+
+      function tampilSoal() {
+        const s = SOAL[nomor];
+        app.innerHTML = `
+          <p class="progres">Soal ${nomor + 1} dari ${SOAL.length}</p>
+          <h1>${s.soal}</h1>
+          ${s.opsi.map((opsi, i) => `<button class="opsi" data-i="${i}">${opsi}</button>`).join("")}
+          <div class="pembahasan" id="pembahasan"></div>
+          <button class="lanjut" id="lanjut">${nomor + 1 === SOAL.length ? "Lihat hasil" : "Soal berikutnya"}</button>
+        `;
+        document.querySelectorAll(".opsi").forEach((button) => {
+          button.addEventListener("click", () => jawab(Number(button.dataset.i)));
+        });
+        document.getElementById("lanjut").addEventListener("click", () => {
+          nomor++;
+          nomor < SOAL.length ? tampilSoal() : tampilHasil();
+        });
+      }
+
+      function jawab(pilihan) {
+        const s = SOAL[nomor];
+        const benar = pilihan === s.jawaban;
+        if (benar) skor++;
+        document.querySelectorAll(".opsi").forEach((button) => {
+          const index = Number(button.dataset.i);
+          button.disabled = true;
+          if (index === s.jawaban) button.classList.add("benar");
+          else if (index === pilihan) button.classList.add("salah");
+        });
+        const box = document.getElementById("pembahasan");
+        box.className = `pembahasan tampil ${benar ? "benar" : "salah"}`;
+        box.innerHTML = benar
+          ? `<strong>Benar.</strong> ${s.pembahasan}`
+          : `<strong>Belum tepat.</strong> Jawaban benar: <em>${s.opsi[s.jawaban]}</em>. ${s.pembahasan}`;
+        document.getElementById("lanjut").classList.add("tampil");
+      }
+
+      function tampilHasil() {
+        const pesan = skor === SOAL.length
+          ? "Semua jawabanmu tepat. Kamu siap melanjutkan project tugas."
+          : skor >= 3
+            ? "Bagus. Baca kembali bagian yang jawabannya belum tepat, lalu lanjutkan ke tugas."
+            : "Buka kembali materi yang jawabannya belum tepat, lalu coba quiz sekali lagi.";
+        app.innerHTML = `
+          <p class="progres">Quiz selesai</p>
+          <h1>Skor kamu</h1>
+          <p class="skor">${skor}/${SOAL.length}</p>
+          <p class="pesan">${pesan}</p>
+          <button class="lanjut tampil" id="ulang">Ulangi quiz</button>
+        `;
+        document.getElementById("ulang").addEventListener("click", () => {
+          nomor = 0;
+          skor = 0;
+          tampilSoal();
+        });
+      }
+
+      tampilSoal();
+    </script>
+  </body>
+</html>

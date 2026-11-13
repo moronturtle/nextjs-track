@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quiz — Konsumsi API</title>
+    <style>
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      body {
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        padding: 2rem 1rem;
+        background: #0f1117;
+        color: #e4e6e9;
+        font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      }
+      .kartu { width: 100%; max-width: 560px; }
+      .progres { margin-bottom: 0.5rem; color: #8b94a3; font-size: 0.85rem; }
+      h1 { margin-bottom: 1.25rem; font-size: 1.35rem; line-height: 1.4; }
+      .opsi {
+        display: block;
+        width: 100%;
+        margin-bottom: 0.6rem;
+        padding: 0.85rem 1rem;
+        border: 1px solid #2a2f3f;
+        border-radius: 8px;
+        background: #1a1d27;
+        color: #e4e6e9;
+        font-size: 0.95rem;
+        text-align: left;
+        cursor: pointer;
+      }
+      .opsi:hover:not(:disabled) { border-color: #5b8def; }
+      .opsi:disabled { cursor: default; }
+      .opsi.benar { border-color: #3ecf8e; background: #16332a; }
+      .opsi.salah { border-color: #f47272; background: #3a2222; }
+      .pembahasan {
+        display: none;
+        margin-top: 1rem;
+        padding: 0.9rem 1rem;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        line-height: 1.5;
+      }
+      .pembahasan.tampil { display: block; }
+      .pembahasan.benar { border: 1px solid #3ecf8e; background: #16332a; }
+      .pembahasan.salah { border: 1px solid #f47272; background: #3a2222; }
+      .lanjut {
+        display: none;
+        margin-top: 1.25rem;
+        padding: 0.7rem 1.5rem;
+        border: 0;
+        border-radius: 8px;
+        background: #5b8def;
+        color: #fff;
+        font-size: 0.95rem;
+        cursor: pointer;
+      }
+      .lanjut.tampil { display: inline-block; }
+      .skor { margin: 1rem 0; font-size: 2.5rem; font-weight: 700; }
+      .pesan { margin-bottom: 1.5rem; color: #aeb5c2; line-height: 1.5; }
+    </style>
+  </head>
+  <body>
+    <main class="kartu" id="app" aria-live="polite"></main>
+    <script>
+      const SOAL = [
+        {
+          soal: "Apa yang dibalas server saat kita mengakses alamat API di browser?",
+          opsi: [
+            "Teks JSON — format data yang susunannya mirip objek JavaScript",
+            "Halaman HTML yang siap tampil",
+            "File gambar berisi data",
+            "Kode JavaScript yang langsung dijalankan",
+          ],
+          jawaban: 0,
+          pembahasan: "API membalas dengan teks JSON. Berbeda dengan halaman web biasa yang membalas HTML untuk ditampilkan.",
+        },
+        {
+          soal: "Kenapa fetch() dan res.json() dipanggil dengan await?",
+          opsi: [
+            "Karena await membuat request lebih cepat",
+            "Karena keduanya mengembalikan Promise — jawaban dan isi response butuh waktu untuk datang",
+            "Karena fetch tidak boleh ada di dalam useEffect",
+            "Karena tanpa await browser akan menutup tab",
+          ],
+          jawaban: 1,
+          pembahasan: "fetch mengirim request ke internet dan res.json membaca isi jawabannya. Keduanya butuh waktu, jadi hasilnya ditunggu dengan await.",
+        },
+        {
+          soal: "Apa fungsi res.json()?",
+          opsi: [
+            "Mengirim data ke server",
+            "Mengubah teks JSON dari server menjadi objek atau array JavaScript",
+            "Memeriksa apakah server masih hidup",
+            "Mengubah objek menjadi teks JSON",
+          ],
+          jawaban: 1,
+          pembahasan: "res.json() membaca isi response dan mengubahnya dari teks JSON menjadi data JavaScript yang bisa dipakai kode kita.",
+        },
+        {
+          soal: "Kenapa fetch dipanggil di dalam useEffect, bukan langsung di badan komponen?",
+          opsi: [
+            "Supaya request dikirim sekali setelah komponen tampil — kalau di badan komponen, request terkirim di setiap render",
+            "Karena fetch tidak bisa membaca state",
+            "Karena useEffect membuat internet lebih stabil",
+            "Karena fetch hanya boleh ada di dalam Context",
+          ],
+          jawaban: 0,
+          pembahasan: "Kode di badan komponen dijalankan di setiap render. useEffect dengan [] memastikan request dikirim satu kali setelah komponen pertama tampil.",
+        },
+        {
+          soal: "Server menjawab dengan status 404. Apa yang dilakukan fetch?",
+          opsi: [
+            "fetch melempar error yang ditangkap catch",
+            "fetch tetap menganggap request berhasil — 404 harus kita periksa sendiri lewat res.ok",
+            "fetch mengulang request tiga kali",
+            "Browser langsung menampilkan halaman error",
+          ],
+          jawaban: 1,
+          pembahasan: "fetch hanya gagal (masuk catch) saat server tidak menjawab sama sekali. Status 404 atau 500 tetap dianggap jawaban, jadi kita periksa res.ok — bernilai true hanya untuk 200–299.",
+        },
+        {
+          soal: "Apa kegunaan ?owner=budi di alamat API latihan?",
+          opsi: [
+            "Menandai milik siapa data ini — tiap murid mendapat daftar yang terpisah",
+            "Membuat request lebih aman",
+            "Mengurutkan daftar berdasarkan nama",
+            "Memilih bahasa jawaban server",
+          ],
+          jawaban: 0,
+          pembahasan: "owner adalah parameter query. Server memisahkan data per owner, jadi daftar tiap murid tidak bercampur.",
+        },
+        {
+          soal: "Kenapa komponen perlu state sedangMemuat selain todos?",
+          opsi: [
+            "Supaya layar menampilkan 'Memuat...' selagi jawaban server belum datang, bukan daftar kosong palsu",
+            "Supaya fetch boleh dipakai di komponen client",
+            "Karena useState hanya boleh dipakai dua kali",
+            "Supaya komponen tidak dihapus React",
+          ],
+          jawaban: 0,
+          pembahasan: "Antara request dikirim dan jawaban datang ada jeda. sedangMemuat menandai jeda itu supaya layar menampilkan 'Memuat...', bukan daftar kosong.",
+        },
+        {
+          soal: "Di project Todo, dari mana halaman daftar dan halaman detail sama-sama membaca data?",
+          opsi: [
+            "Keduanya membaca localStorage masing-masing",
+            "Keduanya memanggil useTodos() — TodoProvider yang memuat daftar dari server",
+            "Halaman detail menyalin state dari halaman daftar",
+            "Keduanya memanggil fetch sendiri-sendiri",
+          ],
+          jawaban: 1,
+          pembahasan: "TodoProvider memanggil bacaTodos sekali dan membagikan todos, sedangMemuat, dan error lewat Context ke semua halaman Todo.",
+        },
+        {
+          soal: "Di project Todo pertemuan ini, kenapa tugas yang baru ditambahkan hilang setelah refresh?",
+          opsi: [
+            "Karena tambahTodo baru mengubah state lokal — perubahan belum dikirim ke server (materi pertemuan 08)",
+            "Karena server menolak tugas baru",
+            "Karena localStorage sudah tidak boleh dipakai",
+            "Karena id tugasnya salah dibuat",
+          ],
+          jawaban: 0,
+          pembahasan: "Pertemuan ini hanya membaca data dari server. tambahTodo masih mengubah state saja — pengiriman perubahan ke server dibahas di pertemuan 08.",
+        },
+      ];
+
+      let nomor = 0;
+      let skor = 0;
+      const app = document.getElementById("app");
+
+      function tampilSoal() {
+        const s = SOAL[nomor];
+        app.innerHTML = `
+          <p class="progres">Soal ${nomor + 1} dari ${SOAL.length}</p>
+          <h1>${s.soal}</h1>
+          ${s.opsi.map((opsi, i) => `<button class="opsi" data-i="${i}">${opsi}</button>`).join("")}
+          <div class="pembahasan" id="pembahasan"></div>
+          <button class="lanjut" id="lanjut">${nomor + 1 === SOAL.length ? "Lihat hasil" : "Soal berikutnya"}</button>
+        `;
+        document.querySelectorAll(".opsi").forEach((button) => {
+          button.addEventListener("click", () => jawab(Number(button.dataset.i)));
+        });
+        document.getElementById("lanjut").addEventListener("click", () => {
+          nomor++;
+          nomor < SOAL.length ? tampilSoal() : tampilHasil();
+        });
+      }
+
+      function jawab(pilihan) {
+        const s = SOAL[nomor];
+        const benar = pilihan === s.jawaban;
+        if (benar) skor++;
+        document.querySelectorAll(".opsi").forEach((button) => {
+          const index = Number(button.dataset.i);
+          button.disabled = true;
+          if (index === s.jawaban) button.classList.add("benar");
+          else if (index === pilihan) button.classList.add("salah");
+        });
+        const box = document.getElementById("pembahasan");
+        box.className = `pembahasan tampil ${benar ? "benar" : "salah"}`;
+        box.innerHTML = benar
+          ? `<strong>Benar.</strong> ${s.pembahasan}`
+          : `<strong>Belum tepat.</strong> Jawaban benar: <em>${s.opsi[s.jawaban]}</em>. ${s.pembahasan}`;
+        document.getElementById("lanjut").classList.add("tampil");
+      }
+
+      function tampilHasil() {
+        const pesan = skor === SOAL.length
+          ? "Semua jawabanmu tepat. Kamu siap melanjutkan project tugas."
+          : skor >= 3
+            ? "Bagus. Baca kembali bagian yang jawabannya belum tepat, lalu lanjutkan ke tugas."
+            : "Buka kembali materi yang jawabannya belum tepat, lalu coba quiz sekali lagi.";
+        app.innerHTML = `
+          <p class="progres">Quiz selesai</p>
+          <h1>Skor kamu</h1>
+          <p class="skor">${skor}/${SOAL.length}</p>
+          <p class="pesan">${pesan}</p>
+          <button class="lanjut tampil" id="ulang">Ulangi quiz</button>
+        `;
+        document.getElementById("ulang").addEventListener("click", () => {
+          nomor = 0;
+          skor = 0;
+          tampilSoal();
+        });
+      }
+
+      tampilSoal();
+    </script>
+  </body>
+</html>

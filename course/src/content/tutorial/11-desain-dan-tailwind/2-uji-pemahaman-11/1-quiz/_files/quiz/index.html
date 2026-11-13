@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quiz — Desain dan Tailwind</title>
+    <style>
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      body {
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        padding: 2rem 1rem;
+        background: #0f1117;
+        color: #e4e6e9;
+        font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      }
+      .kartu { width: 100%; max-width: 560px; }
+      .progres { margin-bottom: 0.5rem; color: #8b94a3; font-size: 0.85rem; }
+      h1 { margin-bottom: 1.25rem; font-size: 1.35rem; line-height: 1.4; }
+      .opsi {
+        display: block;
+        width: 100%;
+        margin-bottom: 0.6rem;
+        padding: 0.85rem 1rem;
+        border: 1px solid #2a2f3f;
+        border-radius: 8px;
+        background: #1a1d27;
+        color: #e4e6e9;
+        font-size: 0.95rem;
+        text-align: left;
+        cursor: pointer;
+      }
+      .opsi:hover:not(:disabled) { border-color: #5b8def; }
+      .opsi:disabled { cursor: default; }
+      .opsi.benar { border-color: #3ecf8e; background: #16332a; }
+      .opsi.salah { border-color: #f47272; background: #3a2222; }
+      .pembahasan {
+        display: none;
+        margin-top: 1rem;
+        padding: 0.9rem 1rem;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        line-height: 1.5;
+      }
+      .pembahasan.tampil { display: block; }
+      .pembahasan.benar { border: 1px solid #3ecf8e; background: #16332a; }
+      .pembahasan.salah { border: 1px solid #f47272; background: #3a2222; }
+      .lanjut {
+        display: none;
+        margin-top: 1.25rem;
+        padding: 0.7rem 1.5rem;
+        border: 0;
+        border-radius: 8px;
+        background: #5b8def;
+        color: #fff;
+        font-size: 0.95rem;
+        cursor: pointer;
+      }
+      .lanjut.tampil { display: inline-block; }
+      .skor { margin: 1rem 0; font-size: 2.5rem; font-weight: 700; }
+      .pesan { margin-bottom: 1.5rem; color: #aeb5c2; line-height: 1.5; }
+    </style>
+  </head>
+  <body>
+    <main class="kartu" id="app" aria-live="polite"></main>
+    <script>
+      const SOAL = [
+        {
+          soal: "Tiga hal apa yang selalu kamu baca dari sebuah desain?",
+          opsi: [
+            "Warna, jarak, dan ukuran teks",
+            "Framework, library, dan bahasa",
+            "Jumlah elemen, nama file, dan ukuran gambar",
+            "Font, logo, dan ikon",
+          ],
+          jawaban: 0,
+          pembahasan: "Warna, jarak, dan ukuran teks adalah tiga hal yang selalu ada di desain — dan ketiganya punya padanan langsung di class Tailwind.",
+        },
+        {
+          soal: "Desain meminta padding 12px dan sudut membulat 8px. Class Tailwind-nya?",
+          opsi: [
+            "p-3 rounded-lg",
+            "p-12 rounded-full",
+            "px-3 rounded-sm",
+            "m-3 rounded-lg",
+          ],
+          jawaban: 0,
+          pembahasan: "Skala Tailwind kelipatan 4px: p-3 = 12px. rounded-lg menghasilkan sudut 8px. m-3 adalah margin (jarak ke luar), bukan padding.",
+        },
+        {
+          soal: "Apa yang dimaksud token desain?",
+          opsi: [
+            "Keputusan desain yang dipakai berulang — palet warna, skala jarak, ukuran teks",
+            "Kode rahasia untuk masuk Figma",
+            "Nama file CSS",
+            "Ukuran layar handphone",
+          ],
+          jawaban: 0,
+          pembahasan: "Token desain adalah keputusan yang ditetapkan sekali dan dipakai konsisten — misalnya 'merah kita = rose-600'. Konsistensi inilah yang membuat tampilan rapi.",
+        },
+        {
+          soal: "Tiga tombol di project memakai class yang hampir sama, beda warna saja. Langkah paling tepat?",
+          opsi: [
+            "Buat satu komponen Tombol dengan prop varian yang memilih warna",
+            "Salin class ke tiga tempat dan biarkan",
+            "Buat tiga file CSS module",
+            "Pakai inline style saja",
+          ],
+          jawaban: 0,
+          pembahasan: "Class dasar ditulis sekali; perbedaan warna disimpan di objek GAYA dan dipilih lewat prop varian. Perubahan cukup di satu tempat.",
+        },
+        {
+          soal: "Apa arti class hover:bg-indigo-500?",
+          opsi: [
+            "Warna latar berubah saat pointer di atas elemen",
+            "Elemen hanya tampil saat di-hover",
+            "Warna latar untuk perangkat hover",
+            "Animasi warna setiap detik",
+          ],
+          jawaban: 0,
+          pembahasan: "Awalan seperti hover:, focus:, dan disabled: adalah state variant — class setelahnya hanya berlaku saat kondisi itu terpenuhi.",
+        },
+        {
+          soal: "Kenapa \"bg-\" + warna tidak berfungsi di Tailwind?",
+          opsi: [
+            "Tailwind hanya mengenali class yang tertulis lengkap di kode — class rakitan dari string tidak digenerate",
+            "Karena warnanya belum terdaftar",
+            "Karena + tidak boleh ada di JSX",
+            "Karena harus lewat CSS module dulu",
+          ],
+          jawaban: 0,
+          pembahasan: "Tailwind memindai kode dan hanya membuat CSS untuk class yang tertulis utuh. Ternary kondisi ? \"a\" : \"b\" aman karena kedua class lengkap.",
+        },
+        {
+          soal: "Checkbox memakai accent-indigo-600 dan tombol utama bg-indigo-600. Kenapa warnanya disamakan?",
+          opsi: [
+            "Warna aksen yang konsisten di semua elemen interaktif membuat tampilan terasa satu kesatuan",
+            "Karena Tailwind mewajibkan satu warna",
+            "Supaya CSS lebih cepat diunduh",
+            "Agar checkbox dan tombol bertukar fungsi",
+          ],
+          jawaban: 0,
+          pembahasan: "Itulah token warna: satu keputusan 'warna utama = indigo-600' dipakai di semua elemen — konsistensi yang membuat aplikasi terlihat rapi.",
+        },
+      ];
+
+      let nomor = 0;
+      let skor = 0;
+      const app = document.getElementById("app");
+
+      function tampilSoal() {
+        const s = SOAL[nomor];
+        app.innerHTML = `
+          <p class="progres">Soal ${nomor + 1} dari ${SOAL.length}</p>
+          <h1>${s.soal}</h1>
+          ${s.opsi.map((opsi, i) => `<button class="opsi" data-i="${i}">${opsi}</button>`).join("")}
+          <div class="pembahasan" id="pembahasan"></div>
+          <button class="lanjut" id="lanjut">${nomor + 1 === SOAL.length ? "Lihat hasil" : "Soal berikutnya"}</button>
+        `;
+        document.querySelectorAll(".opsi").forEach((button) => {
+          button.addEventListener("click", () => jawab(Number(button.dataset.i)));
+        });
+        document.getElementById("lanjut").addEventListener("click", () => {
+          nomor++;
+          nomor < SOAL.length ? tampilSoal() : tampilHasil();
+        });
+      }
+
+      function jawab(pilihan) {
+        const s = SOAL[nomor];
+        const benar = pilihan === s.jawaban;
+        if (benar) skor++;
+        document.querySelectorAll(".opsi").forEach((button) => {
+          const index = Number(button.dataset.i);
+          button.disabled = true;
+          if (index === s.jawaban) button.classList.add("benar");
+          else if (index === pilihan) button.classList.add("salah");
+        });
+        const box = document.getElementById("pembahasan");
+        box.className = `pembahasan tampil ${benar ? "benar" : "salah"}`;
+        box.innerHTML = benar
+          ? `<strong>Benar.</strong> ${s.pembahasan}`
+          : `<strong>Belum tepat.</strong> Jawaban benar: <em>${s.opsi[s.jawaban]}</em>. ${s.pembahasan}`;
+        document.getElementById("lanjut").classList.add("tampil");
+      }
+
+      function tampilHasil() {
+        const pesan = skor === SOAL.length
+          ? "Semua jawabanmu tepat. Kamu siap melanjutkan project tugas."
+          : skor >= 3
+            ? "Bagus. Baca kembali bagian yang jawabannya belum tepat, lalu lanjutkan ke tugas."
+            : "Buka kembali materi yang jawabannya belum tepat, lalu coba quiz sekali lagi.";
+        app.innerHTML = `
+          <p class="progres">Quiz selesai</p>
+          <h1>Skor kamu</h1>
+          <p class="skor">${skor}/${SOAL.length}</p>
+          <p class="pesan">${pesan}</p>
+          <button class="lanjut tampil" id="ulang">Ulangi quiz</button>
+        `;
+        document.getElementById("ulang").addEventListener("click", () => {
+          nomor = 0;
+          skor = 0;
+          tampilSoal();
+        });
+      }
+
+      tampilSoal();
+    </script>
+  </body>
+</html>

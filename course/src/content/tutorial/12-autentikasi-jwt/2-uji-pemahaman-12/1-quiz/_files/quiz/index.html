@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quiz — Login dan JWT</title>
+    <style>
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      body {
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        padding: 2rem 1rem;
+        background: #0f1117;
+        color: #e4e6e9;
+        font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      }
+      .kartu { width: 100%; max-width: 560px; }
+      .progres { margin-bottom: 0.5rem; color: #8b94a3; font-size: 0.85rem; }
+      h1 { margin-bottom: 1.25rem; font-size: 1.35rem; line-height: 1.4; }
+      .opsi {
+        display: block;
+        width: 100%;
+        margin-bottom: 0.6rem;
+        padding: 0.85rem 1rem;
+        border: 1px solid #2a2f3f;
+        border-radius: 8px;
+        background: #1a1d27;
+        color: #e4e6e9;
+        font-size: 0.95rem;
+        text-align: left;
+        cursor: pointer;
+      }
+      .opsi:hover:not(:disabled) { border-color: #5b8def; }
+      .opsi:disabled { cursor: default; }
+      .opsi.benar { border-color: #3ecf8e; background: #16332a; }
+      .opsi.salah { border-color: #f47272; background: #3a2222; }
+      .pembahasan {
+        display: none;
+        margin-top: 1rem;
+        padding: 0.9rem 1rem;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        line-height: 1.5;
+      }
+      .pembahasan.tampil { display: block; }
+      .pembahasan.benar { border: 1px solid #3ecf8e; background: #16332a; }
+      .pembahasan.salah { border: 1px solid #f47272; background: #3a2222; }
+      .lanjut {
+        display: none;
+        margin-top: 1.25rem;
+        padding: 0.7rem 1.5rem;
+        border: 0;
+        border-radius: 8px;
+        background: #5b8def;
+        color: #fff;
+        font-size: 0.95rem;
+        cursor: pointer;
+      }
+      .lanjut.tampil { display: inline-block; }
+      .skor { margin: 1rem 0; font-size: 2.5rem; font-weight: 700; }
+      .pesan { margin-bottom: 1.5rem; color: #aeb5c2; line-height: 1.5; }
+    </style>
+  </head>
+  <body>
+    <main class="kartu" id="app" aria-live="polite"></main>
+    <script>
+      const SOAL = [
+        {
+          soal: "Kenapa ?owner=budi tidak cukup aman untuk memisahkan data?",
+          opsi: [
+            "Karena parameter URL bisa diketik siapa saja — tidak ada pembuktian siapa pengirimnya",
+            "Karena URL terlalu panjang",
+            "Karena server tidak membaca query",
+            "Karena owner harus berupa angka",
+          ],
+          jawaban: 0,
+          pembahasan: "Query parameter adalah teks bebas — siapa pun bisa menulis ?owner=siapapun. Token membuktikan identitas karena hanya server yang bisa membuatnya.",
+        },
+        {
+          soal: "Apa yang membuat JWT tidak bisa dipalsukan?",
+          opsi: [
+            "Tanda tangan kriptografi di bagian akhir — isi yang diubah membuat tanda tangan tidak cocok",
+            "Token disimpan di server",
+            "Isinya dienkripsi dan tidak bisa dibaca",
+            "Token hanya berlaku satu menit",
+          ],
+          jawaban: 0,
+          pembahasan: "JWT ditandatangani dengan rahasia yang hanya dimiliki server. Mengubah satu huruf isi membuat tanda tangan tidak cocok — server langsung menolak.",
+        },
+        {
+          soal: "Benar atau salah: isi JWT bersifat rahasia?",
+          opsi: [
+            "Salah — isinya bisa dibaca siapa saja (misalnya di jwt.io). Yang aman adalah pembuatan/perubahannya",
+            "Benar — hanya server yang bisa membaca isi token",
+            "Benar — token terenkripsi penuh",
+            "Tergantung panjang tokennya",
+          ],
+          jawaban: 0,
+          pembahasan: "Payload JWT hanya di-encode, bukan dienkripsi — semua orang bisa membacanya. Jadi jangan taruh data rahasia di dalam token; keamanannya ada di tanda tangan.",
+        },
+        {
+          soal: "Ke mana token dikirim di setiap request?",
+          opsi: [
+            "Header Authorization: Bearer <token>",
+            "Query string ?token=",
+            "Body JSON",
+            "URL path /token/",
+          ],
+          jawaban: 0,
+          pembahasan: "Konvensinya adalah header Authorization dengan format 'Bearer <token>' — Bearer berarti 'siapa pembawa token sah ini dianggap pemiliknya'.",
+        },
+        {
+          soal: "Kenapa header Authorization ditambahkan di fungsi kirimRequest, bukan di tiap fetch?",
+          opsi: [
+            "Semua request melewati satu fungsi — token ditambahkan di satu tempat dan tidak ada yang lupa",
+            "Karena fetch tidak menerima header",
+            "Karena lebih cepat",
+            "Karena header hanya boleh satu",
+          ],
+          jawaban: 0,
+          pembahasan: "Menambahkan header di satu fungsi pembungkus memastikan semua request konsisten membawa token — tanpa menyalin baris yang sama ke mana-mana.",
+        },
+        {
+          soal: "Server menjawab 401 Unauthorized. Apa artinya?",
+          opsi: [
+            "Token tidak ada, tidak valid, atau kedaluwarsa — pengguna perlu login kembali",
+            "Server sedang rusak",
+            "Datanya terlalu besar",
+            "URL-nya salah ketik",
+          ],
+          jawaban: 0,
+          pembahasan: "401 berarti server tidak mengenali peminta — token hilang atau tidak sah. Respons yang tepat: arahkan pengguna login ulang.",
+        },
+        {
+          soal: "Kenapa setelah login halaman dipindah dengan window.location.assign dan bukan router.push?",
+          opsi: [
+            "Muat ulang penuh membuat TodoProvider berjalan dari awal — request pertamanya sudah membawa token baru",
+            "Karena router.push tidak bisa ke /todo",
+            "Supaya URL lebih pendek",
+            "Karena localStorage butuh refresh",
+          ],
+          jawaban: 0,
+          pembahasan: "Provider sudah terpasang dan memuat sebelum token ada. Muat ulang penuh memulai ulang seluruh aplikasi — semua request langsung membawa token.",
+        },
+        {
+          soal: "Apa risiko menyimpan token di localStorage?",
+          opsi: [
+            "Script apa pun yang berjalan di halaman bisa membacanya — aplikasi produksi sering memakai cookie httpOnly",
+            "Token terhapus setiap menit",
+            "localStorage tidak bisa dibaca JavaScript",
+            "Tidak ada risiko sama sekali",
+          ],
+          jawaban: 0,
+          pembahasan: "localStorage mudah untuk belajar, tapi bisa dibaca semua script di halaman. Cookie httpOnly lebih aman karena tidak bisa disentuh JavaScript — itu pilihan umum di produksi.",
+        },
+      ];
+
+      let nomor = 0;
+      let skor = 0;
+      const app = document.getElementById("app");
+
+      function tampilSoal() {
+        const s = SOAL[nomor];
+        app.innerHTML = `
+          <p class="progres">Soal ${nomor + 1} dari ${SOAL.length}</p>
+          <h1>${s.soal}</h1>
+          ${s.opsi.map((opsi, i) => `<button class="opsi" data-i="${i}">${opsi}</button>`).join("")}
+          <div class="pembahasan" id="pembahasan"></div>
+          <button class="lanjut" id="lanjut">${nomor + 1 === SOAL.length ? "Lihat hasil" : "Soal berikutnya"}</button>
+        `;
+        document.querySelectorAll(".opsi").forEach((button) => {
+          button.addEventListener("click", () => jawab(Number(button.dataset.i)));
+        });
+        document.getElementById("lanjut").addEventListener("click", () => {
+          nomor++;
+          nomor < SOAL.length ? tampilSoal() : tampilHasil();
+        });
+      }
+
+      function jawab(pilihan) {
+        const s = SOAL[nomor];
+        const benar = pilihan === s.jawaban;
+        if (benar) skor++;
+        document.querySelectorAll(".opsi").forEach((button) => {
+          const index = Number(button.dataset.i);
+          button.disabled = true;
+          if (index === s.jawaban) button.classList.add("benar");
+          else if (index === pilihan) button.classList.add("salah");
+        });
+        const box = document.getElementById("pembahasan");
+        box.className = `pembahasan tampil ${benar ? "benar" : "salah"}`;
+        box.innerHTML = benar
+          ? `<strong>Benar.</strong> ${s.pembahasan}`
+          : `<strong>Belum tepat.</strong> Jawaban benar: <em>${s.opsi[s.jawaban]}</em>. ${s.pembahasan}`;
+        document.getElementById("lanjut").classList.add("tampil");
+      }
+
+      function tampilHasil() {
+        const pesan = skor === SOAL.length
+          ? "Semua jawabanmu tepat. Kamu siap melanjutkan project tugas."
+          : skor >= 3
+            ? "Bagus. Baca kembali bagian yang jawabannya belum tepat, lalu lanjutkan ke tugas."
+            : "Buka kembali materi yang jawabannya belum tepat, lalu coba quiz sekali lagi.";
+        app.innerHTML = `
+          <p class="progres">Quiz selesai</p>
+          <h1>Skor kamu</h1>
+          <p class="skor">${skor}/${SOAL.length}</p>
+          <p class="pesan">${pesan}</p>
+          <button class="lanjut tampil" id="ulang">Ulangi quiz</button>
+        `;
+        document.getElementById("ulang").addEventListener("click", () => {
+          nomor = 0;
+          skor = 0;
+          tampilSoal();
+        });
+      }
+
+      tampilSoal();
+    </script>
+  </body>
+</html>

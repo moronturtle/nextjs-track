@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quiz — Mengubah Data lewat API</title>
+    <style>
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      body {
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        padding: 2rem 1rem;
+        background: #0f1117;
+        color: #e4e6e9;
+        font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      }
+      .kartu { width: 100%; max-width: 560px; }
+      .progres { margin-bottom: 0.5rem; color: #8b94a3; font-size: 0.85rem; }
+      h1 { margin-bottom: 1.25rem; font-size: 1.35rem; line-height: 1.4; }
+      .opsi {
+        display: block;
+        width: 100%;
+        margin-bottom: 0.6rem;
+        padding: 0.85rem 1rem;
+        border: 1px solid #2a2f3f;
+        border-radius: 8px;
+        background: #1a1d27;
+        color: #e4e6e9;
+        font-size: 0.95rem;
+        text-align: left;
+        cursor: pointer;
+      }
+      .opsi:hover:not(:disabled) { border-color: #5b8def; }
+      .opsi:disabled { cursor: default; }
+      .opsi.benar { border-color: #3ecf8e; background: #16332a; }
+      .opsi.salah { border-color: #f47272; background: #3a2222; }
+      .pembahasan {
+        display: none;
+        margin-top: 1rem;
+        padding: 0.9rem 1rem;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        line-height: 1.5;
+      }
+      .pembahasan.tampil { display: block; }
+      .pembahasan.benar { border: 1px solid #3ecf8e; background: #16332a; }
+      .pembahasan.salah { border: 1px solid #f47272; background: #3a2222; }
+      .lanjut {
+        display: none;
+        margin-top: 1.25rem;
+        padding: 0.7rem 1.5rem;
+        border: 0;
+        border-radius: 8px;
+        background: #5b8def;
+        color: #fff;
+        font-size: 0.95rem;
+        cursor: pointer;
+      }
+      .lanjut.tampil { display: inline-block; }
+      .skor { margin: 1rem 0; font-size: 2.5rem; font-weight: 700; }
+      .pesan { margin-bottom: 1.5rem; color: #aeb5c2; line-height: 1.5; }
+    </style>
+  </head>
+  <body>
+    <main class="kartu" id="app" aria-live="polite"></main>
+    <script>
+      const SOAL = [
+        {
+          soal: "Method HTTP mana yang dipakai untuk membuat data baru?",
+          opsi: ["GET", "POST", "DELETE", "OPTIONS"],
+          jawaban: 1,
+          pembahasan: "GET membaca, POST membuat, PATCH/PUT mengubah, DELETE menghapus. Empat operasi ini disebut CRUD.",
+        },
+        {
+          soal: "Kenapa request POST perlu header 'Content-Type': 'application/json'?",
+          opsi: [
+            "Supaya server tahu isi body berupa teks JSON",
+            "Supaya request lebih cepat sampai",
+            "Supaya data tidak bisa dibaca orang lain",
+            "Supaya browser mengizinkan request",
+          ],
+          jawaban: 0,
+          pembahasan: "Body hanyalah teks. Tanpa Content-Type, server tidak tahu cara membaca isinya — header ini memberi tahu bahwa isinya JSON.",
+        },
+        {
+          soal: "Apa fungsi JSON.stringify saat mengirim data?",
+          opsi: [
+            "Mengubah objek JavaScript menjadi teks JSON untuk dikirim di body",
+            "Mengubah teks JSON menjadi objek JavaScript",
+            "Mengenkripsi data supaya aman",
+            "Menghapus bagian objek yang kosong",
+          ],
+          jawaban: 0,
+          pembahasan: "JSON.stringify adalah kebalikan res.json(): objek → teks untuk dikirim. Saat membaca jawaban, res.json() melakukan sebaliknya.",
+        },
+        {
+          soal: "Server membalas POST dengan status 201. Artinya?",
+          opsi: [
+            "Request gagal — coba lagi",
+            "Data baru berhasil dibuat",
+            "Data sudah ada sebelumnya",
+            "Server meminta login dulu",
+          ],
+          jawaban: 1,
+          pembahasan: "201 berarti 'created' — data baru berhasil dibuat. Biasanya server juga membalas dengan data yang baru dibuat, termasuk id-nya.",
+        },
+        {
+          soal: "Request DELETE berhasil dan server membalas 204. Apa yang perlu diperhatikan?",
+          opsi: [
+            "204 artinya gagal — todo belum terhapus",
+            "204 artinya sukses tanpa isi — jangan panggil res.json() karena tidak ada yang dibaca",
+            "204 mengharuskan request diulang",
+            "204 hanya untuk request GET",
+          ],
+          jawaban: 1,
+          pembahasan: "204 = 'no content': sukses, tapi tanpa body. Memanggil res.json() pada jawaban kosong akan error.",
+        },
+        {
+          soal: "Untuk mengubah satu todo, kenapa alamatnya /api/todos/3, bukan /api/todos?",
+          opsi: [
+            "Angka 3 di URL memberi tahu server todo mana yang diubah",
+            "Karena PATCH tidak boleh memakai parameter owner",
+            "Supaya requestnya lebih pendek",
+            "Karena GET dan PATCH harus memakai alamat berbeda",
+          ],
+          jawaban: 0,
+          pembahasan: "id data diubah atau dihapus ditulis di URL. Body hanya berisi bagian yang berubah, misalnya { selesai: true }.",
+        },
+        {
+          soal: "Di tambahTodo, kenapa setTodos dijalankan SETELAH server menjawab?",
+          opsi: [
+            "Supaya daftar di layar selalu sesuai isi server — kalau request gagal, state tidak ikut berubah",
+            "Karena setTodos tidak boleh dipanggil dua kali",
+            "Supaya animasi loading lebih halus",
+            "Karena await membutuhkan state yang sudah ada",
+          ],
+          jawaban: 0,
+          pembahasan: "Kalau state diubah dulu lalu request gagal, layar menampilkan data yang tidak tersimpan di server. Urutan aman: kirim → sukses → baru ubah state.",
+        },
+        {
+          soal: "Apa kegunaan state sedangMengirim di TodoForm?",
+          opsi: [
+            "Menandai form sedang menunggu server — tombol berubah 'Menyimpan...' dan tidak bisa diklik ganda",
+            "Menghitung jumlah request yang sudah dikirim",
+            "Menyimpan jawaban server sementara",
+            "Mengaktifkan validasi HTML",
+          ],
+          jawaban: 0,
+          pembahasan: "Selama jeda request, sedangMengirim menampilkan tanda proses dan menonaktifkan tombol supaya request tidak terkirim dua kali.",
+        },
+        {
+          soal: "Server membalas POST dengan 400 dan { error: 'teks wajib diisi' }. Apa artinya?",
+          opsi: [
+            "Server sedang mati",
+            "Request sampai, tapi isinya tidak bisa diproses — misalnya teks kosong",
+            "Alamat API salah",
+            "Internet putus",
+          ],
+          jawaban: 1,
+          pembahasan: "400 berarti request-nya sampai tapi isinya salah menurut aturan server. Pesan error di body menjelaskan penyebabnya — berguna untuk ditampilkan ke pengguna.",
+        },
+      ];
+
+      let nomor = 0;
+      let skor = 0;
+      const app = document.getElementById("app");
+
+      function tampilSoal() {
+        const s = SOAL[nomor];
+        app.innerHTML = `
+          <p class="progres">Soal ${nomor + 1} dari ${SOAL.length}</p>
+          <h1>${s.soal}</h1>
+          ${s.opsi.map((opsi, i) => `<button class="opsi" data-i="${i}">${opsi}</button>`).join("")}
+          <div class="pembahasan" id="pembahasan"></div>
+          <button class="lanjut" id="lanjut">${nomor + 1 === SOAL.length ? "Lihat hasil" : "Soal berikutnya"}</button>
+        `;
+        document.querySelectorAll(".opsi").forEach((button) => {
+          button.addEventListener("click", () => jawab(Number(button.dataset.i)));
+        });
+        document.getElementById("lanjut").addEventListener("click", () => {
+          nomor++;
+          nomor < SOAL.length ? tampilSoal() : tampilHasil();
+        });
+      }
+
+      function jawab(pilihan) {
+        const s = SOAL[nomor];
+        const benar = pilihan === s.jawaban;
+        if (benar) skor++;
+        document.querySelectorAll(".opsi").forEach((button) => {
+          const index = Number(button.dataset.i);
+          button.disabled = true;
+          if (index === s.jawaban) button.classList.add("benar");
+          else if (index === pilihan) button.classList.add("salah");
+        });
+        const box = document.getElementById("pembahasan");
+        box.className = `pembahasan tampil ${benar ? "benar" : "salah"}`;
+        box.innerHTML = benar
+          ? `<strong>Benar.</strong> ${s.pembahasan}`
+          : `<strong>Belum tepat.</strong> Jawaban benar: <em>${s.opsi[s.jawaban]}</em>. ${s.pembahasan}`;
+        document.getElementById("lanjut").classList.add("tampil");
+      }
+
+      function tampilHasil() {
+        const pesan = skor === SOAL.length
+          ? "Semua jawabanmu tepat. Kamu siap melanjutkan project tugas."
+          : skor >= 3
+            ? "Bagus. Baca kembali bagian yang jawabannya belum tepat, lalu lanjutkan ke tugas."
+            : "Buka kembali materi yang jawabannya belum tepat, lalu coba quiz sekali lagi.";
+        app.innerHTML = `
+          <p class="progres">Quiz selesai</p>
+          <h1>Skor kamu</h1>
+          <p class="skor">${skor}/${SOAL.length}</p>
+          <p class="pesan">${pesan}</p>
+          <button class="lanjut tampil" id="ulang">Ulangi quiz</button>
+        `;
+        document.getElementById("ulang").addEventListener("click", () => {
+          nomor = 0;
+          skor = 0;
+          tampilSoal();
+        });
+      }
+
+      tampilSoal();
+    </script>
+  </body>
+</html>
