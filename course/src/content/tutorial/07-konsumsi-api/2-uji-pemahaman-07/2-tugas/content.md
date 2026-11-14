@@ -25,6 +25,8 @@ export const API_URL = "https://nextjs-track-api.vercel.app";
 
 Fungsi `bacaTodos` mengirim permintaan GET. Setelah menerima jawaban, fungsi memeriksa `res.ok` dan mengambil daftar Todo.
 
+Untuk mengirim permintaan, kamu boleh memakai `fetch` atau `axios` — pilih yang lebih kamu pahami. Kalau memakai `axios`, pasang dulu dengan `npm install axios`. Bedanya saat membaca jawaban: `axios` otomatis melempar error saat status gagal dan JSON langsung ada di `res.data`, jadi tidak perlu `res.ok` dan `res.json()`.
+
 ## Langkah 2: sambungkan TodoProvider
 
 Di `contexts/todo-context.tsx`, file yang membagikan data Todo ke halaman:
@@ -61,10 +63,28 @@ npx prettier --write app components contexts data lib types styles
 npx tsc --noEmit
 ```
 
+## Bonus (opsional): alamat API lewat environment variable
+
+`API_URL` saat ini ditulis langsung di `lib/todo-api.ts`. Ini tidak masalah untuk latihan. Di project nyata, alamat API sering berbeda antara komputermu dan server produksi, jadi alamatnya disimpan di file environment variable:
+
+1. Buat file `.env.local` di root project. File ini berisi nilai untuk komputermu dan **tidak ikut di-push** ke GitHub — Next.js sudah memasukkannya ke `.gitignore`:
+   ```text
+   NEXT_PUBLIC_API_URL=https://nextjs-track-api.vercel.app
+   ```
+2. Buat file `.env.example` yang justru **di-push** ke repo. Isinya nama variabel saja, tanpa nilai, sebagai contoh supaya orang lain tahu apa yang harus diisi di komputernya:
+   ```text
+   NEXT_PUBLIC_API_URL=
+   ```
+3. Di `lib/todo-api.ts`, ganti string alamat dengan `process.env.NEXT_PUBLIC_API_URL`.
+
+Awalan `NEXT_PUBLIC_` wajib ada supaya variabel bisa dibaca kode di browser. Tanpa awalan itu, variabel hanya terbaca di sisi server.
+
+Penjelasan lengkap ada di dokumentasi Next.js: <https://nextjs.org/docs/app/guides/environment-variables>
+
 ## Kriteria selesai
 
 - [ ] Saya melanjutkan project yang sama dari pertemuan 01–06.
-- [ ] `lib/todo-api.ts` berisi `API_URL` dan `bacaTodos` yang memeriksa `res.ok`.
+- [ ] `lib/todo-api.ts` berisi `API_URL` dan `bacaTodos` yang menangani jawaban gagal (`res.ok` di `fetch`, atau error otomatis di `axios`).
 - [ ] `TodoProvider` mengambil daftar dari API dengan `owner=nami`.
 - [ ] Tiga keadaan (memuat, error, sukses) terlihat di halaman daftar dan detail.
 - [ ] `localStorage` sudah tidak dipakai untuk daftar Todo.
