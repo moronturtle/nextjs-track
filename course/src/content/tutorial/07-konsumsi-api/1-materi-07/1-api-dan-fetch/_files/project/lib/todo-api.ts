@@ -12,8 +12,8 @@ export type DaftarTodos = {
   totalHalaman: number;
 };
 
-export async function bacaTodos(owner: string): Promise<Todo[]> {
-  const res = await fetch(`${API_URL}/api/todos?owner=${owner}`);
+export async function bacaTodos(): Promise<Todo[]> {
+  const res = await fetch(`${API_URL}/api/todos`);
 
   if (!res.ok) {
     throw new Error(`Server menjawab ${res.status}`);

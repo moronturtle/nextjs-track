@@ -18,9 +18,7 @@ Server tetap bisa mengirim jawaban meskipun terjadi masalah. Jawaban itu memilik
 Jika server mengirim status `404`, `fetch` tetap menerima jawaban tersebut. Jadi, kita perlu memeriksa `res.ok`. Nilainya `true` jika status menunjukkan keberhasilan, yaitu `200` sampai `299`:
 
 ```tsx
-const res = await fetch(
-  "https://nextjs-track-api.vercel.app/api/todos?owner=demo",
-);
+const res = await fetch("https://nextjs-track-api.vercel.app/api/todos");
 
 if (!res.ok) {
   setError(`Server menjawab ${res.status}`);
@@ -53,9 +51,7 @@ const [error, setError] = useState<string | null>(null);
 useEffect(() => {
   async function muat() {
     try {
-      const res = await fetch(
-        "https://nextjs-track-api.vercel.app/api/todos?owner=demo",
-      );
+      const res = await fetch("https://nextjs-track-api.vercel.app/api/todos");
       if (!res.ok) {
         setError(`Server menjawab ${res.status}`);
         return;
@@ -79,7 +75,7 @@ Blok `finally` selalu dijalankan setelah proses selesai, baik pengambilan data b
 
 ## Buktikan sendiri
 
-- Untuk melihat status `404`, ubah alamat menjadi `https://nextjs-track-api.vercel.app/api/todos/999999999999?owner=demo`. Server akan menjawab bahwa Todo tidak ditemukan, lalu halaman menampilkan status `404`.
+- Untuk melihat status `404`, ubah alamat menjadi `https://nextjs-track-api.vercel.app/api/todos/999999999999`. Server akan menjawab bahwa Todo tidak ditemukan, lalu halaman menampilkan status `404`.
 - Untuk mencoba `catch`, ubah sementara alamat API menjadi `http://localhost:9999`. Tidak ada server di alamat tersebut, jadi halaman menampilkan pesan "Tidak bisa terhubung ke server". Setelah mencoba, kembalikan alamat API yang benar.
 
 Kedua percobaan ini menunjukkan bedanya server yang mengirim status gagal dengan server yang tidak bisa dihubungi.

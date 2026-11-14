@@ -9,7 +9,8 @@ import TodoForm from "./todo-form";
 import TodoList from "./todo-list";
 
 export default function TodoApp() {
-  const { todos, sedangMemuat, error, tambahTodo, ubahSelesai, hapusTodo } = useTodos();
+  const { todos, sedangMemuat, error, tambahTodo, ubahSelesai, hapusTodo } =
+    useTodos();
   const [filter, setFilter] = useState<FilterTodo>("semua");
 
   const todosTampil = useMemo(() => {
@@ -32,7 +33,11 @@ export default function TodoApp() {
     <div className={styles.card}>
       <TodoForm saatTambah={tambahTodo} />
       <TodoFilter pilihan={filter} saatPilih={setFilter} />
-      <TodoList todos={todosTampil} saatDicentang={ubahSelesai} saatDihapus={hapusTodo} />
+      <TodoList
+        todos={todosTampil}
+        saatDicentang={ubahSelesai}
+        saatDihapus={hapusTodo}
+      />
       <p className={styles.note}>
         {jumlahBelumSelesai} dari {todos.length} tugas belum selesai
       </p>

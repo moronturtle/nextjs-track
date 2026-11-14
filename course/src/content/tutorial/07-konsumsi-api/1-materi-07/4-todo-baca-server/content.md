@@ -23,7 +23,7 @@ const [error, setError] = useState<string | null>(null);
 useEffect(() => {
   async function muat() {
     try {
-      const daftar = await bacaTodos("demo"); // ganti "demo" dengan namamu
+      const daftar = await bacaTodos("nami");
       setTodos(daftar);
     } catch {
       setError("Gagal memuat daftar tugas dari server");
@@ -34,6 +34,14 @@ useEffect(() => {
   muat();
 }, []);
 ```
+
+Perhatikan `"nami"` yang dikirim ke `bacaTodos`. Di langkah sebelumnya, kita meminta `/api/todos` tanpa tambahan sehingga server mengembalikan daftar contoh `demo`. Sekarang `bacaTodos` menambahkan parameter query `?owner=` ke alamat, sehingga aplikasi memakai daftar bernama `nami`:
+
+```ts
+const res = await fetch(`${API_URL}/api/todos?owner=${owner}`);
+```
+
+`owner` hanya untuk memilih daftar — di pertemuan ini belum ada login. Mulai pertemuan 12, aplikasi akan mengirim token login dan server memakai nama di token untuk memilih daftar.
 
 Context membagikan tiga nilai: daftar `todos`, status `sedangMemuat`, dan pesan `error`. Halaman daftar dan halaman detail mengambil nilai yang sama lewat `useTodos()`.
 
@@ -68,4 +76,4 @@ Tambahkan tugas di halaman, lalu muat ulang. Tugas baru belum tersimpan dan daft
 - ✅ Context membagikan daftar, status memuat, dan pesan error ke halaman Todo.
 - ✅ Tambah, ubah, dan hapus Todo baru mengubah data di browser. Di pertemuan 08, perubahan tersebut akan dikirim ke server.
 
-Selanjutnya, kerjakan quiz dan tugas. Isi `owner` dengan namamu agar daftar Todo-mu terpisah dari daftar murid lain.
+Selanjutnya, kerjakan quiz dan tugas. Gunakan `owner=nami` seperti di materi agar aplikasimu membaca daftar yang sama.

@@ -31,7 +31,7 @@ export function TodoProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     async function muat() {
       try {
-        const daftar = await bacaTodos("demo"); // ganti "demo" dengan namamu
+        const daftar = await bacaTodos("nami");
         setTodos(daftar);
       } catch {
         setError("Gagal memuat daftar tugas dari server");
@@ -45,12 +45,17 @@ export function TodoProvider({ children }: { children: ReactNode }) {
   // Mutasi masih mengubah state lokal — belum dikirim ke server.
   // Pertemuan 08 menyambungkan ketiganya ke API.
   const tambahTodo = useCallback((teks: string) => {
-    setTodos((daftarLama) => [...daftarLama, { id: Date.now(), teks, selesai: false }]);
+    setTodos((daftarLama) => [
+      ...daftarLama,
+      { id: Date.now(), teks, selesai: false },
+    ]);
   }, []);
 
   const ubahSelesai = useCallback((id: number) => {
     setTodos((daftarLama) =>
-      daftarLama.map((todo) => (todo.id === id ? { ...todo, selesai: !todo.selesai } : todo)),
+      daftarLama.map((todo) =>
+        todo.id === id ? { ...todo, selesai: !todo.selesai } : todo,
+      ),
     );
   }, []);
 

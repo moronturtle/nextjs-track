@@ -11,7 +11,7 @@ editor: false
 
 Lanjutkan **project yang sama** dari pertemuan 01 sampai 06. Jangan membuat project atau repo baru.
 
-Di tugas ini, ubah aplikasi Todo agar mengambil daftar dari API, bukan dari `localStorage`. Isi `owner` dengan namamu agar daftar Todo-mu terpisah dari daftar murid lain.
+Di tugas ini, ubah aplikasi Todo agar mengambil daftar dari API, bukan dari `localStorage`. Gunakan `owner=nami` seperti di materi agar aplikasimu membaca daftar yang sama.
 
 ## Langkah 1: siapkan fungsi untuk membaca API
 
@@ -29,7 +29,7 @@ Fungsi `bacaTodos` mengirim permintaan GET. Setelah menerima jawaban, fungsi mem
 
 Di `contexts/todo-context.tsx`, file yang membagikan data Todo ke halaman:
 
-- ganti kode yang mengambil daftar dari `localStorage` dengan `await bacaTodos("nama-kamu")`; ganti `"nama-kamu"` dengan namamu;
+- ganti kode yang mengambil daftar dari `localStorage` dengan `await bacaTodos("nami")`;
 - tambahkan state `sedangMemuat` dan `error`, lalu bagikan nilai tersebut lewat Context;
 - biarkan `tambahTodo`, `ubahSelesai`, dan `hapusTodo` mengubah data di browser. Cara mengirim perubahan ke server akan dipelajari di pertemuan 08;
 - hapus kode penyimpanan lama hanya jika file tersebut sudah tidak dipakai.
@@ -47,7 +47,7 @@ Terapkan pengecekan yang sama di halaman detail `app/todo/[id]`. Halaman detail 
 ## Buktikan sendiri
 
 - Buka `http://localhost:3000/todo`. Alamat ini membuka aplikasi Next.js yang berjalan di komputermu. Daftar Todo akan muncul setelah aplikasi mengambil data dari API.
-- Buka `https://nextjs-track-api.vercel.app/api/todos?owner=nama-kamu` di tab browser. Ganti `nama-kamu` dengan namamu. Daftar JSON yang muncul adalah data yang diambil aplikasi.
+- Buka `https://nextjs-track-api.vercel.app/api/todos?owner=nami` di tab browser. Daftar JSON yang muncul adalah data yang diambil aplikasi.
 - Untuk mencoba pesan error, ubah sementara `API_URL` menjadi `http://localhost:9999`, lalu muat ulang halaman. Setelah mencoba, kembalikan alamat API yang benar.
 - Tambah tugas lalu muat ulang halaman. Tugas baru belum tersimpan karena pada pertemuan ini aplikasi hanya mengambil data.
 
@@ -65,7 +65,7 @@ npx tsc --noEmit
 
 - [ ] Saya melanjutkan project yang sama dari pertemuan 01–06.
 - [ ] `lib/todo-api.ts` berisi `API_URL` dan `bacaTodos` yang memeriksa `res.ok`.
-- [ ] `TodoProvider` mengambil daftar dari API dengan `owner` namaku.
+- [ ] `TodoProvider` mengambil daftar dari API dengan `owner=nami`.
 - [ ] Tiga keadaan (memuat, error, sukses) terlihat di halaman daftar dan detail.
 - [ ] `localStorage` sudah tidak dipakai untuk daftar Todo.
 - [ ] Saya mencoba keadaan error dengan alamat API yang salah, lalu mengembalikan alamat yang benar.

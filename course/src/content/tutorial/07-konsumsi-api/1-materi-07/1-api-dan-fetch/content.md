@@ -63,33 +63,28 @@ Kesalahan yang sering terjadi: server error mengirim halaman HTML, lalu `res.jso
 
 API untuk latihan di materi ini dapat diakses di `https://nextjs-track-api.vercel.app`.
 
-Untuk mengambil daftar Todo milik Budi, buka alamat berikut di browser:
+Untuk mengambil daftar Todo, buka alamat berikut di browser:
 
 ```text
-https://nextjs-track-api.vercel.app/api/todos?owner=budi
+https://nextjs-track-api.vercel.app/api/todos
 ```
 
-Server mengirim daftar Todo milik Budi dalam bentuk JSON. Saat sebuah nama digunakan untuk pertama kali, server menyiapkan data contoh untuk nama tersebut.
+Server mengirim daftar Todo dalam bentuk JSON. Alamat itu terdiri dari dua bagian:
 
-Alamat itu terdiri dari tiga bagian:
+| Bagian                                | Sebutan                  | Peran                 |
+| ------------------------------------- | ------------------------ | --------------------- |
+| `https://nextjs-track-api.vercel.app` | alamat server (base URL) | tempat API-nya        |
+| `/api/todos`                          | path (jalur)             | data apa yang diminta |
 
-| Bagian                                | Sebutan                  | Peran                       |
-| ------------------------------------- | ------------------------ | --------------------------- |
-| `https://nextjs-track-api.vercel.app` | alamat server (base URL) | tempat API-nya              |
-| `/api/todos`                          | path (jalur)             | data apa yang diminta       |
-| `?owner=budi`                         | parameter query          | pilihan tambahan di request |
-
-Nilai `owner` memberi tahu server daftar siapa yang ingin diambil. Ganti `budi` dengan namamu agar daftar Todo-mu terpisah dari daftar dengan nama lain.
-
-Di pertemuan ini, kita belum memakai login. Nama pada `owner` hanya digunakan untuk memilih daftar. Mulai pertemuan 12, aplikasi akan mengirim token login dan server memakai nama di token untuk memilih daftar.
+Tanpa tambahan apa pun, server mengembalikan daftar contoh bernama `demo`. Alamat juga bisa menerima pilihan tambahan lewat **parameter query** setelah tanda `?` — misalnya `?owner=nami` memilih daftar milik "nami", bukan "demo". Kita menambahkan parameter ini di langkah terakhir.
 
 Alamat API bisa memiliki beberapa parameter query. Pisahkan tiap parameter dengan tanda `&`:
 
 ```text
-https://nextjs-track-api.vercel.app/api/todos?owner=budi&status=belum
+https://nextjs-track-api.vercel.app/api/todos?status=belum&page=1
 ```
 
-Alamat tersebut meminta daftar Todo milik Budi yang belum selesai. Kita akan membahas pencarian dan filter lebih lanjut di pertemuan 10.
+Alamat tersebut meminta daftar Todo `demo` yang belum selesai, halaman pertama. Kita akan membahas pencarian dan filter lebih lanjut di pertemuan 10.
 
 Setiap jawaban server juga disertai **kode status** — angka yang menandai hasil request. Yang paling sering kamu temui: `200` berhasil, `404` tidak ditemukan, `500` server bermasalah. Cara menanganinya di kode kita bahas di langkah berikutnya.
 
@@ -102,9 +97,7 @@ Buka DevTools browser (klik kanan → Inspect) lalu pilih tab **Network**. Buka 
 JavaScript memiliki fungsi bawaan bernama `fetch` untuk mengirim request ke API. Contohnya:
 
 ```ts
-const res = await fetch(
-  "https://nextjs-track-api.vercel.app/api/todos?owner=demo",
-);
+const res = await fetch("https://nextjs-track-api.vercel.app/api/todos");
 const data = await res.json();
 ```
 
@@ -124,9 +117,7 @@ API mengirim objek seperti `{ "todos": [...], "total": 12, "page": 1 }`, bukan a
 
 ```ts
 import axios from "axios";
-const res = await axios.get("https://nextjs-track-api.vercel.app/api/todos", {
-  params: { owner: "demo" }, // Axios menambahkan ?owner=demo ke alamat
-});
+const res = await axios.get("https://nextjs-track-api.vercel.app/api/todos");
 const todos = res.data.todos; // Jawaban JSON sudah menjadi objek
 ```
 

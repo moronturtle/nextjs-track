@@ -12,7 +12,7 @@ export default function DaftarTugas() {
     async function muat() {
       try {
         const res = await fetch(
-          "https://nextjs-track-api.vercel.app/api/todos?owner=demo",
+          "https://nextjs-track-api.vercel.app/api/todos",
         );
         if (!res.ok) {
           setError(`Server menjawab ${res.status}`);
