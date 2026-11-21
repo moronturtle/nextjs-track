@@ -1,77 +1,141 @@
 ---
 type: lesson
-title: "Ubah dan hapus lewat API"
+title: "Edit dan delete Todo"
 template: baca
 previews: false
 terminal: false
-focus: /project/contexts/todo-context.tsx
+focus: /project/lib/todo-api.ts
 ---
 
-# Langkah 3: centang dan hapus lewat server
+# Langkah 3: edit dan delete Todo lewat API
 
-Dua tombol terakhir — centang dan hapus — kita sambungkan dengan `PATCH` dan `DELETE`. Alamatnya berbeda dari POST: kali ini ada **`id` todo di ujung URL**, karena server perlu tahu data mana yang diubah.
+Setelah menambahkan Todo berhasil, kita lanjut ke aksi berikutnya: mengubah Todo yang sudah ada dan menghapus Todo. Kita juga perlu cara untuk memilih Todo yang akan diubah atau dihapus.
 
-## Dua fungsi baru di lib/todo-api.ts
+API menggunakan `id` Todo di akhir alamat:
+
+```text
+/api/todos/123?owner=nami
+```
+
+Angka `123` adalah contoh `id`. Parameter `owner=nami` memilih daftar Todo yang sama seperti di materi sebelumnya.
+
+## `PATCH` untuk mengedit sebagian data
+
+Saat kamu mengubah status Todo lewat checkbox, hanya field `selesai` yang berubah. Kita kirim field `selesai` saja dengan method `PATCH`:
 
 ```ts
-export async function ubahTodo(
+export async function editStatusTodo(
   owner: string,
   id: number,
-  perubahan: { teks?: string; selesai?: boolean },
+  selesai: boolean,
 ): Promise<Todo> {
   const res = await kirimRequest(`/api/todos/${id}?owner=${owner}`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(perubahan),
+    body: JSON.stringify({ selesai }),
   });
-  return res.json();
-}
 
-export async function hapusTodo(owner: string, id: number): Promise<void> {
-  await kirimRequest(`/api/todos/${id}?owner=${owner}`, { method: "DELETE" });
+  return res.json();
 }
 ```
 
-Dua hal baru yang perlu diperhatikan:
+Saat API berhasil, respons berisi Todo terbaru dengan status `200`. Kita gunakan data dari respons tersebut untuk memperbarui item di state, bukan menebak hasil edit sendiri.
 
-- `PATCH /api/todos/3` — id `3` ada di URL, bukan di body. Body hanya berisi bagian yang berubah, misalnya `{ "selesai": true }`.
-- `DELETE` sukses membalas **`204`** — "berhasil, tanpa isi". Karena itu `hapusTodo` tidak memanggil `res.json()`: tidak ada isi untuk dibaca. Kalau dipaksa, `res.json()` akan error.
+## `PUT` untuk mengganti semua field yang dapat diedit
 
-:::info{title="PATCH atau PUT?"}
-API latihan menerima keduanya dan berperilaku sama. Beda teorinya: `PUT` mengganti seluruh data dengan yang dikirim, `PATCH` hanya mengubah bagian yang dikirim. Untuk mengubah `selesai` saja, `PATCH` lebih pas — kita tidak perlu mengirim ulang `teks`.
-:::
+Untuk mengedit teks Todo, kita gunakan `PUT`. Body request harus berisi `teks` dan `selesai`, karena `PUT` mengganti seluruh field Todo yang dapat diedit:
 
-## Provider: urutannya sama dengan tambahTodo
+```ts
+export async function editTodo(
+  owner: string,
+  id: number,
+  todo: { teks: string; selesai: boolean },
+): Promise<Todo> {
+  const res = await kirimRequest(`/api/todos/${id}?owner=${owner}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ teks: todo.teks, selesai: todo.selesai }),
+  });
+
+  return res.json();
+}
+```
+
+Kalau hanya mengirim `teks` ke endpoint `PUT`, API membalas status `400`. Untuk mengirim satu field saja, gunakan `PATCH`.
+
+## `DELETE` untuk menghapus Todo
+
+Untuk menghapus Todo, kirim method `DELETE` ke alamat Todo yang ingin dihapus:
+
+```ts
+export async function deleteTodo(owner: string, id: number): Promise<void> {
+  await kirimRequest(`/api/todos/${id}?owner=${owner}`, {
+    method: "DELETE",
+  });
+}
+```
+
+Ketika delete berhasil, API membalas status **`204 No Content`**. Status ini berarti request berhasil tetapi respons tidak memiliki body. Karena itu, fungsi `deleteTodo` tidak perlu memanggil `res.json()`.
+
+## Perbarui daftar Todo setelah API membalas
+
+Urutannya sama seperti saat menambahkan Todo: kirim request ke API, tunggu respons sukses, lalu perbarui daftar Todo di state.
 
 ```tsx
-const ubahSelesai = useCallback(async (id: number) => {
-  const target = todos.find((todo) => todo.id === id);
-  if (!target) return;
-  const hasil = await api.ubahTodo(OWNER, id, { selesai: !target.selesai });
-  setTodos((daftarLama) => daftarLama.map((todo) => (todo.id === id ? hasil : todo)));
-}, [todos]);
+const toggleSelesai = useCallback(
+  async (id: number) => {
+    const target = todos.find((todo) => todo.id === id);
+    if (!target) return;
 
-const hapusTodo = useCallback(async (id: number) => {
-  await api.hapusTodo(OWNER, id);
+    const hasil = await api.editStatusTodo(OWNER, id, !target.selesai);
+    setTodos((daftarLama) =>
+      daftarLama.map((todo) => (todo.id === id ? hasil : todo)),
+    );
+  },
+  [todos],
+);
+
+const deleteTodo = useCallback(async (id: number) => {
+  await api.deleteTodo(OWNER, id);
   setTodos((daftarLama) => daftarLama.filter((todo) => todo.id !== id));
 }, []);
 ```
 
-- `ubahSelesai` mengirim nilai kebalikan dari status sekarang (`!target.selesai`), lalu menyimpan jawaban server ke daftar. Karena membaca `todos`, dependency `useCallback`-nya sekarang `[todos]` — beda dengan pertemuan 06 yang dependency-nya kosong.
-- `hapusTodo` cukup menunggu server sukses, lalu membuang todo itu dari daftar.
+Komponen item Todo harus menangani Promise dari aksi edit, checkbox, dan delete. Jika request gagal, tampilkan pesan error dan jangan mengubah tampilan Todo.
 
-Kalau request gagal — misalnya todo sudah dihapus orang lain sehingga server menjawab `404` — errornya terlempar ke komponen yang memanggil. Untuk sekarang kita biarkan terlihat di console; di tugas kamu bisa menampilkan pesannya seperti di `TodoForm`.
+Fungsi `toggleSelesai` membaca `todos`, jadi dependency `useCallback` berisi `[todos]`. Fungsi `deleteTodo` tidak perlu membaca `todos` dari closure; callback setter selalu menerima daftar Todo terbaru.
 
-## Buktikan sendiri
+Di `todo-app.tsx` — komponen yang menyatukan form, filter, dan daftar Todo — ambil fungsi aksi dari Context lalu kirim sebagai props ke `TodoList`:
 
-- Centang satu tugas → refresh → centangnya tetap. Hapus satu tugas → refresh → tetap hilang. Sekarang perubahanmu sungguh tersimpan di server.
-- Buka alamat API-mu di tab browser (`/api/todos?owner=namamu`) — isi daftarnya persis seperti yang terlihat di halaman.
+```tsx
+function TodoApp() {
+  const { todos, toggleSelesai, editTodo, deleteTodo } = useTodos();
+
+  return (
+    <TodoList
+      todos={todos}
+      saatDicentang={toggleSelesai}
+      saatEdit={editTodo}
+      saatDelete={deleteTodo}
+    />
+  );
+}
+```
+
+Jika request gagal, jangan mengubah state terlebih dahulu. Tampilkan pesan error agar kamu tahu perubahan belum tersimpan di server.
+
+## Periksa hasilnya
+
+- Centang Todo. Di tab Network, pastikan request memakai `PATCH` dan body berisi `{ "selesai": true }` atau `{ "selesai": false }`.
+- Edit teks Todo. Pastikan request memakai `PUT` dan body berisi `teks` serta `selesai`.
+- Hapus Todo. Pastikan respons berstatus `204` dan tidak memiliki body.
+- Refresh halaman. Edit, status checkbox, dan delete harus tetap tersimpan di server.
 
 ## Ringkasan
 
-- ✅ `PATCH /api/todos/:id` — `id` di URL, bagian yang berubah di body.
-- ✅ `DELETE` sukses membalas `204` tanpa isi — jangan panggil `res.json()`.
-- ✅ Pola yang sama dengan POST: kirim → tunggu sukses → ubah state dengan jawaban server.
-- ✅ `useCallback` yang membaca `todos` perlu dependency `[todos]`.
+- ✅ `PATCH` mengedit field tertentu; `PUT` mengganti semua field yang dapat diedit.
+- ✅ `DELETE` berhasil dengan status `204` tanpa body.
+- ✅ State baru berubah setelah request API berhasil.
+- ✅ Jika request gagal, tampilkan pesan dan pertahankan state sebelumnya.
 
-Aplikasi Todo-mu sekarang full CRUD — semua perubahan bertahan di server. Selanjutnya quiz, lalu tugas.
+Berikutnya kita bandingkan validasi HTML dengan React Hook Form, lalu pilih cara yang akan dipakai di project.

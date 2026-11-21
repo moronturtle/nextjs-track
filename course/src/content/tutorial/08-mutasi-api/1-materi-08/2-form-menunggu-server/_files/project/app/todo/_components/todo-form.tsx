@@ -15,15 +15,20 @@ export default function TodoForm({
   async function kirimForm(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const teksBersih = teks.trim();
-    if (!teksBersih) return;
+    if (teksBersih.length < 3) {
+      setError("Todo minimal 3 karakter.");
+      return;
+    }
 
     setSedangMengirim(true);
     setError(null);
     try {
       await saatTambah(teksBersih);
       setTeks("");
-    } catch {
-      setError("Gagal menyimpan tugas. Coba lagi.");
+    } catch (error) {
+      setError(
+        error instanceof Error ? error.message : "Gagal menyimpan Todo.",
+      );
     } finally {
       setSedangMengirim(false);
     }
@@ -37,12 +42,18 @@ export default function TodoForm({
         onChange={(event) => setTeks(event.target.value)}
         placeholder="Tugas baru..."
         aria-label="Tugas baru"
+        required
+        minLength={3}
         disabled={sedangMengirim}
       />
       <button className={styles.button} type="submit" disabled={sedangMengirim}>
-        {sedangMengirim ? "Menyimpan..." : "Tambah"}
+        {sedangMengirim ? "Mengirim..." : "Tambah"}
       </button>
-      {error && <p className={styles.error}>{error}</p>}
+      {error && (
+        <p className={styles.note} role="alert">
+          {error}
+        </p>
+      )}
     </form>
   );
 }

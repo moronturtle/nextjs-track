@@ -1,88 +1,156 @@
 ---
 type: lesson
-title: "Pertemuan 08 — Mengirim data"
+title: "POST: kirim data ke API"
 template: baca
 previews: false
 terminal: false
 focus: /project/lib/todo-api.ts
 ---
 
-# Pertemuan 08 — Mengirim data ke server
+# Pertemuan 08 — Kirim perubahan Todo ke server
 
-Di pertemuan 07 kamu membuktikan sendiri: tugas baru hilang setelah refresh karena `tambahTodo` hanya mengubah state. Pertemuan ini kita kirim perubahan itu ke server — setelah ini, tambah, centang, dan hapus bertahan selamanya.
+Di pertemuan 07, aplikasi berhasil mengambil daftar Todo dari server. Namun, jika kamu menambahkan Todo, perubahan baru tersimpan di browser. Setelah halaman di-refresh, Todo tersebut hilang karena server belum menerimanya.
 
-## GET membaca, method lain mengubah
+Di pertemuan ini, kita ubah alur aplikasi agar perubahan Todo dikirim ke API. Kita mulai dengan `POST` untuk menambah Todo, lalu belajar cara form menunggu jawaban server.
 
-Selama ini `fetch` kita selalu memakai method `GET` — membaca data. Untuk mengubah data, HTTP menyediakan method lain:
+**Yang kamu pelajari di pertemuan ini:**
 
-| Method | Artinya | Di API latihan |
-| --- | --- | --- |
-| `GET` | ambil data | `GET /api/todos` |
-| `POST` | buat data baru | `POST /api/todos` |
-| `PATCH` / `PUT` | ubah data yang ada | `PATCH /api/todos/3` |
-| `DELETE` | hapus data | `DELETE /api/todos/3` |
+- `POST` untuk membuat Todo baru.
+- `PATCH` untuk mengedit sebagian data Todo.
+- `PUT` untuk mengedit semua field Todo yang dapat diubah.
+- `DELETE` untuk menghapus Todo.
+- Validasi form dan cara menampilkan error dari API.
 
-Empat operasi ini sering disebut **CRUD** — Create, Read, Update, Delete.
+## Kenali method API
 
-## Cara mengirim data: body + header
+API Todo mengikuti pola REST sederhana. URL menunjukkan resource yang dituju (data Todo), sedangkan method HTTP menunjukkan aksi yang diminta:
 
-Untuk `POST`, kita mengirim isi data di **body** — bagian request yang berisi muatan. Dua hal wajib ada:
+| Method   | Kegunaan                                     | Contoh                  |
+| -------- | -------------------------------------------- | ----------------------- |
+| `GET`    | Mengambil daftar atau detail Todo            | `GET /api/todos`        |
+| `POST`   | Membuat Todo baru                            | `POST /api/todos`       |
+| `PATCH`  | Edit sebagian field (bagian data) Todo       | `PATCH /api/todos/123`  |
+| `PUT`    | Mengganti semua field Todo yang dapat diedit | `PUT /api/todos/123`    |
+| `DELETE` | Hapus Todo                                   | `DELETE /api/todos/123` |
 
-```ts
-const res = await fetch("http://localhost:3001/api/todos?owner=demo", {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({ teks: "Belajar mengirim data" }),
-});
+`PATCH` dan `PUT` sama-sama untuk mengedit data, tetapi cara kerjanya berbeda. `PATCH` hanya mengirim field yang berubah. `PUT` mengirim semua field yang dapat diedit.
+
+**CRUD** adalah singkatan dari Create, Read, Update, dan Delete. Untuk Todo, artinya membuat, mengambil, mengedit, dan menghapus data. `PATCH` dan `PUT` sama-sama dipakai untuk aksi Update.
+
+## Kenali file yang akan kita sentuh
+
+Kita lanjutkan project Todo dari pertemuan sebelumnya. Untuk mengirim data, bagian yang paling sering kita buka adalah:
+
+```text
+app/
+└── todo/
+    └── _components/
+        ├── todo-form.tsx    # form untuk menambah Todo
+        ├── todo-list.tsx    # menampilkan daftar Todo
+        ├── todo-item.tsx    # satu baris Todo
+        └── todo-app.tsx     # menyatukan form dan daftar Todo
+contexts/
+└── todo-context.tsx        # state Todo yang dipakai beberapa halaman
+lib/
+└── todo-api.ts             # fungsi untuk mengirim request ke API
+types/
+└── todo.ts                 # bentuk data Todo
 ```
 
-- `method: "POST"` — memberi tahu server bahwa request ini membuat data baru.
-- `headers: { "Content-Type": "application/json" }` — memberi tahu server bahwa isi body berupa JSON. Tanpa header ini, server tidak tahu cara membaca body yang kita kirim.
-- `JSON.stringify(...)` — objek JavaScript diubah menjadi teks JSON, kebalikan dari `res.json()` saat membaca.
+`todo-form.tsx` mengurus input dan tombol. `todo-list.tsx` menampilkan Todo, sedangkan `todo-item.tsx` menampilkan satu Todo. `todo-app.tsx` menyatukan form dan daftar. `todo-context.tsx` menyimpan state Todo dan menyediakan fungsi untuk mengirim perubahan ke API. `todo-api.ts` berisi fungsi `fetch` yang kita tambahkan di lesson ini.
 
-## Jawaban server punya arti
+## Kirim Todo dengan POST
 
-Kalau request sukses, server membalas dengan status **`201`** — artinya "data baru berhasil dibuat" — beserta todo yang baru dibuat, lengkap dengan `id` yang dibuat server:
+Saat kamu menambah Todo, aplikasi mengirim teksnya di **body** request. Body adalah bagian request yang membawa data. Header `Content-Type` memberi tahu server bahwa body tersebut berformat JSON.
+
+```ts
+const res = await fetch(
+  "https://nextjs-track-api.vercel.app/api/todos?owner=nami",
+  {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ teks: "Belajar mengirim data" }),
+  },
+);
+```
+
+- `method: "POST"` meminta server membuat Todo baru.
+- `JSON.stringify(...)` mengubah objek JavaScript menjadi teks JSON.
+- Header `Content-Type: application/json` memberi tahu server format data di body.
+- `owner=nami` memilih daftar Todo yang sama seperti di pertemuan 07.
+
+## Baca jawaban server
+
+Kalau request berhasil, API membalas status **`201` Created** dan mengirim data Todo yang baru dibuat. Nilai `id` dan `selesai: false` ditentukan oleh server:
 
 ```json
 { "id": 1731552000123, "teks": "Belajar mengirim data", "selesai": false }
 ```
 
-Kalau body tidak lengkap — misalnya `teks` kosong atau kurang dari 3 karakter — server membalas **`400`** dengan pesan penyebabnya:
+Jangan hanya melihat apakah request sudah terkirim. Periksa juga respons dari server:
 
-```json
-{ "error": "teks wajib diisi dan minimal 3 karakter" }
-```
+| Status | Arti di API Todo                                               |
+| ------ | -------------------------------------------------------------- |
+| `201`  | Todo baru berhasil dibuat                                      |
+| `200`  | Edit berhasil; respons berisi Todo terbaru                     |
+| `204`  | Delete berhasil; respons tidak memiliki body                   |
+| `400`  | Isi request tidak sesuai, misalnya teks kurang dari 3 karakter |
+| `404`  | Todo dengan `id` tersebut tidak ditemukan                      |
+| `500`  | Server mengalami masalah                                       |
 
-`400` artinya "request-mu sampai, tapi isinya tidak bisa diproses". Beda dengan `404` (alamat tidak ada) dan `500` (server bermasalah). Membaca kode ini adalah cara kita tahu kenapa request gagal — nanti di lesson 4 kita menampilkan pesannya ke pengguna.
+`fetch` tidak otomatis melempar error saat API membalas status `400` atau `404`. Karena itu, kita perlu memeriksa `res.ok`. Jika server membalas status gagal, kita baca pesan error dari API dan menampilkan pesan itu di form.
 
-## Tambahkan ke lib/todo-api.ts
+## Bungkus request di `lib/todo-api.ts`
 
-Buka `project/lib/todo-api.ts` — fungsi `tambahTodo` membungkus request POST tadi:
+File `lib/todo-api.ts` menyimpan alamat API dan fungsi untuk mengirim request. Di sini kita menambahkan fungsi `tambahTodo`. Fungsi ini memeriksa apakah server membalas sukses sebelum mengembalikan data:
 
 ```ts
+import type { Todo } from "@/types/todo";
+
+export const API_URL = "https://nextjs-track-api.vercel.app";
+
+async function kirimRequest(
+  alamat: string,
+  init?: RequestInit,
+): Promise<Response> {
+  const res = await fetch(`${API_URL}${alamat}`, init);
+
+  if (!res.ok) {
+    let pesan = `Request gagal (${res.status})`;
+    const data = await res.json().catch(() => null);
+    if (data && data.error) {
+      pesan = data.error;
+    }
+    throw new Error(pesan);
+  }
+
+  return res;
+}
+
 export async function tambahTodo(owner: string, teks: string): Promise<Todo> {
-  const res = await fetch(`${API_URL}/api/todos?owner=${owner}`, {
+  const res = await kirimRequest(`/api/todos?owner=${owner}`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ teks }),
   });
 
-  if (!res.ok) {
-    throw new Error(`Server menjawab ${res.status}`);
-  }
-
   return res.json();
 }
 ```
 
-Pola yang kamu kenal dari GET tetap dipakai: `await fetch`, periksa `res.ok`, baca `res.json()`. Yang baru hanya `method`, `headers`, dan `body`.
+`RequestInit` adalah tipe bawaan untuk opsi `fetch` — di dalamnya kita mengisi `method`, `headers`, dan `body`.
+
+Ketika teks terlalu pendek, API membalas status `400` dan pesan error. Fungsi `kirimRequest` membaca pesan error dari respons, lalu melempar error agar form bisa menampilkan alasan request gagal.
+
+## Coba request di browser
+
+Buka DevTools, pilih tab **Network**, lalu tambahkan Todo dari form. Pilih request `POST /api/todos` untuk melihat method, isi body request, status `201`, dan respons JSON.
 
 ## Ringkasan
 
-- ✅ CRUD = `GET` baca, `POST` buat, `PATCH`/`PUT` ubah, `DELETE` hapus.
-- ✅ Mengirim data butuh `method`, header `Content-Type: application/json`, dan body berupa `JSON.stringify`.
-- ✅ `201` = data dibuat, `400` = isi request salah, `404` = tidak ditemukan.
-- ✅ Fungsi API tetap mengikuti pola fetch → periksa `res.ok` → `res.json()`.
+- ✅ `POST` membuat Todo baru; teksnya dikirim dalam body JSON.
+- ✅ API membalas `201` dengan Todo baru yang sudah memiliki `id`.
+- ✅ `fetch` perlu memeriksa `res.ok` karena status gagal tidak otomatis melempar error JavaScript.
+- ✅ File `lib/todo-api.ts` memisahkan request API dari komponen form.
 
-Berikutnya kita sambungkan `tambahTodo` ke form — dan menampilkan pesan error dari server ke pengguna.
+Berikutnya kita sambungkan form dengan fungsi API dan menunggu jawaban server sebelum mengubah daftar Todo.

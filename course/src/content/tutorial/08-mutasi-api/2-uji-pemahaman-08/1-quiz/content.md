@@ -12,7 +12,7 @@ previews:
 
 # Quiz — cek pemahamanmu
 
-Ada **9 soal pilihan ganda** tentang method HTTP (POST, PATCH, PUT, DELETE), `body` dan `Content-Type`, kode status (`201`, `204`, `400`, `404`), form yang menunggu server, dan validasi. Kerjakan di panel Preview.
+Ada **11 soal pilihan ganda** tentang method HTTP (POST, PATCH, PUT, DELETE), `body` dan `Content-Type`, kode status (`201`, `204`, `400`, `404`), form yang menunggu server, dan validasi. Kerjakan di panel Preview.
 
 - Pilih satu jawaban untuk setiap soal.
 - Jawaban langsung dinilai. Jika jawabanmu belum tepat, quiz menunjukkan jawaban yang benar dan alasannya.

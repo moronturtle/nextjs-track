@@ -1,11 +1,15 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="id">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Quiz — Mengubah Data lewat API</title>
+    <title>Quiz — Kirim dan edit data lewat API</title>
     <style>
-      * { box-sizing: border-box; margin: 0; padding: 0; }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
       body {
         min-height: 100vh;
         display: flex;
@@ -13,11 +17,26 @@
         padding: 2rem 1rem;
         background: #0f1117;
         color: #e4e6e9;
-        font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+        font-family:
+          system-ui,
+          -apple-system,
+          "Segoe UI",
+          sans-serif;
       }
-      .kartu { width: 100%; max-width: 560px; }
-      .progres { margin-bottom: 0.5rem; color: #8b94a3; font-size: 0.85rem; }
-      h1 { margin-bottom: 1.25rem; font-size: 1.35rem; line-height: 1.4; }
+      .kartu {
+        width: 100%;
+        max-width: 560px;
+      }
+      .progres {
+        margin-bottom: 0.5rem;
+        color: #8b94a3;
+        font-size: 0.85rem;
+      }
+      h1 {
+        margin-bottom: 1.25rem;
+        font-size: 1.35rem;
+        line-height: 1.4;
+      }
       .opsi {
         display: block;
         width: 100%;
@@ -31,10 +50,20 @@
         text-align: left;
         cursor: pointer;
       }
-      .opsi:hover:not(:disabled) { border-color: #5b8def; }
-      .opsi:disabled { cursor: default; }
-      .opsi.benar { border-color: #3ecf8e; background: #16332a; }
-      .opsi.salah { border-color: #f47272; background: #3a2222; }
+      .opsi:hover:not(:disabled) {
+        border-color: #5b8def;
+      }
+      .opsi:disabled {
+        cursor: default;
+      }
+      .opsi.benar {
+        border-color: #3ecf8e;
+        background: #16332a;
+      }
+      .opsi.salah {
+        border-color: #f47272;
+        background: #3a2222;
+      }
       .pembahasan {
         display: none;
         margin-top: 1rem;
@@ -43,9 +72,17 @@
         font-size: 0.9rem;
         line-height: 1.5;
       }
-      .pembahasan.tampil { display: block; }
-      .pembahasan.benar { border: 1px solid #3ecf8e; background: #16332a; }
-      .pembahasan.salah { border: 1px solid #f47272; background: #3a2222; }
+      .pembahasan.tampil {
+        display: block;
+      }
+      .pembahasan.benar {
+        border: 1px solid #3ecf8e;
+        background: #16332a;
+      }
+      .pembahasan.salah {
+        border: 1px solid #f47272;
+        background: #3a2222;
+      }
       .lanjut {
         display: none;
         margin-top: 1.25rem;
@@ -57,9 +94,19 @@
         font-size: 0.95rem;
         cursor: pointer;
       }
-      .lanjut.tampil { display: inline-block; }
-      .skor { margin: 1rem 0; font-size: 2.5rem; font-weight: 700; }
-      .pesan { margin-bottom: 1.5rem; color: #aeb5c2; line-height: 1.5; }
+      .lanjut.tampil {
+        display: inline-block;
+      }
+      .skor {
+        margin: 1rem 0;
+        font-size: 2.5rem;
+        font-weight: 700;
+      }
+      .pesan {
+        margin-bottom: 1.5rem;
+        color: #aeb5c2;
+        line-height: 1.5;
+      }
     </style>
   </head>
   <body>
@@ -70,7 +117,8 @@
           soal: "Method HTTP mana yang dipakai untuk membuat data baru?",
           opsi: ["GET", "POST", "DELETE", "OPTIONS"],
           jawaban: 1,
-          pembahasan: "GET membaca, POST membuat, PATCH/PUT mengubah, DELETE menghapus. Empat operasi ini disebut CRUD.",
+          pembahasan:
+            "CRUD adalah Create (membuat), Read (mengambil), Update (mengedit), dan Delete. PATCH dan PUT sama-sama digunakan untuk aksi Update.",
         },
         {
           soal: "Kenapa request POST perlu header 'Content-Type': 'application/json'?",
@@ -81,7 +129,8 @@
             "Supaya browser mengizinkan request",
           ],
           jawaban: 0,
-          pembahasan: "Body hanyalah teks. Tanpa Content-Type, server tidak tahu cara membaca isinya — header ini memberi tahu bahwa isinya JSON.",
+          pembahasan:
+            "Body hanyalah teks. Tanpa Content-Type, server tidak tahu cara membaca isinya — header ini memberi tahu bahwa isinya JSON.",
         },
         {
           soal: "Apa fungsi JSON.stringify saat mengirim data?",
@@ -89,10 +138,11 @@
             "Mengubah objek JavaScript menjadi teks JSON untuk dikirim di body",
             "Mengubah teks JSON menjadi objek JavaScript",
             "Mengenkripsi data supaya aman",
-            "Menghapus bagian objek yang kosong",
+            "Melewati bagian objek yang kosong",
           ],
           jawaban: 0,
-          pembahasan: "JSON.stringify adalah kebalikan res.json(): objek → teks untuk dikirim. Saat membaca jawaban, res.json() melakukan sebaliknya.",
+          pembahasan:
+            "JSON.stringify adalah kebalikan res.json(): objek → teks untuk dikirim. Saat membaca jawaban, res.json() melakukan sebaliknya.",
         },
         {
           soal: "Server membalas POST dengan status 201. Artinya?",
@@ -103,29 +153,32 @@
             "Server meminta login dulu",
           ],
           jawaban: 1,
-          pembahasan: "201 berarti 'created' — data baru berhasil dibuat. Biasanya server juga membalas dengan data yang baru dibuat, termasuk id-nya.",
+          pembahasan:
+            "201 berarti 'created' — data baru berhasil dibuat. Biasanya server juga membalas dengan data yang baru dibuat, termasuk id-nya.",
         },
         {
           soal: "Request DELETE berhasil dan server membalas 204. Apa yang perlu diperhatikan?",
           opsi: [
-            "204 artinya gagal — todo belum terhapus",
+            "204 artinya gagal — Todo belum di-delete",
             "204 artinya sukses tanpa isi — jangan panggil res.json() karena tidak ada yang dibaca",
             "204 mengharuskan request diulang",
             "204 hanya untuk request GET",
           ],
           jawaban: 1,
-          pembahasan: "204 = 'no content': sukses, tapi tanpa body. Memanggil res.json() pada jawaban kosong akan error.",
+          pembahasan:
+            "204 = 'no content': sukses, tapi tanpa body. Memanggil res.json() pada jawaban kosong akan error.",
         },
         {
-          soal: "Untuk mengubah satu todo, kenapa alamatnya /api/todos/3, bukan /api/todos?",
+          soal: "Saat mengedit satu Todo, kenapa alamatnya /api/todos/3, bukan /api/todos?",
           opsi: [
-            "Angka 3 di URL memberi tahu server todo mana yang diubah",
+            "Angka 3 di URL memberi tahu server Todo mana yang diedit",
             "Karena PATCH tidak boleh memakai parameter owner",
             "Supaya requestnya lebih pendek",
             "Karena GET dan PATCH harus memakai alamat berbeda",
           ],
           jawaban: 0,
-          pembahasan: "id data diubah atau dihapus ditulis di URL. Body hanya berisi bagian yang berubah, misalnya { selesai: true }.",
+          pembahasan:
+            "id Todo yang diedit atau di-delete ditulis di URL. Body berisi field yang perlu dikirim.",
         },
         {
           soal: "Di tambahTodo, kenapa setTodos dijalankan SETELAH server menjawab?",
@@ -136,18 +189,20 @@
             "Karena await membutuhkan state yang sudah ada",
           ],
           jawaban: 0,
-          pembahasan: "Kalau state diubah dulu lalu request gagal, layar menampilkan data yang tidak tersimpan di server. Urutan aman: kirim → sukses → baru ubah state.",
+          pembahasan:
+            "Kalau state diubah dulu lalu request gagal, layar menampilkan data yang tidak tersimpan di server. Urutan aman: kirim → sukses → baru ubah state.",
         },
         {
           soal: "Apa kegunaan state sedangMengirim di TodoForm?",
           opsi: [
-            "Menandai form sedang menunggu server — tombol berubah 'Menyimpan...' dan tidak bisa diklik ganda",
+            "Menandai form sedang menunggu server — tombol berubah 'Mengirim...' dan tidak bisa diklik ganda",
             "Menghitung jumlah request yang sudah dikirim",
             "Menyimpan jawaban server sementara",
             "Mengaktifkan validasi HTML",
           ],
           jawaban: 0,
-          pembahasan: "Selama jeda request, sedangMengirim menampilkan tanda proses dan menonaktifkan tombol supaya request tidak terkirim dua kali.",
+          pembahasan:
+            "Selama jeda request, sedangMengirim menampilkan tanda proses dan menonaktifkan tombol supaya request tidak terkirim dua kali.",
         },
         {
           soal: "Server membalas POST dengan 400 dan { error: 'teks wajib diisi' }. Apa artinya?",
@@ -158,7 +213,32 @@
             "Internet putus",
           ],
           jawaban: 1,
-          pembahasan: "400 berarti request-nya sampai tapi isinya salah menurut aturan server. Pesan error di body menjelaskan penyebabnya — berguna untuk ditampilkan ke pengguna.",
+          pembahasan:
+            "400 berarti request-nya sampai tapi isinya salah menurut aturan server. Pesan error di body menjelaskan penyebabnya — berguna untuk ditampilkan ke pengguna.",
+        },
+        {
+          soal: "Apa perbedaan utama PATCH dan PUT di API Todo ini?",
+          opsi: [
+            "PATCH hanya mengirim field yang diedit; PUT mengirim semua field yang dapat diedit",
+            "PATCH membuat Todo; PUT melakukan delete Todo",
+            "PATCH hanya untuk login; PUT hanya untuk register",
+            "Keduanya selalu melakukan delete semua data",
+          ],
+          jawaban: 0,
+          pembahasan:
+            "PATCH dipakai untuk edit sebagian field, misalnya status checkbox. PUT mengganti seluruh field yang dapat diedit, jadi API ini meminta teks dan selesai.",
+        },
+        {
+          soal: "Kapan React Hook Form lebih membantu daripada validasi native HTML?",
+          opsi: [
+            "Saat form punya beberapa aturan dan kita perlu mengelola pesan error serta status submit",
+            "Setiap kali aplikasi memakai Next.js",
+            "Untuk mengganti validasi yang dilakukan API",
+            "Agar request POST tidak membutuhkan body",
+          ],
+          jawaban: 0,
+          pembahasan:
+            "Validasi native cocok untuk aturan sederhana. React Hook Form memudahkan pengelolaan nilai, validasi, pesan error, dan status submit pada form yang lebih berkembang. API tetap harus memvalidasi data.",
         },
       ];
 
@@ -176,7 +256,9 @@
           <button class="lanjut" id="lanjut">${nomor + 1 === SOAL.length ? "Lihat hasil" : "Soal berikutnya"}</button>
         `;
         document.querySelectorAll(".opsi").forEach((button) => {
-          button.addEventListener("click", () => jawab(Number(button.dataset.i)));
+          button.addEventListener("click", () =>
+            jawab(Number(button.dataset.i)),
+          );
         });
         document.getElementById("lanjut").addEventListener("click", () => {
           nomor++;
@@ -203,11 +285,12 @@
       }
 
       function tampilHasil() {
-        const pesan = skor === SOAL.length
-          ? "Semua jawabanmu tepat. Kamu siap melanjutkan project tugas."
-          : skor >= 3
-            ? "Bagus. Baca kembali bagian yang jawabannya belum tepat, lalu lanjutkan ke tugas."
-            : "Buka kembali materi yang jawabannya belum tepat, lalu coba quiz sekali lagi.";
+        const pesan =
+          skor === SOAL.length
+            ? "Semua jawabanmu tepat. Kamu siap melanjutkan project tugas."
+            : skor >= 3
+              ? "Bagus. Baca kembali bagian yang jawabannya belum tepat, lalu lanjutkan ke tugas."
+              : "Buka kembali materi yang jawabannya belum tepat, lalu coba quiz sekali lagi.";
         app.innerHTML = `
           <p class="progres">Quiz selesai</p>
           <h1>Skor kamu</h1>

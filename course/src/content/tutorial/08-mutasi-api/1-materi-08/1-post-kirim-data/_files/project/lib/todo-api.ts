@@ -1,7 +1,7 @@
 import type { Todo } from "@/types/todo";
 
-// Alamat server latihan. Ganti dengan alamat yang diberikan mentor.
-export const API_URL = "http://localhost:3001";
+// Alamat API untuk latihan ini.
+export const API_URL = "https://nextjs-track-api.vercel.app";
 
 // Server membungkus jawaban dengan info tambahan: jumlah data dan halaman.
 export type DaftarTodos = {
@@ -12,11 +12,21 @@ export type DaftarTodos = {
   totalHalaman: number;
 };
 
-async function kirimRequest(alamat: string, init?: RequestInit): Promise<Response> {
+async function kirimRequest(
+  alamat: string,
+  init?: RequestInit,
+): Promise<Response> {
   const res = await fetch(`${API_URL}${alamat}`, init);
+
   if (!res.ok) {
-    throw new Error(`Server menjawab ${res.status}`);
+    let pesan = `Request gagal (${res.status})`;
+    const data = await res.json().catch(() => null);
+    if (data && data.error) {
+      pesan = data.error;
+    }
+    throw new Error(pesan);
   }
+
   return res;
 }
 

@@ -12,8 +12,8 @@ import {
 import * as api from "@/lib/todo-api";
 import type { Todo } from "@/types/todo";
 
-// Ganti "demo" dengan namamu supaya datamu terpisah dari murid lain.
-const OWNER = "demo";
+// Daftar "nami" yang sama seperti di pertemuan 07.
+const OWNER = "nami";
 
 type TodoContextValue = {
   todos: Todo[];
@@ -52,7 +52,9 @@ export function TodoProvider({ children }: { children: ReactNode }) {
 
   const ubahSelesai = useCallback((id: number) => {
     setTodos((daftarLama) =>
-      daftarLama.map((todo) => (todo.id === id ? { ...todo, selesai: !todo.selesai } : todo)),
+      daftarLama.map((todo) =>
+        todo.id === id ? { ...todo, selesai: !todo.selesai } : todo,
+      ),
     );
   }, []);
 

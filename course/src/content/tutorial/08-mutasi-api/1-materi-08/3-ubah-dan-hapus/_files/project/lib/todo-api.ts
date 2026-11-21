@@ -1,7 +1,7 @@
 import type { Todo } from "@/types/todo";
 
-// Alamat server latihan. Ganti dengan alamat yang diberikan mentor.
-export const API_URL = "http://localhost:3001";
+// Alamat API untuk latihan ini.
+export const API_URL = "https://nextjs-track-api.vercel.app";
 
 // Server membungkus jawaban dengan info tambahan: jumlah data dan halaman.
 export type DaftarTodos = {
@@ -12,11 +12,21 @@ export type DaftarTodos = {
   totalHalaman: number;
 };
 
-async function kirimRequest(alamat: string, init?: RequestInit): Promise<Response> {
+async function kirimRequest(
+  alamat: string,
+  init?: RequestInit,
+): Promise<Response> {
   const res = await fetch(`${API_URL}${alamat}`, init);
+
   if (!res.ok) {
-    throw new Error(`Server menjawab ${res.status}`);
+    let pesan = `Request gagal (${res.status})`;
+    const data = await res.json().catch(() => null);
+    if (data && data.error) {
+      pesan = data.error;
+    }
+    throw new Error(pesan);
   }
+
   return res;
 }
 
@@ -35,19 +45,32 @@ export async function tambahTodo(owner: string, teks: string): Promise<Todo> {
   return res.json();
 }
 
-export async function ubahTodo(
+export async function editStatusTodo(
   owner: string,
   id: number,
-  perubahan: { teks?: string; selesai?: boolean },
+  selesai: boolean,
 ): Promise<Todo> {
   const res = await kirimRequest(`/api/todos/${id}?owner=${owner}`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(perubahan),
+    body: JSON.stringify({ selesai }),
   });
   return res.json();
 }
 
-export async function hapusTodo(owner: string, id: number): Promise<void> {
+export async function editTodo(
+  owner: string,
+  id: number,
+  todo: { teks: string; selesai: boolean },
+): Promise<Todo> {
+  const res = await kirimRequest(`/api/todos/${id}?owner=${owner}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(todo),
+  });
+  return res.json();
+}
+
+export async function deleteTodo(owner: string, id: number): Promise<void> {
   await kirimRequest(`/api/todos/${id}?owner=${owner}`, { method: "DELETE" });
 }

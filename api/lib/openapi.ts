@@ -16,7 +16,8 @@ export const spesifikasiOpenApi = {
         type: "http",
         scheme: "bearer",
         bearerFormat: "JWT",
-        description: "Token dari POST /api/auth/login. Kirim sebagai `Authorization: Bearer <token>`.",
+        description:
+          "Token dari POST /api/auth/login. Kirim sebagai `Authorization: Bearer <token>`.",
       },
     },
     schemas: {
@@ -31,7 +32,10 @@ export const spesifikasiOpenApi = {
       DaftarTodos: {
         type: "object",
         properties: {
-          todos: { type: "array", items: { $ref: "#/components/schemas/Todo" } },
+          todos: {
+            type: "array",
+            items: { $ref: "#/components/schemas/Todo" },
+          },
           total: { type: "number", example: 12 },
           page: { type: "number", example: 1 },
           limit: { type: "number", example: 10 },
@@ -41,7 +45,10 @@ export const spesifikasiOpenApi = {
       Error: {
         type: "object",
         properties: {
-          error: { type: "string", example: "teks wajib diisi dan minimal 3 karakter" },
+          error: {
+            type: "string",
+            example: "teks wajib diisi dan minimal 3 karakter",
+          },
         },
       },
     },
@@ -49,7 +56,8 @@ export const spesifikasiOpenApi = {
       owner: {
         name: "owner",
         in: "query",
-        description: "Nama pemilik data. Tidak perlu dikirim jika memakai token JWT.",
+        description:
+          "Nama pemilik data. Tidak perlu dikirim jika memakai token JWT.",
         schema: { type: "string", example: "budi" },
       },
     },
@@ -84,19 +92,29 @@ export const spesifikasiOpenApi = {
             name: "status",
             in: "query",
             description: "Filter berdasarkan status pengerjaan.",
-            schema: { type: "string", enum: ["semua", "belum", "selesai"], default: "semua" },
+            schema: {
+              type: "string",
+              enum: ["semua", "belum", "selesai"],
+              default: "semua",
+            },
           },
         ],
         responses: {
           "200": {
             description: "Daftar todo beserta info pagination.",
             content: {
-              "application/json": { schema: { $ref: "#/components/schemas/DaftarTodos" } },
+              "application/json": {
+                schema: { $ref: "#/components/schemas/DaftarTodos" },
+              },
             },
           },
           "400": {
             description: "Parameter tidak valid.",
-            content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } },
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/Error" },
+              },
+            },
           },
         },
       },
@@ -111,7 +129,11 @@ export const spesifikasiOpenApi = {
                 type: "object",
                 required: ["teks"],
                 properties: {
-                  teks: { type: "string", example: "Mengerjakan tugas pertemuan 08" },
+                  teks: {
+                    type: "string",
+                    minLength: 3,
+                    example: "Mengerjakan tugas pertemuan 08",
+                  },
                 },
               },
             },
@@ -120,11 +142,19 @@ export const spesifikasiOpenApi = {
         responses: {
           "201": {
             description: "Todo baru berhasil dibuat.",
-            content: { "application/json": { schema: { $ref: "#/components/schemas/Todo" } } },
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/Todo" },
+              },
+            },
           },
           "400": {
             description: "Body tidak valid.",
-            content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } },
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/Error" },
+              },
+            },
           },
         },
       },
@@ -144,17 +174,26 @@ export const spesifikasiOpenApi = {
         responses: {
           "200": {
             description: "Data todo.",
-            content: { "application/json": { schema: { $ref: "#/components/schemas/Todo" } } },
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/Todo" },
+              },
+            },
           },
           "404": {
             description: "Todo tidak ditemukan.",
-            content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } },
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/Error" },
+              },
+            },
           },
         },
       },
       patch: {
-        summary: "Ubah todo",
-        description: "Mengubah `teks` dan/atau `selesai`. PUT juga tersedia dengan perilaku sama.",
+        summary: "Edit sebagian data todo",
+        description:
+          "Mengedit `teks`, `selesai`, atau keduanya. Field yang tidak dikirim tetap.",
         parameters: [
           { $ref: "#/components/parameters/owner" },
           {
@@ -170,8 +209,9 @@ export const spesifikasiOpenApi = {
             "application/json": {
               schema: {
                 type: "object",
+                minProperties: 1,
                 properties: {
-                  teks: { type: "string" },
+                  teks: { type: "string", minLength: 3 },
                   selesai: { type: "boolean" },
                 },
               },
@@ -180,21 +220,93 @@ export const spesifikasiOpenApi = {
         },
         responses: {
           "200": {
-            description: "Todo setelah diubah.",
-            content: { "application/json": { schema: { $ref: "#/components/schemas/Todo" } } },
+            description: "Todo setelah diedit.",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/Todo" },
+              },
+            },
           },
           "400": {
             description: "Body tidak valid.",
-            content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } },
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/Error" },
+              },
+            },
           },
           "404": {
             description: "Todo tidak ditemukan.",
-            content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } },
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/Error" },
+              },
+            },
+          },
+        },
+      },
+      put: {
+        summary: "Ganti data todo",
+        description:
+          "Mengganti seluruh field yang dapat diedit. Body wajib mengirim `teks` dan `selesai`.",
+        parameters: [
+          { $ref: "#/components/parameters/owner" },
+          {
+            name: "id",
+            in: "path",
+            required: true,
+            schema: { type: "number" },
+          },
+        ],
+        requestBody: {
+          required: true,
+          content: {
+            "application/json": {
+              schema: {
+                type: "object",
+                required: ["teks", "selesai"],
+                properties: {
+                  teks: {
+                    type: "string",
+                    minLength: 3,
+                    example: "Belajar Next.js",
+                  },
+                  selesai: { type: "boolean", example: false },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          "200": {
+            description:
+              "Todo setelah seluruh field yang dapat diedit diganti.",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/Todo" },
+              },
+            },
+          },
+          "400": {
+            description: "Body tidak lengkap atau tidak valid.",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/Error" },
+              },
+            },
+          },
+          "404": {
+            description: "Todo tidak ditemukan.",
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/Error" },
+              },
+            },
           },
         },
       },
       delete: {
-        summary: "Hapus todo",
+        summary: "Delete todo",
         parameters: [
           { $ref: "#/components/parameters/owner" },
           {
@@ -205,10 +317,17 @@ export const spesifikasiOpenApi = {
           },
         ],
         responses: {
-          "204": { description: "Todo berhasil dihapus (tanpa body)." },
+          "204": {
+            description:
+              "Todo berhasil di-delete. Respons tidak memiliki body.",
+          },
           "404": {
             description: "Todo tidak ditemukan.",
-            content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } },
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/Error" },
+              },
+            },
           },
         },
       },
@@ -252,11 +371,19 @@ export const spesifikasiOpenApi = {
           },
           "400": {
             description: "Validasi gagal (nama/password terlalu pendek).",
-            content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } },
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/Error" },
+              },
+            },
           },
           "409": {
             description: "Nama sudah dipakai.",
-            content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } },
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/Error" },
+              },
+            },
           },
         },
       },
@@ -300,11 +427,19 @@ export const spesifikasiOpenApi = {
           },
           "400": {
             description: "Body tidak valid.",
-            content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } },
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/Error" },
+              },
+            },
           },
           "401": {
             description: "Nama atau password salah.",
-            content: { "application/json": { schema: { $ref: "#/components/schemas/Error" } } },
+            content: {
+              "application/json": {
+                schema: { $ref: "#/components/schemas/Error" },
+              },
+            },
           },
         },
       },
