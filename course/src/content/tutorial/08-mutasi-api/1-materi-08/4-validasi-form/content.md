@@ -114,9 +114,9 @@ React Hook Form memvalidasi input untuk membantu kamu mengisi form. API tetap me
 
 Jika API membalas status `400`, fungsi `kirimRequest` di `lib/todo-api.ts` membaca pesan error dari body. Form menampilkan pesan error melalui `setError`, sehingga kamu tahu alasan request gagal.
 
-## Coba di playground
+## Coba di project-mu
 
-Buka playground materi 08, lalu coba kirim:
+Jalankan form Todo di project-mu, lalu coba kirim:
 
 - Input kosong — pesan wajib diisi tampil tanpa request ke API.
 - Teks satu atau dua karakter — pesan minimal 3 karakter tampil.

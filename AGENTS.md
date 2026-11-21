@@ -19,6 +19,7 @@ Semua teks materi (`course/src/content/**/*.md`) ditulis seperti mentor yang sed
 ## Struktur project
 
 - `course/` — aplikasi TutorialKit (Astro). Build: `npm run build`.
+- `../playground-next-hsi/` — app demo LOKAL untuk mentor saat mengajar; TIDAK di-deploy dan tidak bisa diakses siswa. Materi dilarang menyuruh siswa membuka/mencoba di playground — arahkan selalu ke project siswa sendiri ("Coba di project-mu") atau ke preview/container TutorialKit.
 - Lesson: `course/src/content/tutorial/<part>/<chapter>/<lesson>/content.md` + `_files/` (file yang tampil di panel).
 - Template runtime: `course/src/templates/` — `baca` (server.js ringan, tanpa deps) untuk lesson bacaan; `nextjs` untuk lesson yang butuh Next.js jalan.
 - Frontmatter lesson: `template`, `focus`, `previews` (false = tanpa preview), `terminal` (false = tanpa terminal). `title` WAJIB ada di tiap objek preview (disembunyikan via CSS).
